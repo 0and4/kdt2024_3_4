@@ -9,7 +9,7 @@ import lombok.Setter;
 @Builder
 public class CrawlInfoDto {
     //곡 아이디
-    private int songId;
+    private Long songId;
 
     //곡 이름
     private String song;

@@ -18,4 +18,10 @@ public class ChartDetail {
 
     @Column(nullable = false)
     private int rank;
+
+    public ChartDetail(Chart chart,Song song, int rank) {
+        this.chart = chart;
+        this.song = song;
+        this.rank = rank;
+    }
 }

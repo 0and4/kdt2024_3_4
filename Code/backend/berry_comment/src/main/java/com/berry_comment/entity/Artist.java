@@ -1,8 +1,13 @@
 package com.berry_comment.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 @Entity
+@NoArgsConstructor
+@Getter
 public class Artist {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -14,4 +19,8 @@ public class Artist {
 
     @OneToMany(mappedBy = "artist")
     private List<Album> albumList;
+
+    public Artist(String name) {
+        this.name = name;
+    }
 }

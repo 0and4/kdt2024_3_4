@@ -1,21 +1,28 @@
 package com.berry_comment.service;
 
 import com.berry_comment.dto.CrawlInfoDto;
-import com.berry_comment.repository.ChartRepository;
+import com.berry_comment.entity.*;
+import com.berry_comment.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
 public class CrawlerService {
+    private final SongRepository songRepository;
+    private final AlbumRepository albumRepository;
+    private final ChartRepository chartRepository;
+    private final ChartDetailRepository chartDetailRepository;
 
     //TODO
     /*
@@ -30,7 +37,7 @@ public class CrawlerService {
 
        4. 아티스트 정보 갱신하기
     * */
-    private final ChartRepository chartRepository;
+    private final ArtistRepository artistRepository;
 
     public void crawl(LocalDateTime localDateTime) {
         ArrayList<CrawlInfoDto> crawlInfoDtoArrayList = new ArrayList<>();
@@ -77,7 +84,7 @@ public class CrawlerService {
                 System.out.printf("곡 아이디: %d 곡 이름: %s 아티스트: %s 앨범: %s 이미지 url: %s\n",dataSongId,songTitle,artist.toString(),albumTitle,imageUrl);
                 crawlInfoDtoArrayList.add(
                         CrawlInfoDto.builder()
-                                .songId(dataSongId)
+                                .songId((long) dataSongId)
                                 .song(songTitle)
                                 .artist(artist.toString())
                                 .album(albumTitle)
@@ -90,10 +97,59 @@ public class CrawlerService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        save(crawlInfoDtoArrayList);
+        save(crawlInfoDtoArrayList, localDateTime);
     }
 
-    public void save(ArrayList<CrawlInfoDto> crawlInfoDtoArrayList) {
+    @Transactional
+    public void save(ArrayList<CrawlInfoDto> crawlInfoDtoArrayList, LocalDateTime localDateTime) {
+        //분과 초는 0으로 지정 시간만 값이 있음
+        localDateTime = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonthValue(),localDateTime.getDayOfMonth(),localDateTime.getHour(),0,0);
+        Chart chart = new Chart(localDateTime);
+        //현재 시간대의 chart가 있다면 종료...
+        if(chartRepository.findByDateTime(localDateTime)!=null)
+            return;
+        //차트를 저장합니다.
+        chartRepository.save(chart);
 
+        //음악 저장 로직
+        crawlInfoDtoArrayList.forEach(crawlInfoDto -> {
+            //음악 엔티티
+            Song addSong;
+
+            //앨범 엔티티
+            Album album;
+
+            //아티스트 엔티티
+            Artist artist;
+            //음악 저장 로직
+            if(songRepository.findById(crawlInfoDto.getSongId()).isPresent())
+                addSong = songRepository.findById(crawlInfoDto.getSongId()).get();
+            else
+                addSong = new Song(crawlInfoDto.getSongId(),crawlInfoDto.getSong(), 0);
+
+            //앨범 저장 로직
+            if (albumRepository.findByName(crawlInfoDto.getAlbum()).isPresent())
+                album = albumRepository.findByName(crawlInfoDto.getAlbum()).get();
+            else
+                album = new Album(crawlInfoDto.getUrl(), crawlInfoDto.getAlbum());
+
+            //아티스트저장
+            if(artistRepository.findByName(crawlInfoDto.getArtist()).isPresent())
+                artist = artistRepository.findByName(crawlInfoDto.getArtist()).get();
+            else
+                artist = new Artist(crawlInfoDto.getArtist());
+
+            //앨범에 아티스트 지정하기 및 저장
+            album.setArtist(artist);
+            albumRepository.save(album);
+
+            //음악에 앨범 지정하기 및 저장
+            addSong.setAlbum(album);
+            songRepository.save(addSong);
+            
+            //차트 정보 저장하기
+            ChartDetail chartDetail = new ChartDetail(chart,addSong, crawlInfoDto.getRank());
+            chartDetailRepository.save(chartDetail);
+        });
     }
 }

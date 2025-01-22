@@ -1,10 +1,14 @@
 package com.berry_comment.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 @Entity
+@NoArgsConstructor
+@Getter
 public class Chart {
     //차트 정보를 나타내는 데이터베이스...?
     @Id
@@ -17,4 +21,8 @@ public class Chart {
 
     @OneToMany(mappedBy = "chart")
     private List<ChartDetail> chartDetailList;
+
+    public Chart(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
 }
