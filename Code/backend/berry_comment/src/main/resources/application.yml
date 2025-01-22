@@ -1,7 +1,26 @@
 spring:
+  datasource-data:
+    driver-class-name: org.h2.Driver
+    jdbc-url: jdbc:h2:~/berry_comment
+    username: sa
+    password: ""
+
+  datasource-meta:
+    driver-class-name: org.h2.Driver
+    jdbc-url: jdbc:h2:~/berry_comment_meta
+    username: sa
+    password: ""
+
+  #배치 자동 실행 방지
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
+      schema: classpath:org/springframework/batch/core/schema-@@platform@@.sql
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
   application:
     name: berry_comment
   security:
@@ -19,11 +38,6 @@ spring:
     console:
       enabled: true
       path: /h2-console
-  datasource:
-    driver-class-name: org.h2.Driver
-    url : jdbc:h2:~/berry_comment
-    username: sa
-    password:
 
 jwt:
   issuer: wjdehdwn2475@naver.com
@@ -32,6 +46,9 @@ jwt:
 password:
   secret-key: k9hRZxvPLu+DMIjFnZ4ynQeFYVG9ZDUph5ZbY3UOvAs=
 
+
+
 #logging:
 #  level:
 #    org.springframework.security: DEBUG
+

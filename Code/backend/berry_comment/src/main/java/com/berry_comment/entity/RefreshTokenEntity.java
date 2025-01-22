@@ -11,9 +11,10 @@ import lombok.NoArgsConstructor;
 public class RefreshTokenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private Long id;
 
-    @OneToOne(mappedBy = "refreshToken")
+    @JoinColumn
+    @OneToOne
     private UserEntity user;
 
     @Column(nullable = false)

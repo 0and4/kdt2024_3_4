@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @NoArgsConstructor
 @Getter
@@ -42,10 +45,12 @@ public class UserEntity {
     //oauth2유저인지 일반유저인지 확인
     private TypeUser typeUser;
 
-    @OneToOne
-    //리프레시 토큰 DB
-    @JoinColumn
+    @OneToOne(mappedBy = "user")
     private RefreshTokenEntity refreshToken;
+
+    //플레이리스트 관련
+    @OneToMany(mappedBy = "user")
+    private ArrayList<PlayList> playList;
 
     @Builder
     public UserEntity(String id, String name, String password, String email, String nickname , RoleUser roleUser, TypeUser typeUser) {

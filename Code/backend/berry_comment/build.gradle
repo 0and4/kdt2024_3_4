@@ -34,6 +34,10 @@ dependencies {
     implementation 'com.sun.xml.bind:jaxb-core:4.0.1'
     implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
     annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.jsoup:jsoup:1.16.1'
 }
 
 tasks.named('test') {
