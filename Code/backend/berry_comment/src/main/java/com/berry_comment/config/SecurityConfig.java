@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()// H2 콘솔 요청 허용
                         .requestMatchers("/").permitAll() //테스트 나중에 지워야 함
                         .requestMatchers("/user/user/profile").hasAuthority("NORMAL")
+                        .requestMatchers("/song/chart/**").hasAuthority("NORMAL")
                         .anyRequest().permitAll() // 나머지 요청은 인증 필요X
 
                 );

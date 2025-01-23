@@ -49,8 +49,8 @@ public class UserEntity {
     private RefreshTokenEntity refreshToken;
 
     //플레이리스트 관련
-    @OneToMany(mappedBy = "user")
-    private ArrayList<PlayList> playList;
+    @OneToMany(mappedBy = "user",orphanRemoval = true)
+    private List<PlayList> playList;
 
     @Builder
     public UserEntity(String id, String name, String password, String email, String nickname , RoleUser roleUser, TypeUser typeUser) {
@@ -63,8 +63,4 @@ public class UserEntity {
         this.typeUser = typeUser;
     }
 
-    //refreshToken 저장하는 함수
-    public void saveRefreshToken(RefreshTokenEntity refreshToken) {
-        this.refreshToken = refreshToken;
-    }
 }

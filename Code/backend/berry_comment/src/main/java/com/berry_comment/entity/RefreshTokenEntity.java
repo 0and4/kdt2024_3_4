@@ -20,12 +20,9 @@ public class RefreshTokenEntity {
     @Column(nullable = false)
     private String refreshToken;
 
-    public RefreshTokenEntity update(String newRefreshToken) {
-        this.refreshToken = newRefreshToken;
-        return this;
-    }
 
-    public RefreshTokenEntity(String refreshToken) {
+    public RefreshTokenEntity(String refreshToken,UserEntity user) {
         this.refreshToken = refreshToken;
+        this.user = user;
     }
 }

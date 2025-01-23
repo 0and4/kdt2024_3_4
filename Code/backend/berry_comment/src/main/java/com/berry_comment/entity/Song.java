@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 @Entity
 @Getter
@@ -25,16 +26,16 @@ public class Song {
     private List<PlayListDetail> playListSongInfoList;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "album_id")
     private Album album;
 
-    public Song(Long id, String track, int playTime) {
+    @OneToMany(mappedBy = "song", orphanRemoval = true)
+    private List<SongOfArtist> songOfArtistList;
+
+    public Song(Long id, String track, int playTime, Album album) {
         this.id = id;
         this.track = track;
         this.playTime = playTime;
-    }
-
-    public void setAlbum(Album album) {
         this.album = album;
     }
 }

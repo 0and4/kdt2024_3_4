@@ -69,6 +69,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                     null,
                     principalDetails.getAuthorities()
             );
+            
+            //유저 아이디가 널일때 예외처리가 필요함
+            
             //강제로 시큐어리티 세션에 접근하여 값을 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
             System.out.println("토큰 필터 제대로 적용... 사용자확인함..");

@@ -1,11 +1,16 @@
 package com.berry_comment.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 @Entity
 @NoArgsConstructor
+@ToString
+@Getter
 public class Album {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,21 +24,14 @@ public class Album {
     @Column(nullable = false)
     private String name;
 
-    //아티스트
-    @ManyToOne
-    @JoinColumn
-    private Artist artist;
-
     //음악
-    @OneToMany(mappedBy = "album")
+    @OneToMany(mappedBy = "album",fetch = FetchType.LAZY)
     private List<Song> songList;
+
 
     public Album(String imageUrl, String name) {
         this.imageUrl = imageUrl;
         this.name = name;
     }
 
-    public void setArtist(Artist artist) {
-        this.artist = artist;
-    }
 }

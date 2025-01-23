@@ -16,11 +16,11 @@ spring:
     job:
       enabled: false
     jdbc:
-      initialize-schema: always
+      initialize-schema: never
       schema: classpath:org/springframework/batch/core/schema-@@platform@@.sql
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
   application:
     name: berry_comment
   security:
@@ -52,3 +52,7 @@ password:
 #  level:
 #    org.springframework.security: DEBUG
 
+#lastfm Api 키
+lastFm:
+  api-key: 2874744429cca3473363099544497bfb
+  api-secret: fe0b79217fe2245cbf14e08076382d9f
