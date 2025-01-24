@@ -1,10 +1,11 @@
 import "./App.css";
+import Main from "./component/Main";
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h2>berrecommend</h2>
+        <Main></Main>
       </header>
     </div>
   );
