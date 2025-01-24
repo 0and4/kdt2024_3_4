@@ -7,25 +7,23 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @Getter
-public class ChartDetail {
+public class SongOfArtist {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "chart_id")
-    private Chart chart;
+    @JoinColumn
+    //해당 노래를 부른 아티스트들
+    private Artist artist;
 
     @ManyToOne
-    @JoinColumn(name = "song_id")
+    @JoinColumn
     private Song song;
 
-    @Column(nullable = false)
-    private int rank;
-
-    public ChartDetail(Chart chart,Song song, int rank) {
-        this.chart = chart;
+    public SongOfArtist(Artist artist, Song song) {
+        this.artist = artist;
         this.song = song;
-        this.rank = rank;
     }
 }

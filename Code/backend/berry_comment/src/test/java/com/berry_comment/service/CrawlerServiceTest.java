@@ -1,14 +1,26 @@
 package com.berry_comment.service;
 
+import com.berry_comment.entity.Song;
+import com.berry_comment.repository.SongRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 
+@SpringBootTest
 class CrawlerServiceTest {
+
+    @Autowired
+    private CrawlerService crawlerService;
+
+    @Autowired
+    private SongRepository songRepository;
+
     //크롤링 정보 테스트
     @Test
     void testCrawlerService() {
@@ -58,5 +70,21 @@ class CrawlerServiceTest {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    //실제로 잘 작동되는가 확인하고 있습니다.
+    @Test
+    public void testSchedule() throws InterruptedException {
+        //5초마다 크롤링 잘되는가 확인하기
+
+            LocalDateTime localDateTime = LocalDateTime.now().minusHours(2);
+            crawlerService.crawl(localDateTime);
+
+    }
+
+    @Test
+    public void getSong() {
+        Song song = songRepository.findById(38048464);
+        System.out.println("곡이름" + song.getTrack());
     }
 }

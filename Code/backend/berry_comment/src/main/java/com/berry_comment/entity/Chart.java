@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 @Entity
 @NoArgsConstructor
@@ -19,7 +20,7 @@ public class Chart {
     //생성된 차트날짜
     private LocalDateTime dateTime;
 
-    @OneToMany(mappedBy = "chart")
+    @OneToMany(mappedBy = "chart", orphanRemoval = true)
     private List<ChartDetail> chartDetailList;
 
     public Chart(LocalDateTime dateTime) {

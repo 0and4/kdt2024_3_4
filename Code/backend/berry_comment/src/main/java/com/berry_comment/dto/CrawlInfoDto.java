@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @Builder
@@ -15,7 +17,7 @@ public class CrawlInfoDto {
     private String song;
 
     //아티스트
-    private String artist;
+    private Set<String> artists;
 
     //앨범
     private String album;

@@ -99,13 +99,9 @@ public class PrincipalOauthUserService extends DefaultOAuth2UserService {
 
             //refreshToken 생성 및 저장하기
             String refreshToken = tokenProvider.generateToken(newUser, REFRESH_TOKEN_TIMEOUT);
-            RefreshTokenEntity refreshTokenEntity = new RefreshTokenEntity(refreshToken);
+            RefreshTokenEntity refreshTokenEntity = new RefreshTokenEntity(refreshToken, newUser);
             refreshTokenRepository.save(refreshTokenEntity);
-
-            //새로운 유저에 리프레시 토큰 지정
-            newUser.saveRefreshToken(refreshTokenEntity);
             System.out.println("유저저장 완료");
-            userRepository.save(newUser);
             return new PrincipalDetails(newUser, oAuth2User.getAttributes());
         }
         else {
