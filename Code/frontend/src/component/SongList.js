@@ -1,4 +1,11 @@
+import React, { useState } from "react";
 import styled from "styled-components";
+import {
+  LiaHeart,
+  LiaHeartSolid,
+  LiaPlusSolid,
+  LiaPlaySolid,
+} from "react-icons/lia";
 const Wrapper = styled.div`
   width: 100%;
 `;
@@ -17,7 +24,7 @@ const Header = styled.div`
   align-items: center;
   padding: 10px;
   font-weight: bold;
-  font-size: 1vw;
+  font-size: 1.3vh;
   background-color: #eee;
   border-bottom: 5px solid #ddd;
 `;
@@ -33,7 +40,7 @@ const SongRank = styled.div`
   justify-content: center;
 `;
 const SongInfoContainer = styled.div`
-  flex: 2;
+  flex: 1.5;
   display: flex;
 `;
 const SongCover = styled.div`
@@ -50,8 +57,7 @@ const SongInfo = styled.div`
   text-align: left;
 `;
 const Album = styled.div`
-  flex: 1;
-  text-align: center;
+  flex: 0.7;
   text-align: left;
 `;
 const Duration = styled.div`
@@ -64,14 +70,27 @@ const Actions = styled.div`
   justify-content: space-around;
 `;
 const Button = styled.button`
-  padding: 5px 10px;
-  border: none;
-  border-radius: 3px;
-  background-color: #007bff;
-  color: white;
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid ${(props) => (props.liked ? "#e41111" : "#0a0a0a")};
+  background-color: #f9f9f9;
+  border-radius: 50%;
   cursor: pointer;
-  &:hover {
-    background-color: #0056b3;
+  color: ${(props) => (props.liked ? "#e41111" : "inherit")};
+
+  &:hover,
+  &:active {
+    color: #717171;
+    border-color: #717171;
+  }
+  &:first-child:hover,
+  &:first-child:active {
+    color: #e41111;
+    border-color: #e41111;
   }
 `;
 
@@ -150,14 +169,23 @@ const songs = [
 ];
 
 function SongList() {
+  const [likedSongs, setLikedSongs] = useState([]); // 찜한 노래의 ID를 저장
+
+  const toggleLike = (rank) => {
+    setLikedSongs(
+      (prevLikedSongs) =>
+        prevLikedSongs.includes(rank)
+          ? prevLikedSongs.filter((id) => id !== rank) // 찜 해제
+          : [...prevLikedSongs, rank] // 찜 추가
+    );
+  };
   return (
     <Wrapper>
       <Container>
         <Header>
-          <div>선택</div>
           <div style={{ flex: 0.3 }}>순위</div>
-          <div style={{ flex: 2 }}>곡 정보</div>
-          <div style={{ flex: 1 }}>앨범</div>
+          <div style={{ flex: 1.5 }}>곡 정보</div>
+          <div style={{ flex: 0.7 }}>앨범</div>
           <Duration>재생시간</Duration>
           <Actions>
             <div>찜하기</div>
@@ -179,9 +207,22 @@ function SongList() {
             <Album>{song.album}</Album>
             <Duration>{song.duration}</Duration>
             <Actions>
-              <Button>찜하기</Button>
-              <Button>추가</Button>
-              <Button>듣기</Button>
+              <Button
+                liked={likedSongs.includes(song.rank)}
+                onClick={() => toggleLike(song.rank)}
+              >
+                {likedSongs.includes(song.rank) ? (
+                  <LiaHeartSolid />
+                ) : (
+                  <LiaHeart />
+                )}
+              </Button>
+              <Button>
+                <LiaPlusSolid />
+              </Button>
+              <Button>
+                <LiaPlaySolid />
+              </Button>
             </Actions>
           </SongItem>
         ))}

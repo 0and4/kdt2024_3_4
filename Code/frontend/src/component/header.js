@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
 import logo from "../images/logo.png";
@@ -71,10 +72,11 @@ const SearchDiv = styled.div`
 `;
 const MenuDiv = styled.div`
   display: flex;
-  width: 60%;
   align-self: flex-end;
   gap: 10px;
+  margin: 0 auto;
   button {
+    width: 90px;
     padding: 8px 25px;
     font-size: 1rem;
     font-weight: bold;
@@ -91,14 +93,20 @@ const MenuDiv = styled.div`
       color: #495057;
       border-bottom: 3px solid #68009b;
     }
-  }
-  button:last-child {
-    margin-left: auto;
-    margin-right: 3vw;
-    font-size: 0.9rem;
+    &:last-child {
+      width: 120px;
+      align-item: right;
+      margin-right: 3vw;
+      font-size: 0.8rem;
+    }
   }
 `;
 function Header() {
+  const [activeMenu, setActiveMenu] = useState("chart");
+
+  const handleMenuClick = (menu) => {
+    setActiveMenu(menu);
+  };
   return (
     <Wrapper>
       <Container>
@@ -114,9 +122,24 @@ function Header() {
           <input placeholder="검색어를 입력하세요 !"></input>
         </SearchDiv>
         <MenuDiv>
-          <button>차트</button>
-          <button>추천</button>
-          <button>마이페이지</button>
+          <button
+            className={activeMenu === "chart" ? "active" : ""}
+            onClick={() => handleMenuClick("chart")}
+          >
+            차트
+          </button>
+          <button
+            className={activeMenu === "recommend" ? "active" : ""}
+            onClick={() => handleMenuClick("recommend")}
+          >
+            추천
+          </button>
+          <button
+            className={activeMenu === "mypage" ? "active" : ""}
+            onClick={() => handleMenuClick("mypage")}
+          >
+            마이페이지
+          </button>
         </MenuDiv>
       </Container>
     </Wrapper>
