@@ -100,6 +100,7 @@ const MenuDiv = styled.div`
   height: 45px;
 
   button {
+    width: 90px;
     padding: 8px 25px;
     border: 3px solid #ffffff;
     background-color: #ffffff;
