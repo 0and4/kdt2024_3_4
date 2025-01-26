@@ -21,4 +21,9 @@ public class PlayList {
     @ManyToOne
     @JoinColumn
     private UserEntity user;
+
+    public PlayList(String playListName, UserEntity user) {
+        this.playListName = playListName;
+        this.user = user;
+    }
 }

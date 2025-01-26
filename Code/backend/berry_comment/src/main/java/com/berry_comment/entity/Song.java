@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 @Entity
 @Getter
@@ -32,10 +31,15 @@ public class Song {
     @OneToMany(mappedBy = "song", orphanRemoval = true)
     private List<SongOfArtist> songOfArtistList;
 
-    public Song(Long id, String track, int playTime, Album album) {
+    //곡의 장르
+    @Column(nullable = false)
+    private String genre;
+
+    public Song(Long id, String track, int playTime, Album album, String genre) {
         this.id = id;
         this.track = track;
         this.playTime = playTime;
         this.album = album;
+        this.genre = genre;
     }
 }

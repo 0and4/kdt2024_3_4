@@ -1,14 +1,14 @@
 package com.berry_comment.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import java.util.Set;
-
+import java.util.Map;
+import java.util.List;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CrawlInfoDto {
     //곡 아이디
     private Long songId;
@@ -17,7 +17,7 @@ public class CrawlInfoDto {
     private String song;
 
     //아티스트
-    private Set<String> artists;
+    private List<ArtistDto> artists;
 
     //앨범
     private String album;
@@ -28,4 +28,6 @@ public class CrawlInfoDto {
     //랭킹
     private int rank;
 
+    //장르
+    private String genre;
 }

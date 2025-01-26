@@ -1,5 +1,6 @@
 package com.berry_comment.service;
 
+import com.berry_comment.dto.ArtistDto;
 import com.berry_comment.dto.CrawlInfoDto;
 import com.berry_comment.entity.*;
 import com.berry_comment.repository.*;
@@ -8,9 +9,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -62,46 +66,74 @@ public class CrawlerService {
             AtomicInteger rank = new AtomicInteger(1);
             //아티스트 셋
             rankElements.stream().forEach(element -> {
+                CrawlInfoDto crawlInfoDto = new CrawlInfoDto();
+                crawlInfoDto.setArtists(new ArrayList<>());
                 //곡 ID
                 int dataSongId = Integer.parseInt(element.selectFirst("tr").attr("data-song-no"));
 
                 //곡 이름
                 String songTitle = element.selectFirst("a[title*='재생']").text();
-                Elements artistElements = element.select("div.ellipsis.rank02 a");
-                //중복된 값을 넣게 하지 않기 위함...
-                Set<String> artistSet = new HashSet<>();
-
-                for(int i = 0;i < artistElements.size();i++) {
-                    Element artistElement = artistElements.get(i);
-                    //중복된 값이 들어가도 오류 X
-                    artistSet.add(artistElement.text());
-                }
-                artistSet.forEach(
-                        artist -> {
-                            System.out.println("아티스트들: "+artist);
-                        }
-                );
+//                Elements artistElements = element.select("div.ellipsis.rank02 a");
+//                //중복된 값을 넣게 하지 않기 위함...
+//                Set<String> artistSet = new HashSet<>();
+//
+//                for(int i = 0;i < artistElements.size();i++) {
+//                    Element artistElement = artistElements.get(i);
+//                    //중복된 값이 들어가도 오류 X
+//                    artistSet.add(artistElement.text());
+//                }
+//                artistSet.forEach(
+//                        artist -> {
+//                            System.out.println("아티스트들: "+artist);
+//                        }
+//                );
 
                 //5앨범 제목 추출
                 // 5. 앨범 제목 추출
                 String albumTitle = element.selectFirst("div.ellipsis.rank03 a").text();
                 String imageUrl = element.selectFirst("img").attr("src");
-                crawlInfoDtoArrayList.add(
-                        CrawlInfoDto.builder()
-                                .songId((long) dataSongId)
-                                .song(songTitle)
-                                .artists(artistSet)
-                                .album(albumTitle)
-                                .url(imageUrl)
-                                .rank(rank.getAndIncrement())
-                                .build()
-                );
-                System.out.println(rank.get());
+                crawlInfoDto.setSongId((long) dataSongId);
+                crawlInfoDto.setSong(songTitle);
+                crawlInfoDto.setRank(rank.getAndIncrement());
+                crawlInfoDto.setAlbum(albumTitle);
+                crawlInfoDto.setUrl(imageUrl);
+                setGenreAndArtist((long)dataSongId, crawlInfoDto);
+                crawlInfoDtoArrayList.add(crawlInfoDto);
             });
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         save(crawlInfoDtoArrayList, localDateTime);
+    }
+
+    public void setGenreAndArtist(Long songId, CrawlInfoDto crawlInfoDto){
+
+        String url = "https://www.melon.com/song/detail.htm?songId=" + songId;
+        try{
+            Document document = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36").get();
+            Elements elements = document.getElementsByTag("dd");
+            String genre = elements.get(2).text();
+            System.out.println("장르 "+ genre);
+            crawlInfoDto.setGenre(genre);
+
+            Elements artistElements = document.selectXpath("//*[@id=\"downloadfrm\"]/div/div/div[2]/div[1]");
+            artistElements = artistElements.get(0).getElementsByClass("artist_name");
+            for (Element element : artistElements) {
+                ArtistDto artistDto = new ArtistDto();
+                String artistName = element.selectFirst("span").text();
+                Element imgElement = element.selectFirst("span.thumb_atist img");
+                String imageUrl = (imgElement != null) ? imgElement.attr("src") : "";
+                System.out.println("아티스트 이름: " + artistName);
+                System.out.println("이미지 URL: " + imageUrl);
+                artistDto.setArtistName(artistName);
+                artistDto.setImageUrl(imageUrl);
+                crawlInfoDto.getArtists().add(artistDto);
+            }
+
+
+        } catch (IOException e) {
+
+        }
     }
 
     @Transactional
@@ -129,14 +161,13 @@ public class CrawlerService {
                 Set<Artist> artistsSet = new HashSet<>();
 
                 //엔티티 저장 순서 아티스트 -> (앨범 -> 앨범아티스트디테일)
-
-                //아티스트 저장 로직
                 crawlInfoDto.getArtists().forEach(artistDto -> {
-                    Optional<Artist> artist = artistRepository.findByName(artistDto);
+                    System.out.println("아티스트 찾기");
+                    Optional<Artist> artist = artistRepository.findByName(artistDto.getArtistName());
                     //만약 존재하지 않는 아티스트라면
                     if(artist.isEmpty()){
                         //새로운 아티스트 추가
-                        Artist newArtist = new Artist(artistDto);
+                        Artist newArtist = new Artist(artistDto.getArtistName(), artistDto.getImageUrl());
 
                         //아티스트DB에 아티스트추가
                         artistRepository.save(newArtist);
@@ -176,8 +207,9 @@ public class CrawlerService {
                             playTime = 0;
                         }
                     }
+
                     //음악 저장후
-                    addSong = new Song(crawlInfoDto.getSongId(), crawlInfoDto.getSong(), playTime, album);
+                    addSong = new Song(crawlInfoDto.getSongId(), crawlInfoDto.getSong(), playTime, album, crawlInfoDto.getGenre());
                     songRepository.save(addSong);
 
                     //앨범 디테일 저장하기

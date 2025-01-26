@@ -9,10 +9,10 @@ import com.berry_comment.oauth.PrincipalDetails;
 import com.berry_comment.oauth.provider.GoogleUserInfo;
 import com.berry_comment.repository.RefreshTokenRepository;
 import com.berry_comment.repository.UserRepository;
+import com.berry_comment.service.PlayListService;
 import com.berry_comment.type.RoleUser;
 import com.berry_comment.type.TypeUser;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -35,12 +34,9 @@ public class PrincipalOauthUserService extends DefaultOAuth2UserService {
     private final PasswordProperties passwordProperties;
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
-
+    private final PlayListService playListService;
     //리프레시 토큰 유효시간
     public static final Duration REFRESH_TOKEN_TIMEOUT = ConstantValue.REFRESH_TOKEN_EXPIRE;
-
-    //액세스 토큰 유효시간
-    public static final Duration ACCESS_TOKEN_TIMEOUT = ConstantValue.ACCESS_TOKEN_EXPIRE;
 
     @Override
     @Transactional
@@ -101,7 +97,10 @@ public class PrincipalOauthUserService extends DefaultOAuth2UserService {
             String refreshToken = tokenProvider.generateToken(newUser, REFRESH_TOKEN_TIMEOUT);
             RefreshTokenEntity refreshTokenEntity = new RefreshTokenEntity(refreshToken, newUser);
             refreshTokenRepository.save(refreshTokenEntity);
+
+            //내가 좋아하는 플레이리스트 만들기
             System.out.println("유저저장 완료");
+            playListService.createMyFavouriteSongList(newUser);
             return new PrincipalDetails(newUser, oAuth2User.getAttributes());
         }
         else {

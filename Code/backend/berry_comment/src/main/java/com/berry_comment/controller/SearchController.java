@@ -2,6 +2,8 @@ package com.berry_comment.controller;
 
 import com.berry_comment.dto.ListInfoDto;
 import com.berry_comment.dto.SongChartDto;
+import com.berry_comment.service.AlbumService;
+import com.berry_comment.service.ArtistService;
 import com.berry_comment.service.ChartService;
 import com.berry_comment.service.SongService;
 import com.berry_comment.type.SearchType;
@@ -24,6 +26,8 @@ import java.time.LocalDateTime;
 public class SearchController {
     private final SongService songService;
     private final ChartService chartService;
+    private final AlbumService albumService;
+    private final ArtistService artistService;
     @GetMapping("/chart")
     public ResponseEntity<?> getChartList(
             @PageableDefault(
@@ -58,7 +62,16 @@ public class SearchController {
             case SearchType.SONG:
                 listInfoDto = songService.getSongList(value,pageable);
                 break;
+
             //앨범일경우 작성하기
+            case SearchType.ALBUM:
+                listInfoDto = albumService.getAlbumListByName(value,pageable);
+                break;
+
+            case SearchType.ARTIST:
+                listInfoDto = artistService.getInformationArtistByName(value, pageable);
+                break;
+
             default:
                 return ResponseEntity.badRequest().build();
         }
