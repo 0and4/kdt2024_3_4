@@ -1,11 +1,11 @@
 import "./App.css";
-import Main from "./component/Main";
+import FindPw from "./component/FindPW"; // 파일 경로 및 이름 업데이트
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <Main></Main>
+        <FindPw />
       </header>
     </div>
   );
