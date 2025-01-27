@@ -13,11 +13,12 @@ const Wrapper = styled.div`
 `;
 const Container = styled.div`
   width: 100%;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
   div {
-    margin: 0 10px;
+    margin: 0;
+    gap: 5px;
+    font-size: 0.9rem;
   }
 `;
 const Header = styled.div`
