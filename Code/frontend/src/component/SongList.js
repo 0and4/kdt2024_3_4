@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import AddPopup from "./ui/AddPopup";
 import {
   LiaHeart,
   LiaHeartSolid,
@@ -8,6 +9,7 @@ import {
 } from "react-icons/lia";
 const Wrapper = styled.div`
   width: 100%;
+  position: relative;
 `;
 const Container = styled.div`
   width: 100%;
@@ -169,7 +171,16 @@ const songs = [
 ];
 
 function SongList() {
+  //임의의 플레이리스트 목록
+  const playlists = [
+    { name: "플레이리스트 1" },
+    { name: "플레이리스트 2" },
+    { name: "플레이리스트 3" },
+  ];
+
   const [likedSongs, setLikedSongs] = useState([]); // 찜한 노래의 ID를 저장
+  const [popupPosition, setPopupPosition] = useState(null); // 팝업 위치
+  const popupRef = React.useRef(null);
 
   const toggleLike = (rank) => {
     setLikedSongs(
@@ -179,8 +190,42 @@ function SongList() {
           : [...prevLikedSongs, rank] // 찜 추가
     );
   };
+  const handleAddClick = (e) => {
+    const rect = e.target.getBoundingClientRect();
+    setPopupPosition({
+      top: rect.top + window.scrollY - 300,
+      left: rect.left + window.scrollX - 200,
+    });
+  };
+  const handlePopupClick = (e) => {
+    e.stopPropagation();
+  };
+  const closePopup = () => setPopupPosition(null);
+  // 화면 밖 클릭 시 팝업 닫기
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (popupRef.current && !popupRef.current.contains(e.target)) {
+        closePopup();
+      }
+    };
+    if (popupPosition) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [popupPosition]);
   return (
     <Wrapper>
+      {popupPosition && (
+        <AddPopup
+          ref={popupRef}
+          position={popupPosition}
+          onClose={closePopup}
+          onClick={handlePopupClick}
+          playlists={playlists}
+        />
+      )}
       <Container>
         <Header>
           <div style={{ flex: 0.3 }}>순위</div>
@@ -217,7 +262,7 @@ function SongList() {
                   <LiaHeart />
                 )}
               </Button>
-              <Button>
+              <Button onClick={handleAddClick}>
                 <LiaPlusSolid />
               </Button>
               <Button>
