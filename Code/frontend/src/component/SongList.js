@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+=======
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+>>>>>>> 3c6cd8a (Main>추가 버튼 팝업 구현)
 import AddPopup from "./ui/AddPopup";
 import {
   LiaHeart,
@@ -8,8 +13,15 @@ import {
   LiaPlusSolid,
   LiaPlaySolid,
 } from "react-icons/lia";
+<<<<<<< HEAD
 
 const Wrapper = styled.div``;
+=======
+const Wrapper = styled.div`
+  width: 100%;
+  position: relative;
+`;
+>>>>>>> 3c6cd8a (Main>추가 버튼 팝업 구현)
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -99,6 +111,7 @@ const Button = styled.button`
     border-color: #e41111;
   }
 `;
+<<<<<<< HEAD
 const LikePopup = styled.div`
   position: fixed;
   bottom: 20px;
@@ -120,6 +133,94 @@ function SongList({ showAll, headerTitle, songs = [] }) {
   const [showLikePopup, setShowLikePopup] = useState(false);
   const [popupPosition, setPopupPosition] = useState(null);
   const popupRef = useRef(null);
+=======
+
+//임의의 노래 목록
+const songs = [
+  {
+    rank: 1,
+    title: "Song A",
+    artist: "Artist A",
+    album: "Album A",
+    duration: "3:45",
+  },
+  {
+    rank: 2,
+    title: "Song B",
+    artist: "Artist B",
+    album: "Album B",
+    duration: "4:00",
+  },
+  {
+    rank: 3,
+    title: "Song C",
+    artist: "Artist C",
+    album: "Album C",
+    duration: "3:30",
+  },
+  {
+    rank: 4,
+    title: "Song D",
+    artist: "Artist D",
+    album: "Album D",
+    duration: "3:50",
+  },
+  {
+    rank: 5,
+    title: "Song E",
+    artist: "Artist E",
+    album: "Album E",
+    duration: "4:10",
+  },
+  {
+    rank: 6,
+    title: "Song F",
+    artist: "Artist F",
+    album: "Album F",
+    duration: "3:25",
+  },
+  {
+    rank: 7,
+    title: "Song G",
+    artist: "Artist G",
+    album: "Album G",
+    duration: "3:15",
+  },
+  {
+    rank: 8,
+    title: "Song H",
+    artist: "Artist H",
+    album: "Album H",
+    duration: "4:05",
+  },
+  {
+    rank: 9,
+    title: "Song I",
+    artist: "Artist I",
+    album: "Album I",
+    duration: "3:40",
+  },
+  {
+    rank: 10,
+    title: "Song J",
+    artist: "Artist J",
+    album: "Album J",
+    duration: "3:55",
+  },
+];
+
+function SongList() {
+  //임의의 플레이리스트 목록
+  const playlists = [
+    { name: "플레이리스트 1" },
+    { name: "플레이리스트 2" },
+    { name: "플레이리스트 3" },
+  ];
+
+  const [likedSongs, setLikedSongs] = useState([]); // 찜한 노래의 ID를 저장
+  const [popupPosition, setPopupPosition] = useState(null); // 팝업 위치
+  const popupRef = React.useRef(null);
+>>>>>>> 3c6cd8a (Main>추가 버튼 팝업 구현)
 
   const toggleLike = (rank) => {
     setLikedSongs((prev) => {
@@ -133,6 +234,7 @@ function SongList({ showAll, headerTitle, songs = [] }) {
       return isLiked ? prev.filter((id) => id !== rank) : [...prev, rank];
     });
   };
+<<<<<<< HEAD
   const handleCheckboxChange = (rank) => {
     setSelectedSongs((prev) => {
       const newSelected = prev.includes(rank)
@@ -152,6 +254,8 @@ function SongList({ showAll, headerTitle, songs = [] }) {
     }
     setAllSelected(!allSelected);
   };
+=======
+>>>>>>> 3c6cd8a (Main>추가 버튼 팝업 구현)
   const handleAddClick = (e) => {
     const rect = e.target.getBoundingClientRect();
     setPopupPosition({
@@ -159,9 +263,17 @@ function SongList({ showAll, headerTitle, songs = [] }) {
       left: rect.left + window.scrollX - 200,
     });
   };
+<<<<<<< HEAD
 
   const closePopup = () => setPopupPosition(null);
 
+=======
+  const handlePopupClick = (e) => {
+    e.stopPropagation();
+  };
+  const closePopup = () => setPopupPosition(null);
+  // 화면 밖 클릭 시 팝업 닫기
+>>>>>>> 3c6cd8a (Main>추가 버튼 팝업 구현)
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (popupRef.current && !popupRef.current.contains(e.target)) {
@@ -175,9 +287,12 @@ function SongList({ showAll, headerTitle, songs = [] }) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [popupPosition]);
+<<<<<<< HEAD
 
   const displayedSongs = showAll ? songs : songs.slice(0, 5); // showAll에 따라 전체 목록 또는 5곡만 표시
 
+=======
+>>>>>>> 3c6cd8a (Main>추가 버튼 팝업 구현)
   return (
     <Wrapper>
       {popupPosition && (
@@ -185,7 +300,12 @@ function SongList({ showAll, headerTitle, songs = [] }) {
           ref={popupRef}
           position={popupPosition}
           onClose={closePopup}
+<<<<<<< HEAD
           //playlists={/* 전달할 플레이리스트 배열 */}
+=======
+          onClick={handlePopupClick}
+          playlists={playlists}
+>>>>>>> 3c6cd8a (Main>추가 버튼 팝업 구현)
         />
       )}
       <Container>

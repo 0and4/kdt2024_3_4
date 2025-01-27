@@ -85,7 +85,11 @@ const SaveBtn = styled.button`
   cursor: pointer;
 `;
 
+<<<<<<< HEAD
 function AddPopup({ position, onClose, playlists = [] }) {
+=======
+function AddPopup({ position, onClose, playlists }) {
+>>>>>>> 3c6cd8a (Main>추가 버튼 팝업 구현)
   return (
     <PopupWrapper position={position}>
       <div>
