@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
 import logo from "../images/logo.png";
@@ -71,19 +71,18 @@ const SearchDiv = styled.div`
   }
 `;
 const MenuDiv = styled.div`
-  display: flex;
-  align-self: flex-end;
-  gap: 10px;
-  margin: 0 auto;
+  position: relative;
+  width: 100%;
+  height: 45px;
+
   button {
-    width: 90px;
     padding: 8px 25px;
-    font-size: 1rem;
-    font-weight: bold;
     border: 3px solid #ffffff;
     background-color: #ffffff;
     cursor: pointer;
     transition: border-bottom 0.2s, color 0.2s;
+    font-weight: bold;
+    font-size: 0.9rem;
 
     &:hover {
       color: #68009b;
@@ -93,20 +92,36 @@ const MenuDiv = styled.div`
       color: #495057;
       border-bottom: 3px solid #68009b;
     }
-    &:last-child {
-      width: 120px;
-      align-item: right;
-      margin-right: 3vw;
-      font-size: 0.8rem;
-    }
+  }
+  .active {
+    color: #68009b;
+    border-bottom: 3px solid #68009b;
   }
 `;
-function Header() {
-  const [activeMenu, setActiveMenu] = useState("chart");
-
-  const handleMenuClick = (menu) => {
-    setActiveMenu(menu);
-  };
+const MainMenuDiv = styled.div`
+  position: relative;
+  top: 20px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+`;
+const MyMenuDiv = styled.div`
+  position: absolute;
+  top: 2px;
+  right: 0;
+  width: 130px;
+  font-size: 0.7rem;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 3vw;
+  button {
+    font-size: 0.7rem;
+  }
+`;
+function Header({ activeMenu, onMenuClick }) {
   return (
     <Wrapper>
       <Container>
@@ -121,25 +136,30 @@ function Header() {
           </button>
           <input placeholder="검색어를 입력하세요 !"></input>
         </SearchDiv>
+
         <MenuDiv>
-          <button
-            className={activeMenu === "chart" ? "active" : ""}
-            onClick={() => handleMenuClick("chart")}
-          >
-            차트
-          </button>
-          <button
-            className={activeMenu === "recommend" ? "active" : ""}
-            onClick={() => handleMenuClick("recommend")}
-          >
-            추천
-          </button>
-          <button
-            className={activeMenu === "mypage" ? "active" : ""}
-            onClick={() => handleMenuClick("mypage")}
-          >
-            마이페이지
-          </button>
+          <MainMenuDiv>
+            <button
+              className={activeMenu === "chart" ? "active" : ""}
+              onClick={() => onMenuClick("chart")}
+            >
+              차트
+            </button>
+            <button
+              className={activeMenu === "recommend" ? "active" : ""}
+              onClick={() => onMenuClick("recommend")}
+            >
+              추천
+            </button>
+          </MainMenuDiv>
+          <MyMenuDiv>
+            <button
+              className={activeMenu === "mypage" ? "active" : ""}
+              onClick={() => onMenuClick("mypage")}
+            >
+              마이페이지
+            </button>
+          </MyMenuDiv>
         </MenuDiv>
       </Container>
     </Wrapper>

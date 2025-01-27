@@ -6,6 +6,9 @@ const SongListDiv = styled.div`
   flex: 3;
   overflow-y: auto;
   padding: 10px;
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const TabMenu = styled.ul`
@@ -34,7 +37,6 @@ const TabMenu = styled.ul`
 `;
 
 const TabContent = styled.div`
-  margin-top: 10px;
   ul {
     padding: 0;
     margin: 0;
@@ -42,7 +44,7 @@ const TabContent = styled.div`
   }
 
   li {
-    padding: 10px;
+    padding: 5px 10px;
     margin: 0;
   }
 `;
@@ -55,8 +57,8 @@ const SongItem = styled.li`
 `;
 
 const AlbumCover = styled.div`
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   background-color: #ddd;
   margin-right: 10px;
 `;
@@ -69,12 +71,12 @@ const SongInfo = styled.div`
 
 const SongTitle = styled.span`
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   text-align: left;
 `;
 
 const ArtistName = styled.span`
-  font-size: 0.8rem;
+  font-size: 0.6rem;
   text-align: left;
   color: #555;
 `;
@@ -91,8 +93,8 @@ const PlaylistItem = styled.li`
 `;
 
 const PlaylistCover = styled.div`
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   background-color: #ddd;
   margin-right: 10px;
 `;
@@ -105,7 +107,7 @@ const PlaylistInfo = styled.div`
 
 const PlaylistTitle = styled.span`
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   text-align: left;
 `;
 
@@ -118,6 +120,17 @@ const PlayButton = styled.button`
 `;
 function PlaySongList() {
   const [activeTab, setActiveTab] = useState("playlist"); // 현재 활성화된 탭 상태
+  const playlistData = [
+    { title: "노래 1", artist: "가수 1" },
+    { title: "노래 2", artist: "가수 2" },
+    { title: "노래 3", artist: "가수 3" },
+  ];
+
+  const mylistData = [
+    { title: "플레이리스트 1" },
+    { title: "플레이리스트 2" },
+    { title: "플레이리스트 3" },
+  ];
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -142,58 +155,30 @@ function PlaySongList() {
       <TabContent>
         {activeTab === "playlist" && (
           <ul>
-            <SongItem>
-              <AlbumCover />
-              <SongInfo>
-                <SongTitle>노래 1</SongTitle>
-                <ArtistName>가수 1</ArtistName>
-              </SongInfo>
-            </SongItem>
-            <SongItem>
-              <AlbumCover />
-              <SongInfo>
-                <SongTitle>노래 2</SongTitle>
-                <ArtistName>가수 2</ArtistName>
-              </SongInfo>
-            </SongItem>
-            <SongItem>
-              <AlbumCover />
-              <SongInfo>
-                <SongTitle>노래 3</SongTitle>
-                <ArtistName>가수 3</ArtistName>
-              </SongInfo>
-            </SongItem>
+            {playlistData.map((song, index) => (
+              <SongItem key={index}>
+                <AlbumCover />
+                <SongInfo>
+                  <SongTitle>{song.title}</SongTitle>
+                  <ArtistName>{song.artist}</ArtistName>
+                </SongInfo>
+              </SongItem>
+            ))}
           </ul>
         )}
         {activeTab === "mylist" && (
           <ul>
-            <PlaylistItem>
-              <PlaylistCover />
-              <PlaylistInfo>
-                <PlaylistTitle>플레이리스트 1</PlaylistTitle>
-              </PlaylistInfo>
-              <PlayButton>
-                <FaPlay />
-              </PlayButton>
-            </PlaylistItem>
-            <PlaylistItem>
-              <PlaylistCover />
-              <PlaylistInfo>
-                <PlaylistTitle>플레이리스트 2</PlaylistTitle>
-              </PlaylistInfo>
-              <PlayButton>
-                <FaPlay />
-              </PlayButton>
-            </PlaylistItem>
-            <PlaylistItem>
-              <PlaylistCover />
-              <PlaylistInfo>
-                <PlaylistTitle>플레이리스트 3</PlaylistTitle>
-              </PlaylistInfo>
-              <PlayButton>
-                <FaPlay />
-              </PlayButton>
-            </PlaylistItem>
+            {mylistData.map((playlist, index) => (
+              <PlaylistItem key={index}>
+                <PlaylistCover />
+                <PlaylistInfo>
+                  <PlaylistTitle>{playlist.title}</PlaylistTitle>
+                </PlaylistInfo>
+                <PlayButton>
+                  <FaPlay />
+                </PlayButton>
+              </PlaylistItem>
+            ))}
           </ul>
         )}
       </TabContent>

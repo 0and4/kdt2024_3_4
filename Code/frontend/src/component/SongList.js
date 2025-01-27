@@ -22,9 +22,9 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 5px;
   font-weight: bold;
-  font-size: 1.3vh;
+  font-size: 0.8rem;
   background-color: #eee;
   border-bottom: 5px solid #ddd;
 `;
@@ -32,7 +32,7 @@ const SongItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 5px;
   background-color: #f9f9f9;
 `;
 const SongRank = styled.div`
@@ -208,7 +208,7 @@ function SongList() {
             <Duration>{song.duration}</Duration>
             <Actions>
               <Button
-                liked={likedSongs.includes(song.rank)}
+                liked={likedSongs.includes(song.rank) ? "true" : undefined}
                 onClick={() => toggleLike(song.rank)}
               >
                 {likedSongs.includes(song.rank) ? (

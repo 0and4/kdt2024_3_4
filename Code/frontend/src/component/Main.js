@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import styled from "styled-components";
 import Header from "./header";
 import SongList from "./SongList";
@@ -6,9 +7,17 @@ import Player from "./Player";
 const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
+  position: relative;
+  overflow-x: auto;
+  @media (max-width: 768px) {
+    flex-direction: column; /* 화면이 좁을 때 세로로 변경 */
+  }
 `;
 const Container = styled.div`
-  width: 100%;
+  width: calc(100% - 250px);
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 const MenuDiv = styled.div`
   display: flex;
@@ -43,19 +52,36 @@ const TodayP = styled.p`
   }
 `;
 function Main() {
+  const [activeMenu, setActiveMenu] = useState("chart");
+
+  const handleMenuClick = (menu) => {
+    if (activeMenu === menu) {
+      setActiveMenu(""); // active 상태 해제
+    } else {
+      setActiveMenu(menu); // 다른 메뉴 클릭 시 active 상태 설정
+    }
+  };
   return (
     <Wrapper>
       <Container>
-        <Header />
-        <TodayP>
-          <span>2025.01.17</span> TOP 100
-        </TodayP>
-        <MenuDiv>
-          <AllBtn>전체 듣기</AllBtn>
-          <ShuffleBtn>셔플 듣기</ShuffleBtn>
-          <BasketBtn>담기</BasketBtn>
-        </MenuDiv>
-        <SongList></SongList>
+        <Header activeMenu={activeMenu} onMenuClick={handleMenuClick} />
+        <div>
+          {/* activeMenu에 따라 렌더링될 내용 */}
+          {activeMenu === "chart" && (
+            <>
+              <TodayP>
+                <span>2025.01.17</span> TOP 100
+              </TodayP>
+              <MenuDiv>
+                <AllBtn>전체 듣기</AllBtn>
+                <ShuffleBtn>셔플 듣기</ShuffleBtn>
+                <BasketBtn>담기</BasketBtn>
+              </MenuDiv>
+              <SongList />
+            </>
+          )}
+          {/* 다른 메뉴에 따라 다른 내용을 표시하려면 여기에 추가 가능 */}
+        </div>
       </Container>
       <Player />
     </Wrapper>
