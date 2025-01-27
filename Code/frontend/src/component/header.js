@@ -3,16 +3,18 @@ import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
 import logo from "../images/logo.png";
 const Wrapper = styled.div`
-  padding: 16px;
-  width: 100%;
+  position: relative;
   border-bottom: 3px solid #dee2e6;
 `;
 const Container = styled.div`
-  width: 100%;
-  margin: 0 auto;
+  width: calc(100% - 250px);
+  margin: 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 const LoginDiv = styled.div`
   display: flex;

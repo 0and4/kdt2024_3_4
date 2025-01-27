@@ -1,12 +1,66 @@
 import "./App.css";
+import styled from "styled-components";
+import Header from "./component/header";
 import Main from "./component/Main";
+import PlaylistInfo from "./component/pages/PlaylistInfo";
+import Player from "./component/Player";
+import { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
 
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  overflow-x: hidden;
+  @media (max-width: 768px) {
+    flex-direction: column; /* 화면이 좁을 때 세로로 변경 */
+  }
+`;
+const Container = styled.div`
+  width: 100%;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
 function App() {
+  const [activeMenu, setActiveMenu] = useState("chart");
+  const navigate = useNavigate();
+
+  const onMenuClick = (menu) => {
+    setActiveMenu(menu);
+    if (menu === "chart") {
+      navigate("/chart");
+    } else if (menu === "recommend") {
+      navigate("/recommend");
+    }
+  };
+
   return (
     <div className="App">
-      <Main></Main>
+      <Wrapper>
+        <Container>
+          <Header activeMenu={activeMenu} onMenuClick={onMenuClick} />
+          <Main activeMenu={activeMenu} />
+          <Routes>
+            <Route path="/playlist/:id" element={<PlaylistInfo />} />
+          </Routes>
+        </Container>
+        <Player />
+      </Wrapper>
     </div>
   );
 }
 
-export default App;
+function AppWithRouter() {
+  return (
+    <Router>
+      <App />
+    </Router>
+  );
+}
+export default AppWithRouter;
