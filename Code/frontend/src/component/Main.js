@@ -16,6 +16,15 @@ const Container = styled.div`
 `;
 
 function Main() {
+  const [activeMenu, setActiveMenu] = useState("chart");
+
+  const handleMenuClick = (menu) => {
+    if (activeMenu === menu) {
+      setActiveMenu(""); // active 상태 해제
+    } else {
+      setActiveMenu(menu); // 다른 메뉴 클릭 시 active 상태 설정
+    }
+  };
   return (
     <Wrapper>
       <Container>

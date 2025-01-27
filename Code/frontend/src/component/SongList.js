@@ -234,7 +234,7 @@ function SongList({ showAll, headerTitle, songs = [] }) {
             <Duration>{song.duration}</Duration>
             <Actions>
               <Button
-                liked={likedSongs.includes(song.rank)}
+                liked={likedSongs.includes(song.rank) ? "true" : undefined}
                 onClick={() => toggleLike(song.rank)}
               >
                 {likedSongs.includes(song.rank) ? (
