@@ -52,6 +52,10 @@ public class UserEntity {
     @OneToMany(mappedBy = "user",orphanRemoval = true)
     private List<PlayList> playList;
 
+    //결제관련
+    @OneToMany(mappedBy = "user")
+    private List<Payment> paymentList;
+
     @Builder
     public UserEntity(String id, String name, String password, String email, String nickname , RoleUser roleUser, TypeUser typeUser) {
         this.id = id;
@@ -63,4 +67,7 @@ public class UserEntity {
         this.typeUser = typeUser;
     }
 
+    public void setRoleUser(RoleUser roleUser) {
+        this.roleUser = roleUser;
+    }
 }

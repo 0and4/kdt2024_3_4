@@ -1,8 +1,10 @@
 package com.berry_comment.entity;
 
 import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor
 public class PlayListDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -16,4 +18,8 @@ public class PlayListDetail {
     @JoinColumn(name = "play_list_id")
     private PlayList playList;
 
+    public PlayListDetail(Song song, PlayList playList) {
+        this.song = song;
+        this.playList = playList;
+    }
 }

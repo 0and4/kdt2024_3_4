@@ -4,6 +4,7 @@ import com.berry_comment.dto.ArtistDto;
 import com.berry_comment.dto.CrawlInfoDto;
 import com.berry_comment.entity.*;
 import com.berry_comment.repository.*;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -160,6 +161,9 @@ public class CrawlerService {
                 //아티스트 엔티티
                 Set<Artist> artistsSet = new HashSet<>();
 
+                //곡 url
+                String songUrl = "";
+
                 //엔티티 저장 순서 아티스트 -> (앨범 -> 앨범아티스트디테일)
                 crawlInfoDto.getArtists().forEach(artistDto -> {
                     System.out.println("아티스트 찾기");
@@ -184,7 +188,7 @@ public class CrawlerService {
                 else {
                     album = new Album(crawlInfoDto.getUrl(), crawlInfoDto.getAlbum());
                     albumRepository.save(album);
-                    System.out.println("앨범 엔티티"+album);
+                    System.out.println("앨범 엔티티"+ album);
                 }
                 
 
@@ -198,18 +202,27 @@ public class CrawlerService {
                     int playTime = 0;
                     for (Artist artist : artistsSet) {
                         try {
-                            int time = lastFmService.getSongPlayTime(crawlInfoDto.getSong(), artist.getName());
-                            if (time != 0) {
-                                playTime = time;
+                            String artistName = artist.getName().replaceAll("[^A-Za-z]", "").trim();
+                            JsonNode jsonNode = lastFmService.getSongPlayTime(crawlInfoDto.getSong(), artistName);
+                            if (jsonNode.has("error")) {
+                                playTime = 0;
                                 break; // foreach문 탈출
                             }
+                            //플레이 시간 값 가져오기
+                            playTime = jsonNode.get("track").get("duration").asInt();
+                            //플레이링크 정보값 가져오기
+                            String newSongUrl = getSongUrl(jsonNode.get("track").get("url").asText());
+                            System.out.println("곡 url " + newSongUrl);
+                            if(!newSongUrl.isEmpty())
+                                songUrl = newSongUrl;
+                            
                         } catch (Exception e) {
                             playTime = 0;
                         }
                     }
 
                     //음악 저장후
-                    addSong = new Song(crawlInfoDto.getSongId(), crawlInfoDto.getSong(), playTime, album, crawlInfoDto.getGenre());
+                    addSong = new Song(crawlInfoDto.getSongId(), crawlInfoDto.getSong(), playTime, album, crawlInfoDto.getGenre(),songUrl);
                     songRepository.save(addSong);
 
                     //앨범 디테일 저장하기
@@ -226,6 +239,23 @@ public class CrawlerService {
                 System.out.println(e.getMessage());
             }
         });
+    }
+
+    public String getSongUrl(String url) {
+        String youtubeUrl = "";
+        try {
+            Document document = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36").get();
+            Element link = document.selectFirst("a.image-overlay-playlink-link");
+            if (link != null) {
+                String href = link.attr("href");
+                youtubeUrl = href;
+            } else {
+                youtubeUrl = "";
+            }
+        } catch (IOException e) {
+            return "";
+        }
+        return youtubeUrl;
     }
 
 }

@@ -3,6 +3,7 @@ package com.berry_comment.config.jwt;
 import com.berry_comment.entity.UserEntity;
 import com.berry_comment.oauth.PrincipalDetails;
 import com.berry_comment.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +33,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         excludedUrls.add("/login");
         excludedUrls.add("/favicon.ico");
         excludedUrls.add("/h2-console");
+
+        //결제 관련 리다이렉트 하는 곳..
+        excludedUrls.add("/payment/success");
+        excludedUrls.add("/payment/fail");
+        excludedUrls.add("/payment/cancel");
     }
 
     @Override
@@ -63,6 +69,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String userId = tokenProvider.getClaims(token).get("id").toString();
         if(userId != null) {
             UserEntity user = userRepository.findById(userId);
+            //만약 유저가 널값이라면
+            if(user == null) {
+                throw new EntityNotFoundException("유저가 없습니다.");
+            }
             PrincipalDetails principalDetails = new PrincipalDetails(user);
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     principalDetails,

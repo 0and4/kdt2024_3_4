@@ -35,11 +35,16 @@ public class Song {
     @Column(nullable = false)
     private String genre;
 
-    public Song(Long id, String track, int playTime, Album album, String genre) {
+    //곡링크
+    @Column(nullable = false)
+    private String url;
+
+    public Song(Long id, String track, int playTime, Album album, String genre, String url) {
         this.id = id;
         this.track = track;
         this.playTime = playTime;
         this.album = album;
         this.genre = genre;
+        this.url = url;
     }
 }
