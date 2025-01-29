@@ -135,7 +135,7 @@ function SongList({ showAll, headerTitle, songs = [] }) {
   const popupRef = useRef(null);
 =======
 
-//임의의 노래 목록
+// 임의의 노래 목록
 const songs = [
   {
     rank: 1,
@@ -354,7 +354,7 @@ function SongList() {
             <Duration>{song.duration}</Duration>
             <Actions>
               <Button
-                liked={likedSongs.includes(song.rank) ? "true" : undefined}
+                {...(likedSongs.includes(song.rank) && { liked: true })}
                 onClick={() => toggleLike(song.rank)}
               >
                 {likedSongs.includes(song.rank) ? (

@@ -8,7 +8,12 @@ import SongInfo from "./component/pages/SongInfo";
 import ArtistInfo from "./component/pages/ArtistInfo";
 import AlbumInfo from "./component/pages/AlbumInfo";
 import { useState } from "react";
-import { BrowserRouter as Router, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
 
 const Wrapper = styled.div`
   display: flex;
