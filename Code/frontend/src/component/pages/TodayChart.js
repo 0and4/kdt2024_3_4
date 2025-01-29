@@ -54,15 +54,15 @@ function TodayChart() {
     <Wrapper>
       <Container>
         <TodayP>
-          <span>2025.01.17</span> TOP 100
+          <span id="current_date">2025.01.17</span> TOP 100
         </TodayP>
         <MenuDiv>
           <AllBtn>전체 듣기</AllBtn>
           <ShuffleBtn>셔플 듣기</ShuffleBtn>
           <BasketBtn>담기</BasketBtn>
         </MenuDiv>
-        <SongList />
       </Container>
+      <SongList />
     </Wrapper>
   );
 }

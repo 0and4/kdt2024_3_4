@@ -10,7 +10,7 @@ const Wrapper = styled.div`
 
 const Container = styled.div`
   width: 100%;
-  margin: 0 auto;
+  margin: 20px;
   display: flex;
   flex-direction: column;
   div {
@@ -33,7 +33,7 @@ const PlaylistItem = styled.div`
   flex-direction: row;
   text-align: left;
   padding: 15px 0;
-  gap: 10px;
+  gap: 15px;
   align-items: center;
   box-sizing: border-box;
   p {
@@ -46,8 +46,8 @@ const PlaylistItem = styled.div`
 `;
 
 const PlaylistJacket = styled.div`
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   background-color: yellow;
   object-fit: cover;
   cursor: pointer;

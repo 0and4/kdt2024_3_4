@@ -39,6 +39,7 @@ const SearchDiv = styled.div`
   align-items: center;
   gap: 10px;
   position: relative;
+  margin: 0 20px;
   img:hover {
     cursor: pointer;
   }

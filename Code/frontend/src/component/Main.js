@@ -1,8 +1,9 @@
 import React from "react";
 import styled from "styled-components";
-import { Outlet } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import TodayChart from "./pages/TodayChart";
 import Recommend from "./pages/Recommend";
+import PlaylistInfo from "./pages/PlaylistInfo";
 const Wrapper = styled.div`
   position: relative;
 `;
@@ -17,9 +18,11 @@ function Main({ activeMenu }) {
   return (
     <Wrapper>
       <Container>
-        {activeMenu === "chart" && <TodayChart />}
-        {activeMenu === "recommend" && <Recommend />}
-        <Outlet />
+        <Routes>
+          <Route path="/chart" element={<TodayChart />} />
+          <Route path="/recommend" element={<Recommend />} />
+          <Route path="/playlist/:id" element={<PlaylistInfo />} />
+        </Routes>
       </Container>
     </Wrapper>
   );

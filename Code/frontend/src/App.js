@@ -2,15 +2,9 @@ import "./App.css";
 import styled from "styled-components";
 import Header from "./component/header";
 import Main from "./component/Main";
-import PlaylistInfo from "./component/pages/PlaylistInfo";
 import Player from "./component/Player";
 import { useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useNavigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`
   display: flex;
@@ -46,9 +40,6 @@ function App() {
         <Container>
           <Header activeMenu={activeMenu} onMenuClick={onMenuClick} />
           <Main activeMenu={activeMenu} />
-          <Routes>
-            <Route path="/playlist/:id" element={<PlaylistInfo />} />
-          </Routes>
         </Container>
         <Player />
       </Wrapper>

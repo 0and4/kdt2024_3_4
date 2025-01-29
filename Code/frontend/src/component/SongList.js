@@ -7,12 +7,8 @@ import {
   LiaPlusSolid,
   LiaPlaySolid,
 } from "react-icons/lia";
-const Wrapper = styled.div`
-  width: 100%;
-  position: relative;
-`;
+const Wrapper = styled.div``;
 const Container = styled.div`
-  width: 100%;
   display: flex;
   flex-direction: column;
   div {
@@ -229,8 +225,8 @@ function SongList() {
       )}
       <Container>
         <Header>
-          <div style={{ flex: 0.3 }}>순위</div>
-          <div style={{ flex: 1.5 }}>곡 정보</div>
+          <div style={{ flex: 0.7 }}>순위</div>
+          <div style={{ flex: 1.0 }}>곡 정보</div>
           <div style={{ flex: 0.7 }}>앨범</div>
           <Duration>재생시간</Duration>
           <Actions>
