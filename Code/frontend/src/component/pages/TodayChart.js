@@ -19,8 +19,7 @@ const Container = styled.div`
 `;
 const MenuDiv = styled.div`
   display: flex;
-  align-self: flex-end;
-  gap: 10px;
+  justify-content: space-between;
   margin: 25px 2vw 10px 2vw;
   button {
     padding: 6px 10px;
@@ -41,6 +40,10 @@ const MenuDiv = styled.div`
       margin-left: auto;
     }
   }
+`;
+const ListenDiv = styled.div`
+  display: flex;
+  gap: 5px;
 `;
 const TodayP = styled.p`
   font-size: 1.5rem;
@@ -139,8 +142,11 @@ function TodayChart() {
           <span id="current_date">{getCurrentDate()}</span> TOP 100
         </TodayP>
         <MenuDiv>
-          <AllBtn>전체 듣기</AllBtn>
-          <ShuffleBtn>셔플 듣기</ShuffleBtn>
+          <ListenDiv>
+            <AllBtn>전체 듣기</AllBtn>
+            <ShuffleBtn>셔플 듣기</ShuffleBtn>
+          </ListenDiv>
+
           <BasketBtn>담기</BasketBtn>
         </MenuDiv>
       </Container>
