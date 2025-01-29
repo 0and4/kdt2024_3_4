@@ -14,11 +14,12 @@ const Container = styled.div`
   }
 `;
 
-function Main({ activeMenu }) {
+function Main() {
   return (
     <Wrapper>
       <Container>
         <Routes>
+          <Route path="/" element={<TodayChart />} />
           <Route path="/chart" element={<TodayChart />} />
           <Route path="/recommend" element={<Recommend />} />
           <Route path="/playlist/:id" element={<PlaylistInfo />} />

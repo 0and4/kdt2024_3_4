@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
 import logo from "../images/logo.png";
@@ -125,6 +126,20 @@ const MyMenuDiv = styled.div`
   }
 `;
 function Header({ activeMenu, onMenuClick }) {
+  const [searchTerm, setSearchTerm] = useState(""); // 검색어 상태
+  const navigate = useNavigate();
+
+  // 검색 실행 함수
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim() !== "") {
+      navigate(`/search?query=${encodeURIComponent(searchTerm)}`);
+    }
+  };
+  // 로고 클릭 시 메인 페이지로 이동
+  const handleLogoClick = () => {
+    navigate("/"); // 메인 페이지로 이동
+  };
   return (
     <Wrapper>
       <Container>
@@ -133,11 +148,18 @@ function Header({ activeMenu, onMenuClick }) {
         </LoginDiv>
 
         <SearchDiv>
-          <img src={logo} alt="logo" />
-          <button>
-            <FaSearch />
-          </button>
-          <input placeholder="검색어를 입력하세요 !"></input>
+          <img src={logo} alt="logo" onClick={handleLogoClick} />
+          <form onSubmit={handleSearch} style={{ display: "flex" }}>
+            <input
+              type="text"
+              placeholder="검색어를 입력하세요!"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button type="submit">
+              <FaSearch />
+            </button>
+          </form>
         </SearchDiv>
 
         <MenuDiv>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import AddPopup from "./ui/AddPopup";
 import {
@@ -7,6 +7,7 @@ import {
   LiaPlusSolid,
   LiaPlaySolid,
 } from "react-icons/lia";
+
 const Wrapper = styled.div``;
 const Container = styled.div`
   display: flex;
@@ -92,8 +93,22 @@ const Button = styled.button`
     border-color: #e41111;
   }
 `;
+/*
+const MoreButton = styled.button`
+  margin: 10px auto;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  transition: background 0.3s;
 
-//임의의 노래 목록
+  &:hover {
+    background-color: #ddd;
+  }
+`;
+
+// 임의의 노래 목록
 const songs = [
   {
     rank: 1,
@@ -166,27 +181,18 @@ const songs = [
     duration: "3:55",
   },
 ];
-
-function SongList() {
-  //임의의 플레이리스트 목록
-  const playlists = [
-    { name: "플레이리스트 1" },
-    { name: "플레이리스트 2" },
-    { name: "플레이리스트 3" },
-  ];
-
-  const [likedSongs, setLikedSongs] = useState([]); // 찜한 노래의 ID를 저장
-  const [popupPosition, setPopupPosition] = useState(null); // 팝업 위치
-  const popupRef = React.useRef(null);
+*/
+function SongList({ showAll, headerTitle, songs = [] }) {
+  const [likedSongs, setLikedSongs] = useState([]);
+  const [popupPosition, setPopupPosition] = useState(null);
+  const popupRef = useRef(null);
 
   const toggleLike = (rank) => {
-    setLikedSongs(
-      (prevLikedSongs) =>
-        prevLikedSongs.includes(rank)
-          ? prevLikedSongs.filter((id) => id !== rank) // 찜 해제
-          : [...prevLikedSongs, rank] // 찜 추가
+    setLikedSongs((prev) =>
+      prev.includes(rank) ? prev.filter((id) => id !== rank) : [...prev, rank]
     );
   };
+
   const handleAddClick = (e) => {
     const rect = e.target.getBoundingClientRect();
     setPopupPosition({
@@ -194,11 +200,9 @@ function SongList() {
       left: rect.left + window.scrollX - 200,
     });
   };
-  const handlePopupClick = (e) => {
-    e.stopPropagation();
-  };
+
   const closePopup = () => setPopupPosition(null);
-  // 화면 밖 클릭 시 팝업 닫기
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (popupRef.current && !popupRef.current.contains(e.target)) {
@@ -212,6 +216,9 @@ function SongList() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [popupPosition]);
+
+  const displayedSongs = showAll ? songs : songs.slice(0, 5); // showAll에 따라 전체 목록 또는 5곡만 표시
+
   return (
     <Wrapper>
       {popupPosition && (
@@ -219,13 +226,11 @@ function SongList() {
           ref={popupRef}
           position={popupPosition}
           onClose={closePopup}
-          onClick={handlePopupClick}
-          playlists={playlists}
         />
       )}
       <Container>
         <Header>
-          <div style={{ flex: 0.7 }}>순위</div>
+          <div style={{ flex: 0.7 }}>{headerTitle}</div>
           <div style={{ flex: 1.0 }}>곡 정보</div>
           <div style={{ flex: 0.7 }}>앨범</div>
           <Duration>재생시간</Duration>
@@ -235,9 +240,15 @@ function SongList() {
             <div>재생</div>
           </Actions>
         </Header>
-        {songs.map((song) => (
+
+        {displayedSongs.map((song) => (
           <SongItem key={song.rank}>
-            <input type="checkbox" style={{ flex: 0.2 }}></input>
+            <input
+              type="checkbox"
+              style={{ flex: 0.2 }}
+              checked={likedSongs.includes(song.rank)}
+              onChange={() => toggleLike(song.rank)}
+            ></input>
             <SongRank>{song.rank}</SongRank>
             <SongInfoContainer>
               <SongCover />
@@ -250,7 +261,7 @@ function SongList() {
             <Duration>{song.duration}</Duration>
             <Actions>
               <Button
-                liked={likedSongs.includes(song.rank) ? "true" : undefined}
+                {...(likedSongs.includes(song.rank) && { liked: true })}
                 onClick={() => toggleLike(song.rank)}
               >
                 {likedSongs.includes(song.rank) ? (
@@ -272,4 +283,5 @@ function SongList() {
     </Wrapper>
   );
 }
+
 export default SongList;

@@ -3,8 +3,14 @@ import styled from "styled-components";
 import Header from "./component/header";
 import Main from "./component/Main";
 import Player from "./component/Player";
+import Search from "./component/pages/Search";
 import { useState } from "react";
-import { BrowserRouter as Router, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
 
 const Wrapper = styled.div`
   display: flex;
@@ -39,7 +45,10 @@ function App() {
       <Wrapper>
         <Container>
           <Header activeMenu={activeMenu} onMenuClick={onMenuClick} />
-          <Main activeMenu={activeMenu} />
+          <Routes>
+            <Route path="*" element={<Main activeMenu={activeMenu} />} />
+            <Route path="/search" element={<Search />} />
+          </Routes>
         </Container>
         <Player />
       </Wrapper>

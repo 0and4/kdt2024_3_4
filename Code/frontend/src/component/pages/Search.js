@@ -1,53 +1,301 @@
 import styled from "styled-components";
-import { FaChevronRight } from "react-icons/fa";
+import { useLocation } from "react-router-dom";
+import { useState } from "react";
+import { FaChevronRight, FaChevronUp } from "react-icons/fa";
+import SongList from "../SongList"; // 노래 목록 컴포넌트
 const Wrapper = styled.div`
-  width: 100%;
   position: relative;
-  overflow-x: hidden;
+`;
+const Container = styled.div`
+  width: calc(100% - 250px);
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+const Section = styled.div`
+  margin-bottom: 20px;
+  p {
+    font-weight: bold;
+    text-align: left;
+  }
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #007bff;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
 `;
 
-const Container = styled.div`
-  width: 100%;
-  margin: 20px;
+const ResultDiv = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+const ListDiv = styled.div`
+  margin: 0;
+  padding: 0;
+`;
+const AlbumGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+`;
+
+const AlbumItem = styled.div`
   display: flex;
   flex-direction: column;
-  div {
-    margin-left: 10px;
+  align-items: center;
+  text-align: center;
+
+  img {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    object-fit: cover;
   }
-  max-width: 100%;
+
+  p {
+    margin: 5px 0;
+  }
 `;
+
+const ArtistGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+`;
+
+const ArtistItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  p {
+    margin-top: 5px;
+  }
+`;
+
+const songs = [
+  {
+    rank: 1,
+    title: "Song A",
+    artist: "Artist A",
+    album: "Album A",
+    duration: "3:45",
+  },
+  {
+    rank: 2,
+    title: "Song B",
+    artist: "Artist B",
+    album: "Album B",
+    duration: "4:00",
+  },
+  {
+    rank: 3,
+    title: "Song C",
+    artist: "Artist C",
+    album: "Album C",
+    duration: "3:30",
+  },
+  {
+    rank: 4,
+    title: "Song D",
+    artist: "Artist D",
+    album: "Album D",
+    duration: "3:50",
+  },
+  {
+    rank: 5,
+    title: "Song E",
+    artist: "Artist E",
+    album: "Album E",
+    duration: "4:10",
+  },
+  {
+    rank: 6,
+    title: "Song F",
+    artist: "Artist F",
+    album: "Album F",
+    duration: "3:25",
+  },
+  {
+    rank: 7,
+    title: "Song G",
+    artist: "Artist G",
+    album: "Album G",
+    duration: "3:15",
+  },
+  {
+    rank: 8,
+    title: "Song H",
+    artist: "Artist H",
+    album: "Album H",
+    duration: "4:05",
+  },
+  {
+    rank: 9,
+    title: "Song I",
+    artist: "Artist I",
+    album: "Album I",
+    duration: "3:40",
+  },
+  {
+    rank: 10,
+    title: "Song J",
+    artist: "Artist J",
+    album: "Album J",
+    duration: "3:55",
+  },
+];
+
+const albums = [
+  {
+    id: 1,
+    name: "Album A",
+    artist: "Artist A",
+    cover: "https://via.placeholder.com/100",
+  },
+  {
+    id: 2,
+    name: "Album B",
+    artist: "Artist B",
+    cover: "https://via.placeholder.com/100",
+  },
+  {
+    id: 3,
+    name: "Album C",
+    artist: "Artist C",
+    cover: "https://via.placeholder.com/100",
+  },
+  {
+    id: 4,
+    name: "Album D",
+    artist: "Artist D",
+    cover: "https://via.placeholder.com/100",
+  },
+];
+
+const artists = [
+  { id: 1, name: "Artist A", photo: "https://via.placeholder.com/100" },
+  { id: 2, name: "Artist B", photo: "https://via.placeholder.com/100" },
+  { id: 3, name: "Artist C", photo: "https://via.placeholder.com/100" },
+  { id: 4, name: "Artist D", photo: "https://via.placeholder.com/100" },
+];
+
 function Search() {
+  const location = useLocation();
+  const query = new URLSearchParams(location.search).get("query") || "";
+
+  const [showAllSongs, setShowAllSongs] = useState(false);
+  const [showAllAlbums, setShowAllAlbums] = useState(false);
+  const [showAllArtists, setShowAllArtists] = useState(false);
+
+  const filteredSongs = songs.filter(
+    (song) =>
+      song.title.includes(query) ||
+      song.artist.includes(query) ||
+      song.album.includes(query)
+  );
+  const filteredAlbums = albums.filter(
+    (album) => album.name.includes(query) || album.artist.includes(query)
+  );
+  const filteredArtists = artists.filter((artist) =>
+    artist.name.includes(query)
+  );
+
   return (
     <Wrapper>
       <Container>
         <p>
-          '<span>가을</span>'(으)로 검색 결과
+          '<span style={{ fontWeight: "bold" }}>{query}</span>
+          '(으)로 검색한 결과
         </p>
-        <div>
-          <div>
+
+        {/* 곡 검색 결과 */}
+        <Section>
+          <ResultDiv>
             <p>곡명으로 검색</p>
-            <button>
-              더보기 <FaChevronRight />
+            <button onClick={() => setShowAllSongs((prev) => !prev)}>
+              {showAllSongs ? "접기" : "더보기"}{" "}
+              {showAllSongs ? <FaChevronUp /> : <FaChevronRight />}
             </button>
-            <h2>노래목록</h2>
-          </div>
-          <div>
+          </ResultDiv>
+          <ListDiv>
+            <SongList
+              showAll={showAllSongs} // showAll 값 전달
+              headerTitle="번호"
+              songs={
+                filteredSongs && Array.isArray(filteredSongs)
+                  ? filteredSongs
+                  : []
+              } // 필터링된 곡 목록 전달
+            />
+          </ListDiv>
+        </Section>
+
+        {/* 앨범 검색 결과 */}
+        <Section>
+          <ResultDiv>
             <p>앨범명으로 검색</p>
-            <button>
-              더보기 <FaChevronRight />
+            <button onClick={() => setShowAllAlbums((prev) => !prev)}>
+              {showAllAlbums ? "접기" : "더보기"}{" "}
+              {showAllAlbums ? <FaChevronUp /> : <FaChevronRight />}
             </button>
-            <h2>앨범목록</h2>
-          </div>
-          <div>
+          </ResultDiv>
+
+          {filteredAlbums.length > 0 && (
+            <AlbumGrid>
+              {(showAllAlbums
+                ? filteredAlbums
+                : filteredAlbums.slice(0, 4)
+              ).map((album) => (
+                <AlbumItem key={album.id}>
+                  <img src={album.cover} alt={album.name} />
+                  <p>{album.name}</p>
+                  <p>{album.artist}</p>
+                </AlbumItem>
+              ))}
+            </AlbumGrid>
+          )}
+        </Section>
+
+        {/* 아티스트 검색 결과 */}
+        <Section>
+          <ResultDiv>
             <p>아티스트명으로 검색</p>
-            <button>
-              더보기 <FaChevronRight />
+            <button onClick={() => setShowAllArtists((prev) => !prev)}>
+              {showAllArtists ? "접기" : "더보기"}{" "}
+              {showAllArtists ? <FaChevronUp /> : <FaChevronRight />}
             </button>
-            <h2>아티스트목록</h2>
-          </div>
-        </div>
+          </ResultDiv>
+
+          {filteredArtists.length > 0 && (
+            <ArtistGrid>
+              {(showAllArtists
+                ? filteredArtists
+                : filteredArtists.slice(0, 4)
+              ).map((artist) => (
+                <ArtistItem key={artist.id}>
+                  <img src={artist.photo} alt={artist.name} />
+                  <p>{artist.name}</p>
+                </ArtistItem>
+              ))}
+            </ArtistGrid>
+          )}
+        </Section>
       </Container>
     </Wrapper>
   );
 }
+
 export default Search;

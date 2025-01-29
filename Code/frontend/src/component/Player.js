@@ -72,7 +72,7 @@ const PlayDiv = styled.div`
 `;
 
 const CompactPlayerWrapper = styled.div`
-  display: ${({ isExpanded }) => (isExpanded ? "none" : "flex")};
+  display: ${({ $isExpanded }) => ($isExpanded ? "none" : "flex")};
   justify-content: center;
   padding: 5px;
   background-color: #fff;
@@ -136,10 +136,6 @@ function Player() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  useEffect(() => {
-    console.log("isExpanded 상태:", isExpanded);
-  }, [isExpanded]);
-
   const togglePlay = () => {
     setIsPlaying((prev) => !prev);
   };
@@ -185,7 +181,7 @@ function Player() {
       )}
 
       {!isExpanded && (
-        <CompactPlayerWrapper isExpanded={isExpanded}>
+        <CompactPlayerWrapper $isExpanded={isExpanded}>
           <CompactPlayer
             onClick={(e) => {
               // CompactPlayer 자체 클릭 시 아무 동작도 하지 않음
