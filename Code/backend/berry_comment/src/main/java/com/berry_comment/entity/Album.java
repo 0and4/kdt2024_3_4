@@ -13,7 +13,6 @@ import java.util.List;
 @Getter
 public class Album {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     //대표 이미지
@@ -34,4 +33,9 @@ public class Album {
         this.name = name;
     }
 
+    public Album(Long id, String imageUrl, String name) {
+        this.id = id;
+        this.imageUrl = imageUrl;
+        this.name = name;
+    }
 }

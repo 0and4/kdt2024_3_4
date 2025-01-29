@@ -10,26 +10,22 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class CrawlerService {
     private final SongRepository songRepository;
     private final AlbumRepository albumRepository;
-    private final ChartRepository chartRepository;
-    private final ChartDetailRepository chartDetailRepository;
     private final LastFmService lastFmService;
     private final SongOfArtistRepository songOfArtistRepository;
     //TODO
@@ -46,11 +42,13 @@ public class CrawlerService {
        4. 아티스트 정보 갱신하기
     * */
     private final ArtistRepository artistRepository;
-
+    private final ChartRepository chartRepository;
+    private final ChartDetailRepository chartDetailRepository;
+    private List<Integer> songLists;
 
     //크롤링 정보 수정
     public void crawl(LocalDateTime localDateTime) {
-        ArrayList<CrawlInfoDto> crawlInfoDtoArrayList = new ArrayList<>();
+        songLists = new ArrayList<>();
         String queryParamTime = String.format("%s%s%s%s",localDateTime.getYear(),localDateTime.getMonthValue(),localDateTime.getDayOfMonth(),localDateTime.getHour());
         int queryParamTimeInt = Integer.parseInt(queryParamTime);
         //모든 정보를 크롤링합니다.
@@ -58,187 +56,200 @@ public class CrawlerService {
         System.out.println("test실행..");
         String url = "https://www.melon.com/chart/index.htm?dayTime="+queryParamTimeInt;
         try {
-            //rank XPath = //*[@id="lst50"]/td[2]/div/span[1], //*[@id="lst50"]/td[2]/div/span[1]
             Document document = Jsoup.connect(url).get();
-            //table body xPath = //*[@id="frm"]/div/table/tbody
+
+            // table body xPath = //*[@id="frm"]/div/table/tbody
             Elements tBodyElements = document.selectXpath("//*[@id=\"frm\"]/div/table/tbody");
-            Element tBodyElement = tBodyElements.getFirst();
+            Element tBodyElement = tBodyElements.get(0);  // getFirst() 대신 get(0) 사용
             Elements rankElements = tBodyElement.getElementsByTag("tr");
             AtomicInteger rank = new AtomicInteger(1);
-            //아티스트 셋
-            rankElements.stream().forEach(element -> {
-                CrawlInfoDto crawlInfoDto = new CrawlInfoDto();
-                crawlInfoDto.setArtists(new ArrayList<>());
-                //곡 ID
+            //차트 저장
+            Chart chart = new Chart(localDateTime);
+            chartRepository.save(chart);
+
+            for (Element element : rankElements) {
                 int dataSongId = Integer.parseInt(element.selectFirst("tr").attr("data-song-no"));
+                ArrayList<Integer> artistIds = new ArrayList<>();
 
-                //곡 이름
-                String songTitle = element.selectFirst("a[title*='재생']").text();
-//                Elements artistElements = element.select("div.ellipsis.rank02 a");
-//                //중복된 값을 넣게 하지 않기 위함...
-//                Set<String> artistSet = new HashSet<>();
-//
-//                for(int i = 0;i < artistElements.size();i++) {
-//                    Element artistElement = artistElements.get(i);
-//                    //중복된 값이 들어가도 오류 X
-//                    artistSet.add(artistElement.text());
-//                }
-//                artistSet.forEach(
-//                        artist -> {
-//                            System.out.println("아티스트들: "+artist);
-//                        }
-//                );
+                // 아티스트 element
+                Element rank02Element = element.selectFirst(".rank02").selectFirst(".checkEllipsis");
+                Elements artistHref = rank02Element.getElementsByTag("a");
 
-                //5앨범 제목 추출
-                // 5. 앨범 제목 추출
-                String albumTitle = element.selectFirst("div.ellipsis.rank03 a").text();
-                String imageUrl = element.selectFirst("img").attr("src");
-                crawlInfoDto.setSongId((long) dataSongId);
-                crawlInfoDto.setSong(songTitle);
-                crawlInfoDto.setRank(rank.getAndIncrement());
-                crawlInfoDto.setAlbum(albumTitle);
-                crawlInfoDto.setUrl(imageUrl);
-                setGenreAndArtist((long)dataSongId, crawlInfoDto);
-                crawlInfoDtoArrayList.add(crawlInfoDto);
-            });
+                for (Element artist : artistHref) {  // forEach를 for문으로 교체
+                    String href = artist.attr("href");
+                    Pattern pattern = Pattern.compile("goArtistDetail\\('(\\d+)'\\)");
+                    Matcher matcher = pattern.matcher(href);
+                    if (matcher.find()) {
+                        String artistId = matcher.group(1); // 매칭된 그룹(앨범 ID)
+                        System.out.println("아티스트 아이디: " + artistId);
+                        artistIds.add(Integer.parseInt(artistId));
+                    } else {
+                        System.out.println("앨범 ID를 찾을 수 없습니다.");
+                    }
+                }
+
+                // 앨범 저장
+                int albumId = 0;
+                Element rank03Element = element.selectFirst(".rank03").selectFirst("a");
+                Pattern albumPattern = Pattern.compile("goAlbumDetail\\('(\\d+)'\\)");
+                String href = rank03Element.attr("href");
+                Matcher matcher = albumPattern.matcher(href);
+                if (matcher.find()) {
+                    albumId = Integer.parseInt(matcher.group(1));
+                }
+                saveAlbumById(albumId);
+                //아티스트 저장하기
+                for (int artistId : artistIds) {  // forEach를 for문으로 교체
+                    Artist artist = saveArtistByIdAndName(artistId);
+                }
+                // 음악 저장하기
+                Song song = saveSongById(dataSongId);
+
+                
+                ChartDetail chartDetail = new ChartDetail(chart,song, rank.getAndIncrement());
+                chartDetailRepository.save(chartDetail);
+
+            }
+            songLists.forEach(this::saveSongById);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        save(crawlInfoDtoArrayList, localDateTime);
+
     }
 
-    public void setGenreAndArtist(Long songId, CrawlInfoDto crawlInfoDto){
-
+    public void setAlbumOfSong(int songId) {
         String url = "https://www.melon.com/song/detail.htm?songId=" + songId;
-        try{
-            Document document = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36").get();
-            Elements elements = document.getElementsByTag("dd");
-            String genre = elements.get(2).text();
-            System.out.println("장르 "+ genre);
-            crawlInfoDto.setGenre(genre);
 
-            Elements artistElements = document.selectXpath("//*[@id=\"downloadfrm\"]/div/div/div[2]/div[1]");
-            artistElements = artistElements.get(0).getElementsByClass("artist_name");
-            for (Element element : artistElements) {
-                ArtistDto artistDto = new ArtistDto();
-                String artistName = element.selectFirst("span").text();
-                Element imgElement = element.selectFirst("span.thumb_atist img");
-                String imageUrl = (imgElement != null) ? imgElement.attr("src") : "";
-                System.out.println("아티스트 이름: " + artistName);
-                System.out.println("이미지 URL: " + imageUrl);
-                artistDto.setArtistName(artistName);
-                artistDto.setImageUrl(imageUrl);
-                crawlInfoDto.getArtists().add(artistDto);
-            }
-
-
-        } catch (IOException e) {
-
-        }
     }
 
-    @Transactional
-    public void save(ArrayList<CrawlInfoDto> crawlInfoDtoArrayList, LocalDateTime localDateTime) {
-        //분과 초는 0으로 지정 시간만 값이 있음
-        localDateTime = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonthValue(),localDateTime.getDayOfMonth(),localDateTime.getHour(),0,0);
-        //현재 시간대의 chart가 있다면 종료...
-        if(chartRepository.findByDateTime(localDateTime)!=null)
-            return;
+    public SongOfArtist saveSongOfArtist(Song song, Artist artist) {
+        SongOfArtist songOfArtist = new SongOfArtist(artist, song);
+        songOfArtistRepository.save(songOfArtist);
+        return songOfArtist;
+    }
 
-        Chart chart = new Chart(localDateTime);
-        //차트를 저장합니다.
-        chartRepository.save(chart);
 
-        //음악 저장 로직
-        crawlInfoDtoArrayList.forEach(crawlInfoDto -> {
+    public Artist saveArtistByIdAndName(int id) {
+        //만약 아티스트가 존재한다면
+        Optional<Artist> artist = artistRepository.findById((long)id);
+        if(artist.isEmpty()){
+
+            String url = "https://www.melon.com/artist/timeline.htm?artistId=" + id;
             try {
-                //음악 엔티티
-                Song addSong;
-
-                //앨범 엔티티
-                Album album;
-
-                //아티스트 엔티티
-                Set<Artist> artistsSet = new HashSet<>();
-
-                //곡 url
-                String songUrl = "";
-
-                //엔티티 저장 순서 아티스트 -> (앨범 -> 앨범아티스트디테일)
-                crawlInfoDto.getArtists().forEach(artistDto -> {
-                    System.out.println("아티스트 찾기");
-                    Optional<Artist> artist = artistRepository.findByName(artistDto.getArtistName());
-                    //만약 존재하지 않는 아티스트라면
-                    if(artist.isEmpty()){
-                        //새로운 아티스트 추가
-                        Artist newArtist = new Artist(artistDto.getArtistName(), artistDto.getImageUrl());
-
-                        //아티스트DB에 아티스트추가
-                        artistRepository.save(newArtist);
-                        artistsSet.add(newArtist);
-                    }
-                    else {
-                        artistsSet.add(artist.get());
-                    }
-                });
-
-                //앨범 저장 로직
-                if (albumRepository.findByName(crawlInfoDto.getAlbum()).isPresent())
-                    album = albumRepository.findByName(crawlInfoDto.getAlbum()).get();
-                else {
-                    album = new Album(crawlInfoDto.getUrl(), crawlInfoDto.getAlbum());
-                    albumRepository.save(album);
-                    System.out.println("앨범 엔티티"+ album);
-                }
-                
-
-                //음악 저장 로직
-                if (songRepository.findById(crawlInfoDto.getSongId()).isPresent())
-                    addSong = songRepository.findById(crawlInfoDto.getSongId()).get();
-                else {
-                    //저장하기전에 LastFmApi에서 재생 시간 가져오기
-                    //단위값은 millSeconds이다.
-                    //저장할 playTime 값
-                    int playTime = 0;
-                    for (Artist artist : artistsSet) {
-                        try {
-                            String artistName = artist.getName().replaceAll("[^A-Za-z]", "").trim();
-                            JsonNode jsonNode = lastFmService.getSongPlayTime(crawlInfoDto.getSong(), artistName);
-                            if (jsonNode.has("error")) {
-                                playTime = 0;
-                                break; // foreach문 탈출
-                            }
-                            //플레이 시간 값 가져오기
-                            playTime = jsonNode.get("track").get("duration").asInt();
-                            //플레이링크 정보값 가져오기
-                            String newSongUrl = getSongUrl(jsonNode.get("track").get("url").asText());
-                            System.out.println("곡 url " + newSongUrl);
-                            if(!newSongUrl.isEmpty())
-                                songUrl = newSongUrl;
-                            
-                        } catch (Exception e) {
-                            playTime = 0;
-                        }
-                    }
-
-                    //음악 저장후
-                    addSong = new Song(crawlInfoDto.getSongId(), crawlInfoDto.getSong(), playTime, album, crawlInfoDto.getGenre(),songUrl);
-                    songRepository.save(addSong);
-
-                    //앨범 디테일 저장하기
-                    artistsSet.forEach(artist -> {
-                        //곡에 아티스트들 할당하기
-                        SongOfArtist songOfArtist = new SongOfArtist(artist, addSong);
-                        songOfArtistRepository.save(songOfArtist);
-                    });
-                }
-                //차트 정보 저장하기
-                ChartDetail chartDetail = new ChartDetail(chart, addSong, crawlInfoDto.getRank());
-                chartDetailRepository.save(chartDetail);
+                Document document = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36").get();
+                String imageUrl = document.getElementById("artistImgArea").getElementsByTag("img").getFirst().attr("src");
+                System.out.println("아티스트 이미지"+imageUrl);
+                String artistName = document.selectFirst("p.title_atist").ownText();
+                Artist newArtist = new Artist((long)id, artistName, imageUrl);
+                newArtist = artistRepository.save(newArtist);
+                return newArtist;
             }catch (Exception e){
-                System.out.println(e.getMessage());
+                e.printStackTrace();
             }
-        });
+        }
+        else {
+            return artist.get();
+        }
+        return null;
+    }
+
+    public Album saveAlbumById(int albumId){
+        Optional<Album> returnValue = albumRepository.findById((long) albumId);
+        if(returnValue.isPresent()){
+            return returnValue.get();
+        }
+        String url = "https://www.melon.com/album/detail.htm?albumId=" + albumId;
+        try {
+            Document document = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36").get();
+            Element tBodyElement = document.getElementsByTag("tbody").first();
+            Elements tBodyElements = tBodyElement.getElementsByTag("tr");
+
+            tBodyElements.stream().forEach(element -> {
+                Element songElementTd = element.getElementsByTag("td").get(3);
+                String href = songElementTd.selectFirst("a").attr("href");
+                Pattern pattern = Pattern.compile("\\d+"); // 숫자(0~9)를 추출
+                Matcher matcher = pattern.matcher(href);
+                int cnt = 0;
+                while (matcher.find()) {
+                    cnt++;
+                    if(cnt == 2){
+                        String number = matcher.group();
+                        System.out.println("추출된 숫자: " + number);
+                        //음악 저장 진행...로직 짜기!!
+                        songLists.add(Integer.parseInt(number));
+                    }
+                }
+            });
+            String albumName = document.selectXpath("//*[@id=\"conts\"]/div[2]/div/div[2]/div[1]/div[1]").first().ownText();
+            String albumImageUrl = document.getElementById("d_album_org").selectFirst("img").attr("src");
+            Album newAlbum = new Album((long)albumId, albumName, albumImageUrl);
+            albumRepository.save(newAlbum);
+            return newAlbum;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public Song saveSongById(int songId) {
+        Song song = songRepository.findById((long) songId);
+        if(song != null){
+            return song;
+        }
+        String url = "https://www.melon.com/song/detail.htm?songId=" + songId;
+        try {
+            Document document = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36").get();
+            String track = document.selectXpath("//*[@id=\"downloadfrm\"]/div/div/div[2]/div[1]/div[1]").first().ownText();
+            int playTime = 0;
+            int albumId = 0;
+            String genre;
+            String musicUrl = "";
+            String lyric = "";
+            //앨범 아이디 가져오기
+            Element albumIdElement = document.selectXpath("//*[@id=\"downloadfrm\"]/div/div/div[2]/div[2]/dl/dd[1]/a").first();
+            String href = albumIdElement.selectFirst("a").attr("href");
+            Pattern pattern = Pattern.compile("'(\\d+)'"); // 숫자(0~9)를 추출
+            Matcher matcher = pattern.matcher(href);
+            if (matcher.find()) {
+                albumId = Integer.parseInt(matcher.group(1));
+            }
+            
+            Album album = saveAlbumById(albumId);
+            Elements elements = document.getElementsByTag("dd");
+            genre = elements.get(2).text();
+            System.out.println("장르 "+ genre);
+            Element artistNameElement = document.selectXpath("//*[@id=\"downloadfrm\"]/div/div/div[2]/div[1]/div[2]").first();
+            Elements artistLinks = artistNameElement.select("a.artist_name");
+            Elements artistIdHref = artistNameElement.getElementsByTag("a");
+            for (Element artistLink : artistLinks) {
+                JsonNode jsonNode = lastFmService.getSongPlayTime(track, artistLink.attr("title"));
+                if(jsonNode.has("error")){
+                    continue;
+                }
+                playTime = jsonNode.get("track").get("duration").asInt();
+                musicUrl = getSongUrl(jsonNode.get("track").get("url").asText());
+            }
+            //가사 가져오기
+            lyric = (document.getElementById("d_video_summary").html()!=null) ?  document.getElementById("d_video_summary").html(): "";
+            System.out.println("가사 "+lyric);
+            song = new Song((long)songId, track, playTime, album, genre, musicUrl, lyric);
+            songRepository.save(song);
+            Song finalSong = song;
+            artistIdHref.forEach(element -> {
+                Matcher matcher2 = pattern.matcher(element.attr("href"));
+                if (matcher2.find()) {
+                    Optional<Artist> artist = artistRepository.findById((long)Integer.parseInt(matcher2.group(1)));
+                    if(artist.isPresent()){
+                        saveSongOfArtist(finalSong,artist.get());
+                    }
+                }
+            });
+            }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return song;
     }
 
     public String getSongUrl(String url) {

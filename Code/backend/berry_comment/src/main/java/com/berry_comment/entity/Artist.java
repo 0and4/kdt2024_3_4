@@ -13,7 +13,6 @@ import java.util.List;
 @ToString
 public class Artist {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     //아티스트 이름
@@ -27,7 +26,8 @@ public class Artist {
     @Column(nullable = false)
     private String image;
 
-    public Artist(String name, String image) {
+    public Artist(Long id,String name, String image) {
+        this.id = id;
         this.name = name;
         this.image = image;
     }

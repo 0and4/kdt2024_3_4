@@ -26,4 +26,6 @@ public class SongOfArtist {
         this.artist = artist;
         this.song = song;
     }
+
+
 }
