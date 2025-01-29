@@ -4,6 +4,9 @@ import Header from "./component/header";
 import Main from "./component/Main";
 import Player from "./component/Player";
 import Search from "./component/pages/Search";
+import SongInfo from "./component/pages/SongInfo";
+import ArtistInfo from "./component/pages/ArtistInfo";
+import AlbumInfo from "./component/pages/AlbumInfo";
 import { useState } from "react";
 import {
   BrowserRouter as Router,
@@ -48,6 +51,9 @@ function App() {
           <Routes>
             <Route path="*" element={<Main activeMenu={activeMenu} />} />
             <Route path="/search" element={<Search />} />
+            <Route path="/song/:songId" element={<SongInfo />} />
+            <Route path="/artist/:artistName" element={<ArtistInfo />} />
+            <Route path="/album/:albumName" element={<AlbumInfo />} />
           </Routes>
         </Container>
         <Player />

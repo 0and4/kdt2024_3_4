@@ -171,7 +171,7 @@ function PlaylistInfo() {
                     <AllBtn>전체 듣기</AllBtn>
                     <ShuffleBtn>셔플 듣기</ShuffleBtn>
                     <KeepBtn
-                      isBookmarked={isBookmarked}
+                      $isBookmarked={isBookmarked}
                       onClick={toggleBookmark}
                     >
                       {isBookmarked ? <FaBookmark /> : <FaRegBookmark />}

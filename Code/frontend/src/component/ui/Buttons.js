@@ -20,8 +20,8 @@ export const BasketBtn = styled.button`
 export const KeepBtn = styled.button`
   border-radius: 20px;
   border: 1px solid black;
-  background-color: ${(props) => (props.isBookmarked ? "black" : "#ffffff")};
-  color: ${(props) => (props.isBookmarked ? "#fff" : "black")};
+  background-color: ${(props) => (props.$isBookmarked ? "black" : "#ffffff")};
+  color: ${(props) => (props.$isBookmarked ? "#fff" : "black")};
   &:hover,
   &:active {
     border: 1px solid #c69fda;

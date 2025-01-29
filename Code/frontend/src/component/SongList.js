@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 import AddPopup from "./ui/AddPopup";
 import {
   LiaHeart,
@@ -93,95 +94,6 @@ const Button = styled.button`
     border-color: #e41111;
   }
 `;
-/*
-const MoreButton = styled.button`
-  margin: 10px auto;
-  padding: 8px 12px;
-  font-size: 0.9rem;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  cursor: pointer;
-  transition: background 0.3s;
-
-  &:hover {
-    background-color: #ddd;
-  }
-`;
-
-// 임의의 노래 목록
-const songs = [
-  {
-    rank: 1,
-    title: "Song A",
-    artist: "Artist A",
-    album: "Album A",
-    duration: "3:45",
-  },
-  {
-    rank: 2,
-    title: "Song B",
-    artist: "Artist B",
-    album: "Album B",
-    duration: "4:00",
-  },
-  {
-    rank: 3,
-    title: "Song C",
-    artist: "Artist C",
-    album: "Album C",
-    duration: "3:30",
-  },
-  {
-    rank: 4,
-    title: "Song D",
-    artist: "Artist D",
-    album: "Album D",
-    duration: "3:50",
-  },
-  {
-    rank: 5,
-    title: "Song E",
-    artist: "Artist E",
-    album: "Album E",
-    duration: "4:10",
-  },
-  {
-    rank: 6,
-    title: "Song F",
-    artist: "Artist F",
-    album: "Album F",
-    duration: "3:25",
-  },
-  {
-    rank: 7,
-    title: "Song G",
-    artist: "Artist G",
-    album: "Album G",
-    duration: "3:15",
-  },
-  {
-    rank: 8,
-    title: "Song H",
-    artist: "Artist H",
-    album: "Album H",
-    duration: "4:05",
-  },
-  {
-    rank: 9,
-    title: "Song I",
-    artist: "Artist I",
-    album: "Album I",
-    duration: "3:40",
-  },
-  {
-    rank: 10,
-    title: "Song J",
-    artist: "Artist J",
-    album: "Album J",
-    duration: "3:55",
-  },
-];
-*/
 function SongList({ showAll, headerTitle, songs = [] }) {
   const [likedSongs, setLikedSongs] = useState([]);
   const [popupPosition, setPopupPosition] = useState(null);
@@ -253,11 +165,28 @@ function SongList({ showAll, headerTitle, songs = [] }) {
             <SongInfoContainer>
               <SongCover />
               <SongInfo>
-                <div>{song.title}</div>
-                <div>{song.artist}</div>
+                <Link
+                  to={`/song/${song.rank}`}
+                  style={{ textDecoration: "none" }}
+                >
+                  <div>{song.title}</div>
+                </Link>
+                <Link
+                  to={`/artist/${song.artist}`}
+                  style={{ textDecoration: "none" }}
+                >
+                  <div>{song.artist}</div>
+                </Link>
               </SongInfo>
             </SongInfoContainer>
-            <Album>{song.album}</Album>
+            <Album>
+              <Link
+                to={`/album/${song.album}`}
+                style={{ textDecoration: "none" }}
+              >
+                {song.album}
+              </Link>
+            </Album>
             <Duration>{song.duration}</Duration>
             <Actions>
               <Button
