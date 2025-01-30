@@ -74,7 +74,6 @@ const PlayDiv = styled.div`
 const CompactPlayerWrapper = styled.div`
   display: ${({ $isExpanded }) => ($isExpanded ? "none" : "flex")};
   justify-content: center;
-  padding: 5px;
   background-color: #fff;
   border-top: 2px solid #ccc;
   position: fixed;

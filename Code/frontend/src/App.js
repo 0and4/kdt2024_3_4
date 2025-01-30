@@ -23,6 +23,9 @@ const Wrapper = styled.div`
   @media (max-width: 768px) {
     flex-direction: column; /* 화면이 좁을 때 세로로 변경 */
   }
+  @media (max-width: 768px) {
+    padding-bottom: 72px; /* 플레이어 높이에 맞게 적절한 값으로 설정 */
+  }
 `;
 const Container = styled.div`
   width: 100%;
