@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import logo from "../images/logo.png"; // 로고 이미지 경로
+import logo from "../images/logo.png";
 
 const Wrapper = styled.div`
   display: flex;
@@ -37,7 +37,7 @@ const InputGroup = styled.div`
   gap: 20px;
 
   &:first-child {
-    margin-top: 10px; /* 아이디 입력란 위쪽 공간 추가 */
+    margin-top: 10px;
   }
 `;
 

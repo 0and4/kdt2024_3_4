@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import logo from "../images/logo.png"; // 로고 이미지 경로
+import logo from "../images/logo.png";
 
 const Wrapper = styled.div`
   display: flex;
@@ -42,7 +42,7 @@ const IdInputGroup = styled.div`
   justify-content: flex-start;
   gap: 20px;
   width: 100%;
-  margin-left: 150px; /* 아이디 입력창만 왼쪽으로 이동 */
+  margin-left: 150px;
 `;
 
 const IdLabel = styled.label`
@@ -104,14 +104,14 @@ const SmallButton = styled.button`
   padding: 0 10px;
   font-size: 0.9rem;
   color: white;
-  background-color: #68009b;
+  background-color: rgb(121, 16, 174);
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: #9e7bb5;
+    background-color: rgb(95, 31, 137);
   }
 `;
 
@@ -146,7 +146,7 @@ const Modal = styled.div`
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -158,12 +158,12 @@ const ModalContent = styled.div`
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  width: 320px; /* 팝업 너비 고정 */
-  height: 200px; /* 팝업 높이 고정 */
-  display: flex; /* 플렉스 박스 활성화 */
-  flex-direction: column; /* 세로 정렬 */
-  justify-content: center; /* 세로 가운데 정렬 */
-  align-items: center; /* 가로 가운데 정렬 */
+  width: 320px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 `;
 
 const ModalButton = styled.button`

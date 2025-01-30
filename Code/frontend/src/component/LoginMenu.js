@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import logo from "../images/logo.png"; // 로고 이미지 경로
+import logo from "../images/logo.png";
 
 const Wrapper = styled.div`
   display: flex;
@@ -27,7 +27,7 @@ const LoginBox = styled.div`
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly; /* 내부 요소 간 간격 균등 */
+  justify-content: space-evenly;
 `;
 
 const Button = styled.button`
@@ -46,7 +46,7 @@ const Button = styled.button`
     background-color: #fff;
     color: #757575;
     border: 1px solid #ddd;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 기본 그림자 효과 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
   &:nth-child(1):hover {
@@ -56,7 +56,7 @@ const Button = styled.button`
   &:nth-child(2) {
     background-color: #fff;
     color: #757575;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 기본 그림자 효과 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
   &:nth-child(2):hover {
