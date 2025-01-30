@@ -85,7 +85,7 @@ const SaveBtn = styled.button`
   cursor: pointer;
 `;
 
-function AddPopup({ position, onClose, playlists }) {
+function AddPopup({ position, onClose, playlists = [] }) {
   return (
     <PopupWrapper position={position}>
       <div>

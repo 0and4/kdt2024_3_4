@@ -185,6 +185,7 @@ function SongList({ showAll, headerTitle, songs = [] }) {
           ref={popupRef}
           position={popupPosition}
           onClose={closePopup}
+          //playlists={/* 전달할 플레이리스트 배열 */}
         />
       )}
       <Container>

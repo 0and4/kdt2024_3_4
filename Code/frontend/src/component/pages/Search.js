@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import { FaChevronRight, FaChevronUp } from "react-icons/fa";
@@ -12,12 +13,12 @@ const Container = styled.div`
     width: 100%;
   }
 `;
+const ResultP = styled.p`
+  font-size: 1.5rem;
+  margin-top: 40px;
+`;
 const Section = styled.div`
   margin-bottom: 20px;
-  p {
-    font-weight: bold;
-    text-align: left;
-  }
   button {
     background: none;
     border: none;
@@ -32,12 +33,16 @@ const Section = styled.div`
 const ResultDiv = styled.div`
   display: flex;
   justify-content: space-between;
+  p {
+    margin-left: 20px;
+  }
 `;
 const ListDiv = styled.div`
   margin: 0;
   padding: 0;
 `;
 const AlbumGrid = styled.div`
+  margin: 10px 40px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
@@ -45,23 +50,33 @@ const AlbumGrid = styled.div`
 
 const AlbumItem = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  text-align: center;
+  gap: 15px;
+  margin-bottom: 10px;
 
   img {
     width: 100px;
     height: 100px;
     border-radius: 8px;
     object-fit: cover;
+    background-color: #ccc;
   }
 
   p {
-    margin: 5px 0;
+    margin: 2px 0;
+    text-align: left;
   }
 `;
-
+const TitleP = styled.p`
+  font-weight: bold;
+`;
+const SubtitleP = styled.p`
+  font-weight: 100;
+  font-size: 0.9rem;
+`;
 const ArtistGrid = styled.div`
+  margin: 10px 40px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
@@ -69,19 +84,26 @@ const ArtistGrid = styled.div`
 
 const ArtistItem = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  text-align: center;
+  gap: 15px;
+  margin-bottom: 10px;
 
   img {
     width: 100px;
     height: 100px;
     border-radius: 50%;
     object-fit: cover;
+    background-color: #ccc;
+  }
+  div {
+    display: flex;
+    flex-direction: column;
   }
 
   p {
-    margin-top: 5px;
+    margin: 2px 0;
+    text-align: left;
   }
 `;
 
@@ -186,10 +208,34 @@ const albums = [
 ];
 
 const artists = [
-  { id: 1, name: "Artist A", photo: "https://via.placeholder.com/100" },
-  { id: 2, name: "Artist B", photo: "https://via.placeholder.com/100" },
-  { id: 3, name: "Artist C", photo: "https://via.placeholder.com/100" },
-  { id: 4, name: "Artist D", photo: "https://via.placeholder.com/100" },
+  {
+    id: 1,
+    name: "Artist A",
+    category: "솔로",
+    genre: "랩/힙합",
+    photo: "https://via.placeholder.com/100",
+  },
+  {
+    id: 2,
+    name: "Artist B",
+    category: "솔로",
+    genre: "인디",
+    photo: "https://via.placeholder.com/100",
+  },
+  {
+    id: 3,
+    name: "Artist C",
+    category: "그룹",
+    genre: "국악/크로스오버",
+    photo: "https://via.placeholder.com/100",
+  },
+  {
+    id: 4,
+    name: "Artist D",
+    category: "솔로",
+    genre: "재즈",
+    photo: "https://via.placeholder.com/100",
+  },
 ];
 
 function Search() {
@@ -216,15 +262,15 @@ function Search() {
   return (
     <Wrapper>
       <Container>
-        <p>
+        <ResultP>
           '<span style={{ fontWeight: "bold" }}>{query}</span>
           '(으)로 검색한 결과
-        </p>
+        </ResultP>
 
         {/* 곡 검색 결과 */}
         <Section>
           <ResultDiv>
-            <p>곡명으로 검색</p>
+            <TitleP>곡명으로 검색</TitleP>
             <button onClick={() => setShowAllSongs((prev) => !prev)}>
               {showAllSongs ? "접기" : "더보기"}{" "}
               {showAllSongs ? <FaChevronUp /> : <FaChevronRight />}
@@ -246,7 +292,7 @@ function Search() {
         {/* 앨범 검색 결과 */}
         <Section>
           <ResultDiv>
-            <p>앨범명으로 검색</p>
+            <TitleP>앨범명으로 검색</TitleP>
             <button onClick={() => setShowAllAlbums((prev) => !prev)}>
               {showAllAlbums ? "접기" : "더보기"}{" "}
               {showAllAlbums ? <FaChevronUp /> : <FaChevronRight />}
@@ -261,8 +307,22 @@ function Search() {
               ).map((album) => (
                 <AlbumItem key={album.id}>
                   <img src={album.cover} alt={album.name} />
-                  <p>{album.name}</p>
-                  <p>{album.artist}</p>
+                  <div>
+                    {/* 앨범명 클릭 시 해당 앨범 페이지로 이동 */}
+                    <Link
+                      to={`/album/${album.name}`}
+                      style={{ textDecoration: "none", color: "black" }}
+                    >
+                      <TitleP>{album.name}</TitleP>
+                    </Link>
+                    {/* 아티스트명 클릭 시 해당 아티스트 페이지로 이동 */}
+                    <Link
+                      to={`/artist/${album.artist}`}
+                      style={{ textDecoration: "none", color: "black" }}
+                    >
+                      <SubtitleP>{album.artist}</SubtitleP>
+                    </Link>
+                  </div>
                 </AlbumItem>
               ))}
             </AlbumGrid>
@@ -272,7 +332,7 @@ function Search() {
         {/* 아티스트 검색 결과 */}
         <Section>
           <ResultDiv>
-            <p>아티스트명으로 검색</p>
+            <TitleP>아티스트명으로 검색</TitleP>
             <button onClick={() => setShowAllArtists((prev) => !prev)}>
               {showAllArtists ? "접기" : "더보기"}{" "}
               {showAllArtists ? <FaChevronUp /> : <FaChevronRight />}
@@ -287,7 +347,18 @@ function Search() {
               ).map((artist) => (
                 <ArtistItem key={artist.id}>
                   <img src={artist.photo} alt={artist.name} />
-                  <p>{artist.name}</p>
+                  {/* 아티스트명 클릭 시 해당 아티스트 페이지로 이동 */}
+                  <div>
+                    <Link
+                      to={`/artist/${artist.name}`}
+                      style={{ textDecoration: "none", color: "black" }}
+                    >
+                      <TitleP>{artist.name}</TitleP>
+                      <SubtitleP>
+                        {artist.category}, {artist.genre}
+                      </SubtitleP>
+                    </Link>
+                  </div>
                 </ArtistItem>
               ))}
             </ArtistGrid>
