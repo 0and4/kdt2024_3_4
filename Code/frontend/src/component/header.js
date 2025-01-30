@@ -51,6 +51,9 @@ const SearchDiv = styled.div`
     font-size: 1rem;
     outline: none;
     transition: border-color 0.3s;
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
 
     &::placeholder {
       font-size: 0.9rem;
@@ -61,7 +64,8 @@ const SearchDiv = styled.div`
   }
   button {
     position: absolute;
-    left: 200px; /* input의 왼쪽에 버튼 배치 */
+    left: 200px;
+
     top: 50%;
     transform: translateY(-50%);
     background: none;
@@ -71,6 +75,22 @@ const SearchDiv = styled.div`
       width: 16px;
       height: 16px;
       color: #495057;
+    }
+  }
+  @media (max-width: 532px) {
+    input {
+      padding: 8px 50px 8px 36px;
+      font-size: 0.9rem;
+    }
+    button {
+      left: 90%;
+    }
+  }
+  @media (max-width: 768px) {
+    margin: 0 10px;
+    input {
+      padding: 8px 58px 8px 30px;
+      font-size: 0.9rem;
     }
   }
 `;
