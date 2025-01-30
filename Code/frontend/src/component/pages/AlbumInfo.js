@@ -135,7 +135,7 @@ const songs = [
 
 function AlbumInfo() {
   const { albumName } = useParams();
-  const artistName = "Artist A"; // 임시 아티스트명
+  const artistName = "Artist A";
   const navigate = useNavigate();
   const [likedSongs, setLikedSongs] = useState({});
 
