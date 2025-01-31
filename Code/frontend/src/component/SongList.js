@@ -1,23 +1,38 @@
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-const Wrapper = styled.div`
-  width: 100%;
-`;
+import { Link } from "react-router-dom";
+import AddPopup from "./ui/AddPopup";
+import {
+  LiaHeart,
+  LiaHeartSolid,
+  LiaPlusSolid,
+  LiaPlaySolid,
+} from "react-icons/lia";
+
+const Wrapper = styled.div``;
 const Container = styled.div`
-  width: 100%;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
   div {
-    margin: 0 10px;
+    margin: 0;
+    gap: 5px;
+    font-size: 0.9rem;
+  }
+  .album-link {
+    text-decoration: none;
+    color: black;
+  }
+  .album-link:hover {
+    text-decoration: underline;
   }
 `;
 const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 5px;
   font-weight: bold;
-  font-size: 1vw;
+  font-size: 0.8rem;
   background-color: #eee;
   border-bottom: 5px solid #ddd;
 `;
@@ -25,7 +40,7 @@ const SongItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 5px;
   background-color: #f9f9f9;
 `;
 const SongRank = styled.div`
@@ -33,7 +48,7 @@ const SongRank = styled.div`
   justify-content: center;
 `;
 const SongInfoContainer = styled.div`
-  flex: 2;
+  flex: 1;
   display: flex;
 `;
 const SongCover = styled.div`
@@ -43,17 +58,14 @@ const SongCover = styled.div`
   border-radius: 5px;
 `;
 const SongInfo = styled.div`
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 5px;
   text-align: left;
 `;
-const Album = styled.div`
-  flex: 1;
-  text-align: center;
-  text-align: left;
-`;
+const Song = styled.div``;
+const Artist = styled.div``;
+const Album = styled.div``;
 const Duration = styled.div`
   flex: 0.5;
   text-align: center;
@@ -64,129 +76,188 @@ const Actions = styled.div`
   justify-content: space-around;
 `;
 const Button = styled.button`
-  padding: 5px 10px;
-  border: none;
-  border-radius: 3px;
-  background-color: #007bff;
-  color: white;
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid ${(props) => (props.liked ? "#e41111" : "#0a0a0a")};
+  background-color: #f9f9f9;
+  border-radius: 50%;
   cursor: pointer;
-  &:hover {
-    background-color: #0056b3;
+  color: ${(props) => (props.liked ? "#e41111" : "inherit")};
+
+  &:hover,
+  &:active {
+    color: #717171;
+    border-color: #717171;
+  }
+  &:first-child:hover,
+  &:first-child:active {
+    color: #e41111;
+    border-color: #e41111;
   }
 `;
+const LikePopup = styled.div`
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: black;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  opacity: ${(props) => (props.show ? "1" : "0")};
+  transition: opacity 0.5s ease-in-out;
+  visibility: ${(props) => (props.show ? "visible" : "hidden")};
+`;
+function SongList({ showAll, headerTitle, songs = [] }) {
+  const [likedSongs, setLikedSongs] = useState([]);
+  const [selectedSongs, setSelectedSongs] = useState([]);
+  const [allSelected, setAllSelected] = useState(false);
+  const [showLikePopup, setShowLikePopup] = useState(false);
+  const [popupPosition, setPopupPosition] = useState(null);
+  const popupRef = useRef(null);
 
-//임의의 노래 목록
-const songs = [
-  {
-    rank: 1,
-    title: "Song A",
-    artist: "Artist A",
-    album: "Album A",
-    duration: "3:45",
-  },
-  {
-    rank: 2,
-    title: "Song B",
-    artist: "Artist B",
-    album: "Album B",
-    duration: "4:00",
-  },
-  {
-    rank: 3,
-    title: "Song C",
-    artist: "Artist C",
-    album: "Album C",
-    duration: "3:30",
-  },
-  {
-    rank: 4,
-    title: "Song D",
-    artist: "Artist D",
-    album: "Album D",
-    duration: "3:50",
-  },
-  {
-    rank: 5,
-    title: "Song E",
-    artist: "Artist E",
-    album: "Album E",
-    duration: "4:10",
-  },
-  {
-    rank: 6,
-    title: "Song F",
-    artist: "Artist F",
-    album: "Album F",
-    duration: "3:25",
-  },
-  {
-    rank: 7,
-    title: "Song G",
-    artist: "Artist G",
-    album: "Album G",
-    duration: "3:15",
-  },
-  {
-    rank: 8,
-    title: "Song H",
-    artist: "Artist H",
-    album: "Album H",
-    duration: "4:05",
-  },
-  {
-    rank: 9,
-    title: "Song I",
-    artist: "Artist I",
-    album: "Album I",
-    duration: "3:40",
-  },
-  {
-    rank: 10,
-    title: "Song J",
-    artist: "Artist J",
-    album: "Album J",
-    duration: "3:55",
-  },
-];
+  const toggleLike = (rank) => {
+    setLikedSongs((prev) => {
+      const isLiked = prev.includes(rank);
 
-function SongList() {
+      if (!isLiked) {
+        setShowLikePopup(true);
+        setTimeout(() => setShowLikePopup(false), 2000);
+      }
+
+      return isLiked ? prev.filter((id) => id !== rank) : [...prev, rank];
+    });
+  };
+  const handleCheckboxChange = (rank) => {
+    setSelectedSongs((prev) => {
+      const newSelected = prev.includes(rank)
+        ? prev.filter((id) => id !== rank)
+        : [...prev, rank];
+
+      // 전체 선택 상태 업데이트
+      setAllSelected(newSelected.length === songs.length);
+      return newSelected;
+    });
+  };
+  const handleSelectAll = () => {
+    if (allSelected) {
+      setSelectedSongs([]);
+    } else {
+      setSelectedSongs(songs.map((song) => song.rank));
+    }
+    setAllSelected(!allSelected);
+  };
+  const handleAddClick = (e) => {
+    const rect = e.target.getBoundingClientRect();
+    setPopupPosition({
+      top: rect.top + window.scrollY - 300,
+      left: rect.left + window.scrollX - 200,
+    });
+  };
+
+  const closePopup = () => setPopupPosition(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (popupRef.current && !popupRef.current.contains(e.target)) {
+        closePopup();
+      }
+    };
+    if (popupPosition) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [popupPosition]);
+
+  const displayedSongs = showAll ? songs : songs.slice(0, 5); // showAll에 따라 전체 목록 또는 5곡만 표시
+
   return (
     <Wrapper>
+      {popupPosition && (
+        <AddPopup
+          ref={popupRef}
+          position={popupPosition}
+          onClose={closePopup}
+          //playlists={/* 전달할 플레이리스트 배열 */}
+        />
+      )}
       <Container>
         <Header>
-          <div>선택</div>
-          <div style={{ flex: 0.3 }}>순위</div>
-          <div style={{ flex: 2 }}>곡 정보</div>
-          <div style={{ flex: 1 }}>앨범</div>
-          <Duration>재생시간</Duration>
+          <input
+            type="checkbox"
+            style={{ flex: 0.1 }}
+            checked={allSelected}
+            onChange={handleSelectAll}
+          />
+          <div style={{ flex: 0.2 }}>{headerTitle}</div>
+          <div style={{ flex: 0.6 }}>곡 정보</div>
+          <div style={{ flex: 0.7 }}>앨범</div>
+          <div style={{ flex: 0.3 }}>재생시간</div>
           <Actions>
             <div>찜하기</div>
             <div>추가</div>
             <div>재생</div>
           </Actions>
         </Header>
-        {songs.map((song) => (
+
+        {displayedSongs.map((song) => (
           <SongItem key={song.rank}>
-            <input type="checkbox" style={{ flex: 0.2 }}></input>
+            <input
+              type="checkbox"
+              style={{ flex: 0.1 }}
+              checked={selectedSongs.includes(song.rank)}
+              onChange={() => handleCheckboxChange(song.rank)}
+            />
             <SongRank>{song.rank}</SongRank>
             <SongInfoContainer>
               <SongCover />
               <SongInfo>
-                <div>{song.title}</div>
-                <div>{song.artist}</div>
+                <Link to={`/song/${song.rank}`} className="album-link">
+                  <Song>{song.title}</Song>
+                </Link>
+                <Link to={`/artist/${song.artist}`} className="album-link">
+                  <Artist>{song.artist}</Artist>
+                </Link>
               </SongInfo>
             </SongInfoContainer>
-            <Album>{song.album}</Album>
+
+            <Link to={`/album/${song.album}`} className="album-link">
+              <Album>{song.album}</Album>
+            </Link>
             <Duration>{song.duration}</Duration>
             <Actions>
-              <Button>찜하기</Button>
-              <Button>추가</Button>
-              <Button>듣기</Button>
+              <Button
+                liked={likedSongs.includes(song.rank)}
+                onClick={() => toggleLike(song.rank)}
+              >
+                {likedSongs.includes(song.rank) ? (
+                  <LiaHeartSolid />
+                ) : (
+                  <LiaHeart />
+                )}
+              </Button>
+              <Button onClick={handleAddClick}>
+                <LiaPlusSolid />
+              </Button>
+              <Button>
+                <LiaPlaySolid />
+              </Button>
             </Actions>
           </SongItem>
         ))}
       </Container>
+      <LikePopup show={showLikePopup}>
+        내가 좋아하는 노래로 저장했어요!
+      </LikePopup>
     </Wrapper>
   );
 }
+
 export default SongList;
