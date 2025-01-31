@@ -53,6 +53,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            //오류 발생시키기...
             chain.doFilter(request, response);
 
         }

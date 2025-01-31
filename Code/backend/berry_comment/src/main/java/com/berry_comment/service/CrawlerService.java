@@ -1,7 +1,5 @@
 package com.berry_comment.service;
 
-import com.berry_comment.dto.ArtistDto;
-import com.berry_comment.dto.CrawlInfoDto;
 import com.berry_comment.entity.*;
 import com.berry_comment.repository.*;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,8 +9,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -165,7 +161,7 @@ public class CrawlerService {
             Elements tBodyElements = tBodyElement.getElementsByTag("tr");
 
             tBodyElements.stream().forEach(element -> {
-                Element songElementTd = element.getElementsByTag("td").get(3);
+                Element songElementTd = element.getElementsByTag("td").get(3); //인데스 outofError고치기..
                 String href = songElementTd.selectFirst("a").attr("href");
                 Pattern pattern = Pattern.compile("\\d+"); // 숫자(0~9)를 추출
                 Matcher matcher = pattern.matcher(href);
@@ -182,7 +178,7 @@ public class CrawlerService {
             });
             String albumName = document.selectXpath("//*[@id=\"conts\"]/div[2]/div/div[2]/div[1]/div[1]").first().ownText();
             String albumImageUrl = document.getElementById("d_album_org").selectFirst("img").attr("src");
-            Album newAlbum = new Album((long)albumId, albumName, albumImageUrl);
+            Album newAlbum = new Album((long)albumId, albumImageUrl,albumName);
             albumRepository.save(newAlbum);
             return newAlbum;
         } catch (Exception e) {
@@ -231,6 +227,7 @@ public class CrawlerService {
                 musicUrl = getSongUrl(jsonNode.get("track").get("url").asText());
             }
             //가사 가져오기
+            //널값 오류 해결..
             lyric = (document.getElementById("d_video_summary").html()!=null) ?  document.getElementById("d_video_summary").html(): "";
             System.out.println("가사 "+lyric);
             song = new Song((long)songId, track, playTime, album, genre, musicUrl, lyric);

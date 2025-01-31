@@ -1,17 +1,20 @@
 package com.berry_comment.service;
 
+import com.berry_comment.dto.ArtistDto;
 import com.berry_comment.dto.ArtistSearchAnswerDto;
 import com.berry_comment.dto.ListInfoDto;
+import com.berry_comment.dto.SongDto;
 import com.berry_comment.entity.Artist;
+import com.berry_comment.entity.Song;
+import com.berry_comment.entity.SongOfArtist;
 import com.berry_comment.repository.ArtistRepository;
+import com.berry_comment.repository.SongOfArtistRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -19,6 +22,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ArtistService {
     private final ArtistRepository artistRepository;
+    private final SongOfArtistRepository songOfArtistRepository;
 
     public ListInfoDto getInformationArtistByName(String artistName, Pageable pageable) {
         ListInfoDto listInfoDto = new ListInfoDto();
@@ -44,27 +48,37 @@ public class ArtistService {
         return listInfoDto;
     }
 
-    @Transactional
-    public Artist saveArtistByIdAndName(int id) {
-        //만약 아티스트가 존재한다면
-        Optional<Artist> artist = artistRepository.findById((long)id);
-        if(!artist.isPresent()){
+    public List<SongDto> getArtistDetailById(long id, Pageable pageableOfSong){
+        Artist artist = artistRepository.findById(id).orElse(null);
+        if(artist == null){
+            throw new EntityNotFoundException("해당하는 아티스트가 없습니다.");
+        }
+        List<SongDto> songDtoList = new ArrayList<>();
+        Page<SongOfArtist> songOfArtistPage = songOfArtistRepository.findByArtistId(artist.getId(), pageableOfSong);
+        songOfArtistPage.forEach(songOfArtist -> {
+            Song song = songOfArtist.getSong();
+            SongDto songDto = SongDto.builder()
+                    .id(song.getId().intValue())
+                    .artist(artist.getName())
+                    .track(song.getTrack())
+                    .image(song.getAlbum().getImageUrl())
+                    .playTime(song.getPlayTime())
+                    .build();
+            songDtoList.add(songDto);
+        });
 
-            String url = "https://www.melon.com/artist/timeline.htm?artistId=" + id;
-            try {
-                Document document = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36").get();
-                String imageUrl = document.getElementById("artistImgArea").attr("src");
-                String artistName = document.selectFirst("p.title_atist").ownText();
-                Artist newArtist = new Artist((long)id, artistName, imageUrl);
-                artistRepository.save(newArtist);
-                return newArtist;
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+        return songDtoList;
+    }
+
+    public ArtistDto getArtistById(long id) {
+        Artist artist = artistRepository.findById(id).orElse(null);
+        if(artist == null){
+            throw new EntityNotFoundException("해당하는 아티스트가 없습니다.");
         }
-        else {
-            return artist.get();
-        }
-        return null;
+        return ArtistDto.builder()
+                .id(artist.getId().intValue())
+                .artistName(artist.getName())
+                .imageUrl(artist.getImage())
+                .build();
     }
 }

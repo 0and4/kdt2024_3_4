@@ -1,13 +1,13 @@
 package com.berry_comment.controller;
 
-import com.berry_comment.dto.ListInfoDto;
-import com.berry_comment.dto.SongChartDto;
+import com.berry_comment.dto.*;
 import com.berry_comment.service.AlbumService;
 import com.berry_comment.service.ArtistService;
 import com.berry_comment.service.ChartService;
 import com.berry_comment.service.SongService;
 import com.berry_comment.type.SearchType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
-
+import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/search")
@@ -76,5 +76,43 @@ public class SearchController {
                 return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(listInfoDto);
+    }
+
+    @GetMapping("/detail")
+    public ResponseEntity<?> getDetail(
+            @RequestParam(name = "keyword") SearchType keyword,
+            @RequestParam(name = "id") int id
+    ){
+        switch (keyword){
+            case SONG:
+                SongDetailDto songDetailDto = songService.getSongDetail(id);
+                return ResponseEntity.ok(songDetailDto);
+            case ALBUM:
+                AlbumDetailDto albumDetailDto = albumService.getAlbumDetailById(id);
+                return ResponseEntity.ok(albumDetailDto);
+            case ARTIST:
+                ArtistDto artistDto = artistService.getArtistById(id);
+                Pageable pageableOfSong = PageRequest.of(0,5);
+                Pageable pageableOfAlbum = PageRequest.of(0,4);
+                List<SongDto> songDtoList = artistService.getArtistDetailById(id, pageableOfSong);
+                List<AlbumDto> albumDtoList = albumService.getAlbumByArtistId(id, pageableOfAlbum);
+                ListInfoDto songListInfoDto = ListInfoDto.builder()
+                        .size(songDtoList.size())
+                        .dataList(songDtoList)
+                        .build();
+                ListInfoDto albumListInfoDto = ListInfoDto.builder()
+                        .size(albumDtoList.size())
+                        .dataList(albumDtoList)
+                        .build();
+
+                ArtistDetailDto artistDetailDto = ArtistDetailDto.builder()
+                        .albumList(albumListInfoDto)
+                        .artist(artistDto)
+                        .songList(songListInfoDto)
+                        .build();
+                return ResponseEntity.ok(artistDetailDto);
+            default:
+                return ResponseEntity.badRequest().build();
+        }
     }
 }
