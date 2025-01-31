@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.berry_comment.oauth.PrincipalDetails;
 import java.security.Principal;
 import java.util.HashMap;
@@ -48,4 +45,6 @@ public class PlayListController {
         PlayListDto playListDto = playListService.addPlayList(userId, playListName);
         return ResponseEntity.ok(playListDto);
     }
+
+    
 }

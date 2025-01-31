@@ -10,4 +10,12 @@ public class RecommendationDetail {
 
     @ManyToOne
     private Song song;
+
+    @ManyToOne
+    private Recommendation recommendation;
+
+    public RecommendationDetail(Song song, Recommendation recommendation) {
+        this.song = song;
+        this.recommendation = recommendation;
+    }
 }
