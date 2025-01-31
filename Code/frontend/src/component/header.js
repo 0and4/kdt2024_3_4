@@ -156,16 +156,22 @@ function Header({ activeMenu, onMenuClick }) {
       navigate(`/search?query=${encodeURIComponent(searchTerm)}`);
     }
   };
+
   // 로고 클릭 시 메인 페이지로 이동
   const handleLogoClick = () => {
     navigate("/"); // 메인 페이지로 이동
+  };
+
+  const handleLoginClick = () => {
+    navigate("/login"); // 로그인 페이지로 이동
   };
 
   return (
     <Wrapper>
       <Container>
         <LoginDiv>
-          <button>로그인</button>
+          <button onClick={handleLoginClick}>로그인</button>{" "}
+          {/* 로그인 버튼 클릭 시 이동 */}
         </LoginDiv>
 
         <SearchDiv>
