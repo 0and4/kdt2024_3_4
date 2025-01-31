@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import { FaChevronRight, FaChevronUp } from "react-icons/fa";
-import SongList from "../SongList"; // 노래 목록 컴포넌트
+import SongList from "../SongList";
 const Wrapper = styled.div`
   position: relative;
 `;

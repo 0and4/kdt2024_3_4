@@ -15,10 +15,10 @@ const Wrapper = styled.div`
   position: relative;
 `;
 const Container = styled.div`
-  padding: 20px;
-  width: calc(100% - 250px);
+  width: calc(100% - 310px);
+  padding: 30px;
   @media (max-width: 768px) {
-    width: 100%;
+    width: calc(100% - 56px);
   }
 `;
 const SongInfoDiv = styled.div`
@@ -27,7 +27,7 @@ const SongInfoDiv = styled.div`
   align-items: center;
   text-align: left;
   gap: 15px;
-  padding: 30px 0;
+  padding-bottom: 30px;
   border-bottom: 1px solid #ccc;
   img {
     width: 150px;
@@ -54,6 +54,7 @@ const Actions = styled.div`
   display: flex;
   justify-content: space-around;
   gap: 5px;
+  margin: 10px 0;
 `;
 const Button = styled.button`
   font-size: 1.5rem;

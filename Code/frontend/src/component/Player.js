@@ -15,10 +15,9 @@ const Wrapper = styled.div`
   border-left: 3px solid #ccc;
   background-color: #fff;
 
-  /* 화면 크기가 작을 때 Wrapper는 화면 크기에 맞게 크기 조정 */
   @media (max-width: 768px) {
     width: 100%;
-    height: 100vh; /* 화면 크기에 맞춰 높이를 조정 */
+    height: 100vh;
     display: none;
   }
 `;
@@ -128,7 +127,6 @@ function Player() {
       }
     };
 
-    // 초기 크기 설정
     handleResize();
 
     window.addEventListener("resize", handleResize);
