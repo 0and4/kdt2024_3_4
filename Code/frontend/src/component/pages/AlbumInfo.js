@@ -146,7 +146,7 @@ function AlbumInfo() {
   const toggleLike = (songId) => {
     setLikedSongs((prev) => ({
       ...prev,
-      [songId]: !prev[songId], // 특정 노래만 토글
+      [songId]: !prev[songId],
     }));
   };
 
