@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import logo from "../images/logo.png";
 
 const Wrapper = styled.div`
@@ -7,6 +8,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100vw;
   height: 100vh;
   background-color: #c69fda;
 `;
@@ -14,6 +16,7 @@ const Wrapper = styled.div`
 const Logo = styled.img`
   width: 400px;
   margin-bottom: 35px;
+  cursor: pointer;
 `;
 
 const LoginBox = styled.div`
@@ -74,29 +77,45 @@ const TextLink = styled.p`
     color: #68009b;
     text-decoration: none;
     font-weight: bold;
-    transition: color 0.3s;
+    transition: color 0.1s;
+    cursor: pointer;
 
     &:hover {
-      color: rgb(95, 31, 137);
+      color: rgb(231, 224, 236);
     }
   }
 `;
 
 function LoginMenu() {
+  const navigate = useNavigate();
+
+  const handleIdLogin = () => {
+    navigate("/login-id"); // 회원 ID 로그인 페이지로 이동
+  };
+
+  const handleLogoClick = () => {
+    navigate("/"); // 로고 클릭 시 메인 페이지로 이동
+  };
+
   return (
     <Wrapper>
-      <Logo src={logo} alt="Berrecommend 로고" />
+      <Logo src={logo} alt="Berrecommend 로고" onClick={handleLogoClick} />
       <LoginBox>
         <Button>Google로 로그인하기</Button>
-        <Button>회원 ID로 로그인하기</Button>
+        <Button onClick={handleIdLogin}>회원 ID로 로그인하기</Button>
       </LoginBox>
       <TextLink>
         아직 회원이 아니신가요?
-        <a href="/signup">회원가입하기</a>
+        <a href="#" onClick={() => navigate("/signup")}>
+          회원가입하기
+        </a>{" "}
+        {/* 회원가입 페이지 이동 */}
       </TextLink>
       <TextLink>
         회원 정보를 잊으셨나요?
-        <a href="/find">ID/PW 찾기</a>
+        <a onClick={() => navigate("/find-id")}>ID 찾기</a>
+        {" / "}
+        <a onClick={() => navigate("/find-pw")}>PW 찾기</a>
       </TextLink>
     </Wrapper>
   );
