@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import logo from "../images/logo.png";
@@ -112,9 +112,24 @@ const TextLink = styled.p`
 
 function Login() {
   const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogoClick = () => {
     navigate("/"); //
+  };
+
+  const handleLogin = () => {
+    // 🔹 실제 로그인 검증 (여기서는 예제용으로 간단한 하드코딩)
+    const validUsername = "user123"; // 실제 DB가 있다면 이 값은 API 요청으로 확인
+    const validPassword = "password123";
+
+    if (username === validUsername && password === validPassword) {
+      alert("로그인 성공");
+      navigate("/"); // ✅ 메인 페이지로 이동
+    } else {
+      alert("로그인 실패: 아이디 또는 비밀번호가 올바르지 않습니다."); // 로그인 실패 알림
+    }
   };
 
   return (
@@ -123,7 +138,13 @@ function Login() {
       <LoginBox>
         <InputGroup>
           <Label htmlFor="username">아이디</Label>
-          <Input id="username" type="text" placeholder="아이디를 입력하세요" />
+          <Input
+            id="username"
+            type="text"
+            placeholder="아이디를 입력하세요"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
         </InputGroup>
         <InputGroup>
           <Label htmlFor="password">비밀번호</Label>
@@ -131,9 +152,11 @@ function Login() {
             id="password"
             type="password"
             placeholder="비밀번호를 입력하세요"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </InputGroup>
-        <Button>로그인</Button>
+        <Button onClick={handleLogin}>로그인</Button>
       </LoginBox>
       <TextLinks>
         <TextLink>
