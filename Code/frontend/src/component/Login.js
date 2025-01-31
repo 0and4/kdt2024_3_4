@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import logo from "../images/logo.png";
 
 const Wrapper = styled.div`
@@ -8,12 +9,14 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: center;
   height: 100vh;
+  weight: 100vw;
   background-color: #c69fda;
 `;
 
 const Logo = styled.img`
   width: 400px;
   margin-bottom: 35px;
+  cursor: pointer;
 `;
 
 const LoginBox = styled.div`
@@ -98,18 +101,25 @@ const TextLink = styled.p`
     color: #68009b;
     text-decoration: none;
     font-weight: bold;
-    transition: color 0.3s;
+    transition: color 0.1s;
+    cursor: pointer;
 
     &:hover {
-      color: rgb(95, 31, 137);
+      color: rgb(231, 224, 236);
     }
   }
 `;
 
 function Login() {
+  const navigate = useNavigate();
+
+  const handleLogoClick = () => {
+    navigate("/"); //
+  };
+
   return (
     <Wrapper>
-      <Logo src={logo} alt="Berrecommend 로고" />
+      <Logo src={logo} alt="Berrecommend 로고" onClick={handleLogoClick} />{" "}
       <LoginBox>
         <InputGroup>
           <Label htmlFor="username">아이디</Label>
@@ -132,7 +142,9 @@ function Login() {
         </TextLink>
         <TextLink>
           회원 정보를 잊으셨나요?
-          <a href="/find">ID/PW 찾기</a>
+          <a onClick={() => navigate("/find-id")}>ID 찾기</a>
+          {" / "}
+          <a onClick={() => navigate("/find-pw")}>PW 찾기</a>
         </TextLink>
       </TextLinks>
     </Wrapper>
