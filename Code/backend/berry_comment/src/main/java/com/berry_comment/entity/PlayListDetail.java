@@ -1,10 +1,12 @@
 package com.berry_comment.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
+@Getter
 public class PlayListDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

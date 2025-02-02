@@ -116,6 +116,7 @@ public class KaKaoPayService {
     @Transactional
     public void addPaymentEntity(KakaoApproveResponse approveResponse) {
         UserEntity user = userService.getUserEntity(userId);
+        System.out.println("유저 아이디" + user.getId());
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
         // 문자열을 LocalDateTime으로 변환

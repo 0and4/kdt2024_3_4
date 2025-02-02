@@ -9,6 +9,7 @@ import com.berry_comment.oauth.PrincipalDetails;
 import com.berry_comment.oauth.provider.GoogleUserInfo;
 import com.berry_comment.repository.RefreshTokenRepository;
 import com.berry_comment.repository.UserRepository;
+import com.berry_comment.service.MailService;
 import com.berry_comment.service.PlayListService;
 import com.berry_comment.type.RoleUser;
 import com.berry_comment.type.TypeUser;
@@ -37,6 +38,7 @@ public class PrincipalOauthUserService extends DefaultOAuth2UserService {
     private final PlayListService playListService;
     //리프레시 토큰 유효시간
     public static final Duration REFRESH_TOKEN_TIMEOUT = ConstantValue.REFRESH_TOKEN_EXPIRE;
+    private final MailService mailService;
 
     @Override
     @Transactional
@@ -101,6 +103,7 @@ public class PrincipalOauthUserService extends DefaultOAuth2UserService {
             //내가 좋아하는 플레이리스트 만들기
             System.out.println("유저저장 완료");
             playListService.createMyFavouriteSongList(newUser);
+            mailService.sendMailJoinSuccess(email);
             return new PrincipalDetails(newUser, oAuth2User.getAttributes());
         }
         else {

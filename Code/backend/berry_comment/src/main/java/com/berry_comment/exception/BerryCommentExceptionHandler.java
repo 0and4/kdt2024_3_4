@@ -1,9 +1,11 @@
 package com.berry_comment.exception;
 
 import com.berry_comment.dto.BerryCommentErrorResponse;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -24,4 +26,21 @@ public class BerryCommentExceptionHandler {
                 .build();
     }
 
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    @ExceptionHandler(value = EntityNotFoundException.class)
+    public BerryCommentErrorResponse handleException(EntityNotFoundException e, HttpServletRequest request) {
+        log.error(e.getMessage());
+        return BerryCommentErrorResponse.builder()
+                .errorMessage(e.getMessage())
+                .errorCode(ErrorCode.NOT_FOUND)
+                .build();
+    }
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ExceptionHandler(value = AuthorizationDeniedException.class)
+    public BerryCommentErrorResponse handleException(AuthorizationDeniedException e, HttpServletRequest request) {
+        log.error(e.getMessage());
+        return BerryCommentErrorResponse.builder()
+                .errorCode(ErrorCode.NOT_AUTHORIZATION)
+                .build();
+    }
 }
