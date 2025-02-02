@@ -17,12 +17,12 @@ const ModalOverlay = styled.div`
 const ModalContainer = styled.div`
   background: #b37bae;
   color: white;
-  padding: 30px 40px;
+  padding: 20px 10px;
   border-radius: 12px;
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  width: 350px;
-  height: 250px;
+  width: 450px;
+  height: 300px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -49,6 +49,7 @@ export const ModalInput = styled.input`
   width: 85%;
   padding: 12px;
   margin-top: 15px;
+  margin-left: 10px;
   border: 2px solid #ddd;
   border-radius: 6px;
   text-align: center;

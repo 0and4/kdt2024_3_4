@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import logo from "../images/logo.png"; // 로고 이미지 경로
 
 const Wrapper = styled.div`
@@ -14,6 +15,7 @@ const Wrapper = styled.div`
 const Logo = styled.img`
   width: 400px;
   margin-bottom: 35px;
+  cursor: pointer;
 `;
 
 const FindBox = styled.div`
@@ -138,8 +140,14 @@ const ModalButton = styled.button`
 `;
 
 function FindId() {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState(""); // 성공 또는 오류 상태 저장
+
+  //로고
+  const handleLogoClick = () => {
+    navigate("/");
+  };
 
   const handleButtonClick = () => {
     // 성공 상태로 모달을 표시
@@ -148,13 +156,14 @@ function FindId() {
   };
 
   const closeModal = () => {
-    setIsModalOpen(false); // 모달 닫기
-    setModalType(""); // 모달 타입 초기화
+    setIsModalOpen(false);
+    setModalType("");
+    navigate("/login-id"); // 로그인 페이지로 이동
   };
 
   return (
     <Wrapper>
-      <Logo src={logo} alt="Berrecommend 로고" />
+      <Logo src={logo} alt="Berrecommend 로고" onClick={handleLogoClick} />{" "}
       <FindBox>
         <Description>
           아이디 찾기를 위해 회원가입 시 입력한 <br />
@@ -172,7 +181,6 @@ function FindId() {
           <Button onClick={handleButtonClick}>확인</Button>
         </ButtonWrapper>
       </FindBox>
-
       {/* 성공 팝업 */}
       {isModalOpen && modalType === "success" && (
         <Modal>
@@ -186,7 +194,6 @@ function FindId() {
           </ModalContent>
         </Modal>
       )}
-
       {/* 오류 팝업 - 주석 처리 */}
       {/* 
       {isModalOpen && modalType === "error" && (
