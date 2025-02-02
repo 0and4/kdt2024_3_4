@@ -229,6 +229,12 @@ function Join() {
     setIsModalOpen(true);
   };
 
+  // 팝업에서 확인 버튼 클릭 시 Main.js로 이동
+  const handleModalConfirm = () => {
+    setIsModalOpen(false);
+    navigate("/"); // 메인 페이지로 이동
+  };
+
   const closeModal = () => {
     setIsModalOpen(false); // 모달 닫기
   };
@@ -243,7 +249,6 @@ function Join() {
   return (
     <Wrapper>
       <Logo src={logo} alt="Berrecommend 로고" onClick={handleLogoClick} />{" "}
-      {/* ✅ 로고 클릭 시 이동 */}
       <JoinBox>
         <InputGroup>
           <Label htmlFor="username">아이디</Label>
@@ -327,7 +332,7 @@ function Join() {
               000님,
               <br /> 베리코멘드의 회원이 된 것을 환영합니다!
             </p>
-            <ModalButton onClick={closeModal}>확인</ModalButton>
+            <ModalButton onClick={handleModalConfirm}>확인</ModalButton>
           </ModalContent>
         </Modal>
       )}

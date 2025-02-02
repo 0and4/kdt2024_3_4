@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import logo from "../images/logo.png";
 
 const Wrapper = styled.div`
@@ -14,6 +15,7 @@ const Wrapper = styled.div`
 const Logo = styled.img`
   width: 400px;
   margin-bottom: 35px;
+  cursor: pointer;
 `;
 
 const FindBox = styled.div`
@@ -185,8 +187,75 @@ const ModalButton = styled.button`
   }
 `;
 
+const TimerText = styled.span`
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  font-size: 1rem;
+  transform: translateY(-50%);
+  color: ${(props) => (props.timer === 0 ? "red" : "rgba(43, 43, 43, 0.61)")};
+`;
+
+const InputWrapper = styled.div`
+  position: relative;
+  width: 250px;
+`;
+
 function FindPw() {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [timer, setTimer] = useState(300); // 5분 (300초)
+  const [isCounting, setIsCounting] = useState(false); // 타이머 작동 여부
+
+  //로고
+  const handleLogoClick = () => {
+    navigate("/");
+  };
+
+  const handleSendVerificationCode = () => {
+    if (!email) {
+      alert("이메일을 입력해주세요."); //
+      return;
+    }
+    alert(
+      "입력한 이메일로 인증번호를 발송했습니다.\n5분 내로 번호를 입력해 주세요."
+    ); //
+    startTimer();
+  };
+
+  // 타이머 시작 함수
+  const startTimer = () => {
+    setTimer(300); // 5분 초기화
+    setIsCounting(true); // 타이머 작동 시작
+  };
+
+  // 타이머 감소 로직
+  useEffect(() => {
+    if (isCounting) {
+      const interval = setInterval(() => {
+        setTimer((prevTimer) => {
+          if (prevTimer <= 1) {
+            clearInterval(interval);
+            setIsCounting(false); // 타이머 멈추기
+            return 0;
+          }
+          return prevTimer - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isCounting]);
+
+  // "분:초" 포맷 변환 함수
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  };
 
   const handleButtonClick = () => {
     setIsModalOpen(true);
@@ -194,11 +263,16 @@ function FindPw() {
 
   const closeModal = () => {
     setIsModalOpen(false);
+    navigate("/login-id");
+  };
+
+  const handleVerifyCode = () => {
+    alert("인증이 완료되었습니다."); // ✅ 인증 완료 alert 표시
   };
 
   return (
     <Wrapper>
-      <Logo src={logo} alt="Berrecommend 로고" />
+      <Logo src={logo} alt="Berrecommend 로고" onClick={handleLogoClick} />{" "}
       <FindBox>
         <Description>
           비밀번호 찾기를 위해 회원가입 시 입력한 <br />
@@ -208,25 +282,39 @@ function FindPw() {
           <IdLabel htmlFor="username">아이디</IdLabel>
           <IdInput id="username" type="text" placeholder="아이디" />
         </IdInputGroup>
+
         <InputGroup>
           <Label htmlFor="email">이메일</Label>
-          <Input id="email" type="email" placeholder="이메일" />
-          <SmallButton>인증하기</SmallButton>
+          <Input
+            id="email"
+            type="email"
+            placeholder="이메일"
+            value={email} // 🔥 입력값을 `email` 상태와 연결
+            onChange={(e) => setEmail(e.target.value)} // 🔥 입력값이 변경될 때 `setEmail`로 상태 업데이트
+          />
+          <SmallButton onClick={handleSendVerificationCode}>
+            코드 전송
+          </SmallButton>
         </InputGroup>
+
         <InputGroup>
           <Label htmlFor="emailCode">이메일 인증</Label>
-          <Input
-            id="emailCode"
-            type="text"
-            placeholder="이메일로 전송한 인증코드 입력"
-          />
-          <SmallButton>인증확인</SmallButton>
+          <InputWrapper>
+            <Input id="emailCode" type="text" placeholder="인증코드 입력" />
+            {/* ✅ 타이머 표시 */}
+            {timer !== null && (
+              <TimerText expired={timer === 0}>
+                {timer > 0 ? formatTime(timer) : "시간 초과"}
+              </TimerText>
+            )}
+          </InputWrapper>
+          <SmallButton onClick={handleVerifyCode}>인증하기</SmallButton>
         </InputGroup>
+
         <ButtonWrapper>
           <Button onClick={handleButtonClick}>확인</Button>
         </ButtonWrapper>
       </FindBox>
-
       {/* 팝업 모달 */}
       {isModalOpen && (
         <Modal>
