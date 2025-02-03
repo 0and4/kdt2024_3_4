@@ -12,10 +12,10 @@ const Text = styled.p`
 `;
 
 const Subscribe1 = ({ isOpen, onClose }) => {
-  const navigate = useNavigate(); // ✅ 페이지 이동을 위한 useNavigate 추가
+  const navigate = useNavigate(); //
 
   const handleChangeSubscription = () => {
-    navigate("/pr"); // ✅ PR.js 페이지로 이동
+    navigate("/pr"); //
   };
 
   return (

@@ -21,6 +21,7 @@ const Container = styled.div`
   max-width: 100%;
 `;
 
+// 프로필 섹션
 const ProfileSection = styled.div`
   display: flex;
   align-items: center;
@@ -29,6 +30,7 @@ const ProfileSection = styled.div`
   border-bottom: 1px solid #dadada;
 `;
 
+// 프로필 이미지
 const ProfileImage = styled.div`
   width: 130px;
   height: 130px;
@@ -43,6 +45,7 @@ const ProfileImage = styled.div`
   flex-shrink: 0;
 `;
 
+// 프로필 정보
 const UsernameContainer = styled.div`
   display: flex;
   align-items: center;
@@ -63,6 +66,7 @@ const Username = styled.p`
   margin: 0;
 `;
 
+// 프로필 수정 버튼
 const EditButton = styled.button`
   background: none;
   border: none;
@@ -80,6 +84,7 @@ const Email = styled.p`
   margin: 0;
 `;
 
+// 플레이리스트 섹션
 const PlaylistSection = styled.div`
   padding: 20px;
 `;
@@ -97,11 +102,13 @@ const PlaylistTitle = styled.h3`
   text-align: left;
 `;
 
+// 플레이리스트 수정 버튼
 const EditButtons = styled.div`
   display: flex;
   gap: 10px;
 `;
 
+// 수정, 삭제 버튼
 const Button = styled.button`
   background: none;
   border: none;
@@ -117,6 +124,7 @@ const Button = styled.button`
   }
 `;
 
+// 플레이리스트 아이템
 const PlaylistItem = styled.div`
   display: flex;
   align-items: center;
@@ -149,6 +157,7 @@ const Checkbox = styled.input`
   cursor: pointer;
 `;
 
+// 구독정보 버튼
 const SubscriptionButton = styled.button`
   padding: 8px 12px;
   font-size: 1rem;

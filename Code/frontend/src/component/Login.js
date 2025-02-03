@@ -13,12 +13,14 @@ const Wrapper = styled.div`
   background-color: #c69fda;
 `;
 
+// 로고 디자인
 const Logo = styled.img`
   width: 400px;
   margin-bottom: 35px;
   cursor: pointer;
 `;
 
+// 로그인 박스 디자인
 const LoginBox = styled.div`
   width: 380px;
   height: 200px;
@@ -33,6 +35,7 @@ const LoginBox = styled.div`
   gap: 20px;
 `;
 
+// 로그인 버튼 디자인
 const InputGroup = styled.div`
   display: flex;
   align-items: center;
@@ -44,6 +47,7 @@ const InputGroup = styled.div`
   }
 `;
 
+// 아이디와 입력창 스타일
 const Label = styled.label`
   font-size: 1rem;
   color: #333;
@@ -51,6 +55,7 @@ const Label = styled.label`
   width: 80px;
 `;
 
+// 입력창 스타일
 const Input = styled.input`
   width: 230px;
   height: 40px;
@@ -67,6 +72,7 @@ const Input = styled.input`
   }
 `;
 
+// 로그인 버튼 디자인
 const Button = styled.button`
   width: 130px;
   height: 45px;
@@ -86,6 +92,7 @@ const Button = styled.button`
   }
 `;
 
+// '회원가입', 'ID 찾기' & 'PW 찾기' 문구 디자인
 const TextLinks = styled.div`
   margin-top: 20px;
   text-align: center;
@@ -111,22 +118,24 @@ const TextLink = styled.p`
 `;
 
 function Login() {
-  const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const navigate = useNavigate(); // 페이지 이동 함수
+  const [username, setUsername] = useState(""); // 아이디 입력값
+  const [password, setPassword] = useState(""); // 비밀번호 입력값
 
+  // 로고 클릭 시 메인 페이지로 이동
   const handleLogoClick = () => {
     navigate("/"); //
   };
 
+  // 로그인 버튼 클릭 시 로그인 검증
   const handleLogin = () => {
     // 🔹 실제 로그인 검증 (여기서는 예제용으로 간단한 하드코딩)
     const validUsername = "user123"; // 실제 DB가 있다면 이 값은 API 요청으로 확인
-    const validPassword = "password123";
+    const validPassword = "password123!";
 
     if (username === validUsername && password === validPassword) {
-      alert("로그인 성공");
-      navigate("/"); // ✅ 메인 페이지로 이동
+      alert("로그인 성공. 환영합니다:)");
+      navigate("/"); // 메인 페이지로 이동
     } else {
       alert("로그인 실패: 아이디 또는 비밀번호가 올바르지 않습니다."); // 로그인 실패 알림
     }
