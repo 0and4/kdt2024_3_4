@@ -22,4 +22,6 @@ public class SongDto {
 
     //재생시간
     private int playTime;
+
+    private String album;
 }

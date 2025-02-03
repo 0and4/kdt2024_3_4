@@ -73,4 +73,27 @@ public class SongService {
                 .build();
         return songDetailDto;
     }
+
+    public SongDto getSong(long id) {
+        Song song = songRepository.findById(id);
+        if(song == null){
+            throw new EntityNotFoundException("요청하신 곡의 정보가 없습니다.");
+        }
+        StringBuilder artist = new StringBuilder();
+        System.out.println("아티스트 목록" + song.getSongOfArtistList().toString());
+        for (int i = 0; i < song.getSongOfArtistList().size(); i++) {
+            if (i != 0) {
+                artist.append(", ");
+            }
+            artist.append(song.getSongOfArtistList().get(i).getArtist().getName());
+        }
+        return SongDto.builder()
+                .id(song.getId().intValue())
+                .playTime(song.getPlayTime())
+                .track(song.getTrack())
+                .image(song.getAlbum().getImageUrl())
+                .album(song.getAlbum().getName())
+                .artist(artist.toString())
+                .build();
+    }
 }

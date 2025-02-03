@@ -1,4 +1,16 @@
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: berrecommended
+    password: fnvk qgzy bryk sjrm
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   datasource-data:
     driver-class-name: org.h2.Driver
     jdbc-url: jdbc:h2:~/berry_comment
@@ -38,6 +50,10 @@ spring:
     console:
       enabled: true
       path: /h2-console
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 jwt:
   issuer: wjdehdwn2475@naver.com

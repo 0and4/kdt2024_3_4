@@ -30,8 +30,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http
-                // CSRF 비활성화
-                .csrf(AbstractHttpConfigurer::disable)
                 // CORS 비활성화
                 .cors(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable);
@@ -41,24 +39,27 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/user/login").permitAll()// 로그인 API 허용
+                        .requestMatchers("/user/**").permitAll()// 로그인 API 허용
                         .requestMatchers("/h2-console/**").permitAll()// H2 콘솔 요청 허용
-                        .requestMatchers("/user/user/profile").hasAuthority("NORMAL")
                         .requestMatchers("/song/chart/**").hasAuthority("NORMAL")
                         .requestMatchers("/stream/**").hasAuthority("NORMAL")
+                        .requestMatchers("/playList/**").hasAuthority("PREMIUM")
                         .anyRequest().permitAll() // 나머지 요청은 인증 필요X
 
                 );
 
         //커스텀 필터 적용
         http
-                .addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository, tokenProvider))
                 .addFilter(corsConfig.corsFilter());
+        http
+                .addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository, tokenProvider));
         // 세션 사용 X
         http
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
+        http
+                .csrf(AbstractHttpConfigurer::disable);
         // OAuth2 설정
         http
                 .oauth2Login(httpSecurityOAuth2LoginConfigurer -> httpSecurityOAuth2LoginConfigurer

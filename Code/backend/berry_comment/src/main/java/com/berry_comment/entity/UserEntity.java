@@ -70,4 +70,8 @@ public class UserEntity {
     public void setRoleUser(RoleUser roleUser) {
         this.roleUser = roleUser;
     }
+
+    public void setUserPassword(String password) {
+        this.password = password;
+    }
 }

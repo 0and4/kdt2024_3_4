@@ -1,7 +1,9 @@
 package com.berry_comment.service;
 
+import com.berry_comment.dto.ListInfoDto;
 import com.berry_comment.dto.PlayListDto;
 import com.berry_comment.dto.RequestAddSongToPlayListDto;
+import com.berry_comment.dto.SongDto;
 import com.berry_comment.entity.PlayList;
 import com.berry_comment.entity.PlayListDetail;
 import com.berry_comment.entity.Song;
@@ -12,10 +14,15 @@ import com.berry_comment.repository.SongRepository;
 import com.berry_comment.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +35,8 @@ public class PlayListService {
     private final SongRepository songRepository;
     private final PlayListDetailRepository playListDetailRepository;
     private final UserRepository userRepository;
+    private final RecommendService recommendService;
+    private final SongService songService;
 
     public void createMyFavouriteSongList(UserEntity user) {
         PlayList playList = new PlayList(MY_FAVOURITE_SONG, user);
@@ -64,5 +73,44 @@ public class PlayListService {
                 .name(playListName)
                 .build();
         return playListDto;
+    }
+
+    public ListInfoDto getPlayListThumbnail(Pageable pageable) {
+        Slice<PlayList> playListSlice = playListRepository.findAll(pageable);
+        List<PlayListDto> playListDtoList = new ArrayList<>();
+        playListSlice.forEach(playList -> {
+            PlayListDto playListDto = PlayListDto.builder()
+                    .id(playList.getId().intValue())
+                    .name(playList.getPlayListName())
+                    .build();
+            playListDtoList.add(playListDto);
+        });
+        return ListInfoDto.builder()
+                .size(playListDtoList.size())
+                .dataList(playListDtoList)
+                .build();
+    }
+
+    public ListInfoDto getPlayList(Long id, String userId, Pageable pageable) {
+        validate(id, userId);
+        Slice<Long> integerSlice = playListDetailRepository.findSongIdByPlayListId(id, pageable);
+        List<SongDto> songDtoList = new ArrayList<>();
+        integerSlice.toList().forEach(playListDetail -> {
+            songDtoList.add(songService.getSong(playListDetail));
+        });
+        return ListInfoDto.builder()
+                .size(songDtoList.size())
+                .dataList(songDtoList)
+                .build();
+    }
+
+    private void validate(Long id, String userId) {
+        PlayList playList = playListRepository.findById(id).orElse(null);
+        if(playList == null) {
+            throw new EntityNotFoundException("해당하는 플레이리스트의 정보를 찾을 수 없습니다.");
+        }
+        if(!userId.equals(playList.getUser().getId())) {
+            throw new AuthorizationDeniedException("권한이 없습니다.");
+        }
     }
 }

@@ -12,6 +12,7 @@ import Login from "./component/Login";
 import Join from "./component/Join";
 import FindId from "./component/FindId";
 import FindPW from "./component/FindPW";
+import PR from "./component/PR";
 
 import { useState } from "react";
 import {
@@ -75,13 +76,15 @@ function App() {
       location.pathname === "/login-id" ||
       location.pathname === "/signup" ||
       location.pathname === "/find-id" ||
-      location.pathname === "/find-pw" ? (
+      location.pathname === "/find-pw" ||
+      location.pathname === "/pr" ? (
         <FullScreenWrapper>
           {location.pathname === "/login" && <LoginMenu />}
           {location.pathname === "/login-id" && <Login />}
           {location.pathname === "/signup" && <Join />}
           {location.pathname === "/find-id" && <FindId />}
           {location.pathname === "/find-pw" && <FindPW />}
+          {location.pathname === "/pr" && <PR />}
         </FullScreenWrapper>
       ) : (
         <Wrapper>
@@ -98,6 +101,7 @@ function App() {
               <Route path="/song/:songId" element={<SongInfo />} />
               <Route path="/artist/:artistName" element={<ArtistInfo />} />
               <Route path="/album/:albumName" element={<AlbumInfo />} />
+              <Route path="/pr" element={<PR />} />
             </Routes>
           </Container>
           <Player />

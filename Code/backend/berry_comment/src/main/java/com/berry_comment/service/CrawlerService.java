@@ -40,7 +40,7 @@ public class CrawlerService {
     private final ArtistRepository artistRepository;
     private final ChartRepository chartRepository;
     private final ChartDetailRepository chartDetailRepository;
-    private List<Integer> songLists;
+    private List<Integer> songLists = new ArrayList<>();
 
     //크롤링 정보 수정
     public void crawl(LocalDateTime localDateTime) {
@@ -161,19 +161,25 @@ public class CrawlerService {
             Elements tBodyElements = tBodyElement.getElementsByTag("tr");
 
             tBodyElements.stream().forEach(element -> {
-                Element songElementTd = element.getElementsByTag("td").get(3); //인데스 outofError고치기..
-                String href = songElementTd.selectFirst("a").attr("href");
-                Pattern pattern = Pattern.compile("\\d+"); // 숫자(0~9)를 추출
-                Matcher matcher = pattern.matcher(href);
-                int cnt = 0;
-                while (matcher.find()) {
-                    cnt++;
-                    if(cnt == 2){
-                        String number = matcher.group();
-                        System.out.println("추출된 숫자: " + number);
-                        //음악 저장 진행...로직 짜기!!
-                        songLists.add(Integer.parseInt(number));
+                try {
+                    Element songElementTd = element.getElementsByClass("wrap_song_info").getFirst().getElementsByClass("ellipsis").getFirst().getElementsByTag("span").getFirst(); //인덱스 outofError고치기..
+                    if(songElementTd.selectFirst("a")!=null) {
+                        String href = songElementTd.selectFirst("a").attr("href");
+                        Pattern pattern = Pattern.compile("\\d+"); // 숫자(0~9)를 추출
+                        Matcher matcher = pattern.matcher(href);
+                        int cnt = 0;
+                        while (matcher.find()) {
+                            cnt++;
+                            if (cnt == 2) {
+                                String number = matcher.group();
+                                System.out.println("추출된 숫자: " + number);
+                                //음악 저장 진행...로직 짜기!!
+                                songLists.add(Integer.parseInt(number));
+                            }
+                        }
                     }
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
             });
             String albumName = document.selectXpath("//*[@id=\"conts\"]/div[2]/div/div[2]/div[1]/div[1]").first().ownText();
@@ -195,7 +201,8 @@ public class CrawlerService {
         }
         String url = "https://www.melon.com/song/detail.htm?songId=" + songId;
         try {
-            Document document = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36").get();
+            Document document = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36")
+                    .get();
             String track = document.selectXpath("//*[@id=\"downloadfrm\"]/div/div/div[2]/div[1]/div[1]").first().ownText();
             int playTime = 0;
             int albumId = 0;
@@ -228,7 +235,8 @@ public class CrawlerService {
             }
             //가사 가져오기
             //널값 오류 해결..
-            lyric = (document.getElementById("d_video_summary").html()!=null) ?  document.getElementById("d_video_summary").html(): "";
+            Element lyricElement = document.getElementById("d_video_summary");
+            lyric = (lyricElement != null) ? lyricElement.html() : "";
             System.out.println("가사 "+lyric);
             song = new Song((long)songId, track, playTime, album, genre, musicUrl, lyric);
             songRepository.save(song);
@@ -239,6 +247,9 @@ public class CrawlerService {
                     Optional<Artist> artist = artistRepository.findById((long)Integer.parseInt(matcher2.group(1)));
                     if(artist.isPresent()){
                         saveSongOfArtist(finalSong,artist.get());
+                    }
+                    else {
+                        Artist newArtist = saveArtistByIdAndName(Integer.parseInt(matcher2.group(1)));
                     }
                 }
             });

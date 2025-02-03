@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import styled from "styled-components";
 import logo from "../images/logo.png";
 import ArrowImage from "../images/Arrow.png";
+import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`
   display: flex;
@@ -9,15 +10,19 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: flex-start;
   height: 100vh;
+  min-height: 100vh;
+  width: 100vw;
   overflow-y: auto;
   background-color: #c69fda;
   padding: 20px 0;
+  box-sizing: border-box;
 `;
 
 const Logo = styled.img`
   width: 250px;
-  margin-top: 20px;
+  margin-top: 50px;
   margin-bottom: 30px;
+  cursor: pointer;
 `;
 
 const ArrowIcon = styled.img`
@@ -28,6 +33,7 @@ const ArrowIcon = styled.img`
 
 const SubscriptionBox = styled.div`
   width: 600px;
+  max-width: 90%;
   background-color: rgb(239, 224, 225);
   padding: 30px;
   border-radius: 20px;
@@ -40,7 +46,7 @@ const Title = styled.h2`
   font-size: 1.8rem;
   font-weight: bold;
   color: black;
-  margin-bottom: px30;
+  margin-bottom: 30px;
 `;
 
 const SubscriptionButton = styled.button`
@@ -65,6 +71,7 @@ const SubscriptionButton = styled.button`
 
 const PaymentSection = styled.div`
   width: 600px;
+  max-width: 90%;
   background-color: white;
   padding: 30px;
   border-radius: 20px;
@@ -146,6 +153,7 @@ const CancelButton = styled.button`
   border: 1px solid rgb(94, 50, 110);
   border-radius: 5px;
   margin-top: 30px;
+  margin-bottom: 50px;
   cursor: pointer;
   transition: background-color 0.3s;
 
@@ -155,15 +163,21 @@ const CancelButton = styled.button`
 `;
 
 function PR() {
+  const navigate = useNavigate();
   const paymentRef = useRef(null);
 
   const scrollToPayment = () => {
     paymentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  //로고
+  const handleLogoClick = () => {
+    navigate("/");
+  };
+
   return (
     <Wrapper>
-      <Logo src={logo} alt="Berrecommend 로고" />
+      <Logo src={logo} alt="Berrecommend 로고" onClick={handleLogoClick} />{" "}
       <Title>베리코멘드만의 특별한 혜택을 확인하세요!</Title>
       <SubscriptionBox>
         <h1>BASIC</h1>
@@ -180,7 +194,6 @@ function PR() {
           <strong>월 8,900원에 제한 없이 모든 음악을 감상하세요</strong>
         </p>
       </SubscriptionBox>
-
       <Title>결제 정보</Title>
       <PaymentSection ref={paymentRef}>
         <h3>베리코멘드 PREMIUM 5,900원/월</h3>
@@ -201,7 +214,6 @@ function PR() {
           <PaymentButton>결제하기</PaymentButton>
         </ButtonWrapper>
       </PaymentSection>
-
       <CancelButtonWrapper>
         <CancelButton>해지하기</CancelButton>
       </CancelButtonWrapper>
