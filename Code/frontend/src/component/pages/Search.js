@@ -3,23 +3,15 @@ import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import { FaChevronRight, FaChevronUp } from "react-icons/fa";
-import SongList from "../SongList"; // 노래 목록 컴포넌트
-const Wrapper = styled.div`
-  position: relative;
-`;
-const Container = styled.div`
-  width: calc(100% - 250px);
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
+import SongList from "../SongList";
+import { Wrapper, Container } from "../ui/AllDiv";
 const ResultP = styled.p`
   font-size: 1.5rem;
-  margin-top: 40px;
+  margin-top: 30px;
 `;
 const Section = styled.div`
   margin-bottom: 20px;
-  button {
+  button.more-btn {
     background: none;
     border: none;
     cursor: pointer;
@@ -29,7 +21,6 @@ const Section = styled.div`
     gap: 5px;
   }
 `;
-
 const ResultDiv = styled.div`
   display: flex;
   justify-content: space-between;
@@ -41,20 +32,23 @@ const ListDiv = styled.div`
   margin: 0;
   padding: 0;
 `;
-const AlbumGrid = styled.div`
+const ListGrid = styled.div`
   margin: 10px 40px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
 `;
-
-const AlbumItem = styled.div`
+const ListItem = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 15px;
   margin-bottom: 10px;
-
+  word-wrap: break-word;
+  div {
+    display: flex;
+    flex-direction: column;
+  }
   img {
     width: 100px;
     height: 100px;
@@ -62,7 +56,6 @@ const AlbumItem = styled.div`
     object-fit: cover;
     background-color: #ccc;
   }
-
   p {
     margin: 2px 0;
     text-align: left;
@@ -75,35 +68,11 @@ const SubtitleP = styled.p`
   font-weight: 100;
   font-size: 0.9rem;
 `;
-const ArtistGrid = styled.div`
-  margin: 10px 40px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-`;
 
-const ArtistItem = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 10px;
-
+const ArtistItem = styled(ListItem)`
   img {
-    width: 100px;
-    height: 100px;
     border-radius: 50%;
     object-fit: cover;
-    background-color: #ccc;
-  }
-  div {
-    display: flex;
-    flex-direction: column;
-  }
-
-  p {
-    margin: 2px 0;
-    text-align: left;
   }
 `;
 
@@ -271,7 +240,10 @@ function Search() {
         <Section>
           <ResultDiv>
             <TitleP>곡명으로 검색</TitleP>
-            <button onClick={() => setShowAllSongs((prev) => !prev)}>
+            <button
+              onClick={() => setShowAllSongs((prev) => !prev)}
+              className="more-btn"
+            >
               {showAllSongs ? "접기" : "더보기"}{" "}
               {showAllSongs ? <FaChevronUp /> : <FaChevronRight />}
             </button>
@@ -293,19 +265,22 @@ function Search() {
         <Section>
           <ResultDiv>
             <TitleP>앨범명으로 검색</TitleP>
-            <button onClick={() => setShowAllAlbums((prev) => !prev)}>
+            <button
+              onClick={() => setShowAllAlbums((prev) => !prev)}
+              className="more-btn"
+            >
               {showAllAlbums ? "접기" : "더보기"}{" "}
               {showAllAlbums ? <FaChevronUp /> : <FaChevronRight />}
             </button>
           </ResultDiv>
 
           {filteredAlbums.length > 0 && (
-            <AlbumGrid>
+            <ListGrid>
               {(showAllAlbums
                 ? filteredAlbums
                 : filteredAlbums.slice(0, 4)
               ).map((album) => (
-                <AlbumItem key={album.id}>
+                <ListItem key={album.id}>
                   <img src={album.cover} alt={album.name} />
                   <div>
                     {/* 앨범명 클릭 시 해당 앨범 페이지로 이동 */}
@@ -323,9 +298,9 @@ function Search() {
                       <SubtitleP>{album.artist}</SubtitleP>
                     </Link>
                   </div>
-                </AlbumItem>
+                </ListItem>
               ))}
-            </AlbumGrid>
+            </ListGrid>
           )}
         </Section>
 
@@ -333,14 +308,17 @@ function Search() {
         <Section>
           <ResultDiv>
             <TitleP>아티스트명으로 검색</TitleP>
-            <button onClick={() => setShowAllArtists((prev) => !prev)}>
+            <button
+              onClick={() => setShowAllArtists((prev) => !prev)}
+              className="more-btn"
+            >
               {showAllArtists ? "접기" : "더보기"}{" "}
               {showAllArtists ? <FaChevronUp /> : <FaChevronRight />}
             </button>
           </ResultDiv>
 
           {filteredArtists.length > 0 && (
-            <ArtistGrid>
+            <ListGrid>
               {(showAllArtists
                 ? filteredArtists
                 : filteredArtists.slice(0, 4)
@@ -361,7 +339,7 @@ function Search() {
                   </div>
                 </ArtistItem>
               ))}
-            </ArtistGrid>
+            </ListGrid>
           )}
         </Section>
       </Container>

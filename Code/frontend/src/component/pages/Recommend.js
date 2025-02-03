@@ -1,7 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+`;
 const Wrapper = styled.div`
   width: 100%;
   position: relative;
@@ -10,7 +13,6 @@ const Wrapper = styled.div`
 
 const Container = styled.div`
   width: 100%;
-  margin: 20px;
   display: flex;
   flex-direction: column;
   div {
@@ -23,8 +25,8 @@ const PlaylistDiv = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   overflow-x: hidden;
-  gap: 20px; /* 항목 간 간격 설정 */
-  width: 100%; /* 부모 너비에 맞게 크기 설정 */
+  gap: 20px;
+  width: 100%;
   box-sizing: border-box;
 `;
 
@@ -42,6 +44,10 @@ const PlaylistItem = styled.div`
     cursor: pointer;
     color: black;
     text-decoration: none;
+    &:hover {
+      color: #68009b;
+      text-decoration: underline;
+    }
   }
 `;
 
@@ -57,9 +63,9 @@ const Divider = styled.div`
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 50%; /* 1열과 2열의 중간에 위치하도록 설정 */
+  left: 50%;
   width: 1px;
-  background-color: #ccc; /* 중간선 색상 */
+  background-color: #ccc;
 `;
 
 function Recommend() {
@@ -78,12 +84,12 @@ function Recommend() {
         <PlaylistDiv>
           <Divider />
           {playlistData.map((playlist) => (
-            <Link key={playlist.id} to={`/playlist/${playlist.id}`}>
+            <StyledLink key={playlist.id} to={`/playlist/${playlist.id}`}>
               <PlaylistItem>
                 <PlaylistJacket />
                 <p>{playlist.title}</p>
               </PlaylistItem>
-            </Link>
+            </StyledLink>
           ))}
         </PlaylistDiv>
       </Container>

@@ -1,19 +1,10 @@
 import React from "react";
-import styled from "styled-components";
 import { Routes, Route } from "react-router-dom";
 import TodayChart from "./pages/TodayChart";
 import Recommend from "./pages/Recommend";
 import PlaylistInfo from "./pages/PlaylistInfo";
 import MyPage from "./pages/MyPage";
-const Wrapper = styled.div`
-  position: relative;
-`;
-const Container = styled.div`
-  width: calc(100% - 250px);
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
+import { Wrapper, Container } from "./ui/AllDiv";
 
 function Main() {
   return (
