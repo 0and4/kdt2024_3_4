@@ -9,12 +9,13 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: center;
   height: 100vh;
+  width: 100vw;
   background-color: #c69fda;
 `;
 
 // 로고 이미지
 const Logo = styled.img`
-  width: 400px;
+  width: 250px;
   margin-bottom: 35px;
   cursor: pointer;
 `;

@@ -9,19 +9,20 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: center;
   height: 100vh;
+  width: 100vw;
   background-color: #c69fda;
 `;
 
 // 로고 스타일
 const Logo = styled.img`
-  width: 400px;
+  width: 250px;
   margin-bottom: 35px;
   cursor: pointer;
 `;
 
 // 비밀번호 찾기 박스 스타일
 const FindBox = styled.div`
-  width: 600px;
+  width: 500px;
   background-color: rgb(239, 224, 225);
   padding: 30px;
   border-radius: 20px;
@@ -47,7 +48,7 @@ const IdInputGroup = styled.div`
   justify-content: flex-start;
   gap: 20px;
   width: 100%;
-  margin-left: 150px;
+  margin-left: 50px;
 `;
 
 // 아이디 입력창 스타일
