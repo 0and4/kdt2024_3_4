@@ -13,6 +13,9 @@ const TableHeader = styled.thead`
   font-weight: bold;
   font-size: 0.8rem;
   border-bottom: 2px solid #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 const TableRow = styled.tr`
   border-bottom: 1px solid #f9f9f9;
@@ -21,6 +24,10 @@ const TableData = styled.td`
   padding: 8px;
   text-align: center;
   font-size: 0.9rem;
+  white-space: nowrap;
+  @media (max-width: 556px) {
+    font-size: 0.7rem;
+  }
 `;
 const SongLink = styled(Link)`
   text-decoration: none;
