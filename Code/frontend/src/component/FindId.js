@@ -12,12 +12,14 @@ const Wrapper = styled.div`
   background-color: #c69fda;
 `;
 
+// 로고 디자인
 const Logo = styled.img`
   width: 400px;
   margin-bottom: 35px;
   cursor: pointer;
 `;
 
+// 아이디 찾기 박스 디자인
 const FindBox = styled.div`
   width: 600px;
   background-color: rgb(239, 224, 225);
@@ -30,6 +32,7 @@ const FindBox = styled.div`
   align-items: center;
 `;
 
+// 설명
 const Description = styled.p`
   font-size: 1.1rem;
   color: #333;
@@ -37,6 +40,7 @@ const Description = styled.p`
   margin-bottom: 20px;
 `;
 
+// 입력창과 버튼 스타일
 const InputGroup = styled.div`
   display: flex;
   align-items: center;
@@ -47,6 +51,7 @@ const InputGroup = styled.div`
   }
 `;
 
+// 아이디와 입력창 스타일
 const Label = styled.label`
   font-size: 1rem;
   color: #333;
@@ -54,6 +59,7 @@ const Label = styled.label`
   width: 60px;
 `;
 
+// 입력창 스타일
 const Input = styled.input`
   width: 230px;
   height: 40px;
@@ -69,6 +75,7 @@ const Input = styled.input`
   }
 `;
 
+// 버튼 스타일
 const ButtonWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -94,6 +101,7 @@ const Button = styled.button`
   }
 `;
 
+// 팝업 스타일
 const Modal = styled.div`
   position: fixed;
   top: 0;
@@ -106,6 +114,7 @@ const Modal = styled.div`
   align-items: center;
 `;
 
+// 팝업 내용 스타일
 const ModalContent = styled.div`
   background: rgb(241, 216, 255);
   padding: 20px 40px;
@@ -120,6 +129,7 @@ const ModalContent = styled.div`
   align-items: center; /* 가로 가운데 정렬 */
 `;
 
+// 팝업 버튼 스타일
 const ModalButton = styled.button`
   margin-top: 20px;
   width: 100px;
@@ -140,21 +150,41 @@ const ModalButton = styled.button`
 `;
 
 function FindId() {
-  const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate(); // 페이지 이동 함수
+  const [isModalOpen, setIsModalOpen] = useState(false); // 팝업 상태 저장
   const [modalType, setModalType] = useState(""); // 성공 또는 오류 상태 저장
+  const [name, setName] = useState(""); // 이름 저장
+  const [email, setEmail] = useState(""); // 이메일 저장
 
-  //로고
+  // 로고 클릭 시 메인 페이지로 이동
   const handleLogoClick = () => {
     navigate("/");
   };
 
+  // 확인 버튼 클릭 시 실행
   const handleButtonClick = () => {
-    // 성공 상태로 모달을 표시
-    setIsModalOpen(true);
-    setModalType("success");
+    if (!name || !email) {
+      alert("이름과 이메일을 모두 입력해주세요.");
+      return;
+    }
+
+    // 이름과 이메일이 일치하는지 확인
+    if (name === "홍길동" && email === "user123@naver.com") {
+      setIsModalOpen(true);
+      setModalType("success");
+    } else {
+      alert("일치하는 회원 정보가 없습니다. 다시 한 번 확인해주세요.");
+    }
   };
 
+  // Enter 키 입력 시 확인 버튼 실행
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleButtonClick();
+    }
+  };
+
+  // 팝업 닫기
   const closeModal = () => {
     setIsModalOpen(false);
     setModalType("");
@@ -169,46 +199,53 @@ function FindId() {
           아이디 찾기를 위해 회원가입 시 입력한 <br />
           이름과 이메일을 입력해주세요.
         </Description>
+
+        {/* 이름과 이메일 입력창 */}
         <InputGroup>
           <Label htmlFor="name">이름</Label>
-          <Input id="name" type="text" placeholder="이름" />
+          <Input
+            id="name"
+            type="text"
+            placeholder="이름"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyPress={handleKeyPress} // 🔹 엔터 키 입력 감지
+          />
         </InputGroup>
+
+        {/* 이메일 입력창 */}
         <InputGroup>
           <Label htmlFor="email">이메일</Label>
-          <Input id="email" type="email" placeholder="이메일" />
+          <Input
+            id="email"
+            type="email"
+            placeholder="이메일"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyPress={handleKeyPress} // 🔹 엔터 키 입력 감지
+          />
         </InputGroup>
+
+        {/* 확인 버튼 */}
         <ButtonWrapper>
           <Button onClick={handleButtonClick}>확인</Button>
         </ButtonWrapper>
+
+        {/* 팝업 */}
       </FindBox>
       {/* 성공 팝업 */}
       {isModalOpen && modalType === "success" && (
         <Modal>
           <ModalContent>
             <p>
-              000 회원님의 아이디는
+              {name} 회원님의 아이디는
               <br />
-              <b>@@@</b> 입니다.
+              <b>user123</b> 입니다.
             </p>
             <ModalButton onClick={closeModal}>확인</ModalButton>
           </ModalContent>
         </Modal>
       )}
-      {/* 오류 팝업 - 주석 처리 */}
-      {/* 
-      {isModalOpen && modalType === "error" && (
-        <Modal>
-          <ModalContent>
-            <p>
-              일치하는 회원 정보가 없습니다.
-              <br />
-              다시 한 번 확인해주세요.
-            </p>
-            <ModalButton onClick={closeModal}>확인</ModalButton>
-          </ModalContent>
-        </Modal>
-      )}
-      */}
     </Wrapper>
   );
 }

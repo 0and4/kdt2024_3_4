@@ -12,12 +12,14 @@ const Wrapper = styled.div`
   background-color: #c69fda;
 `;
 
+// 로고 이미지
 const Logo = styled.img`
   width: 400px;
   margin-bottom: 35px;
   cursor: pointer;
 `;
 
+// 회원가입 박스
 const JoinBox = styled.div`
   width: 650px;
   background-color: rgb(239, 224, 225);
@@ -29,6 +31,7 @@ const JoinBox = styled.div`
   gap: 20px;
 `;
 
+// 입력 필드 그룹
 const InputGroup = styled.div`
   display: flex;
   align-items: center;
@@ -39,6 +42,7 @@ const InputGroup = styled.div`
   }
 `;
 
+// 라벨
 const Label = styled.label`
   font-size: 1rem;
   color: #333;
@@ -46,6 +50,7 @@ const Label = styled.label`
   width: 150px;
 `;
 
+// 입력 필드
 const Input = styled.input`
   width: 280px;
   height: 40px;
@@ -61,6 +66,7 @@ const Input = styled.input`
   }
 `;
 
+// 작은 버튼 (중복확인인)
 const SmallButton = styled.button`
   height: 35px;
   width: 90px;
@@ -78,12 +84,14 @@ const SmallButton = styled.button`
   }
 `;
 
+// 동의 체크박스 그룹
 const AgreementGroup = styled.div`
   display: flex;
   align-items: flex-start; /* 위아래 정렬 */
   gap: 20px;
 `;
 
+// 동의 체크박스
 const Textarea = styled.textarea`
   width: 390px;
   height: 120px;
@@ -101,6 +109,7 @@ const Textarea = styled.textarea`
   }
 `;
 
+// 라디오 버튼 그룹 (동의함, 동의하지 않음음)
 const RadioGroup = styled.div`
   display: flex;
   align-items: center;
@@ -114,6 +123,7 @@ const ButtonWrapper = styled.div`
   justify-content: center;
 `;
 
+// 회원가입 버튼
 const Button = styled.button`
   width: 200px;
   height: 45px;
@@ -133,6 +143,7 @@ const Button = styled.button`
   }
 `;
 
+// 모달 스타일
 const Modal = styled.div`
   position: fixed;
   top: 0;
@@ -145,6 +156,7 @@ const Modal = styled.div`
   align-items: center;
 `;
 
+// 모달 내용 스타일
 const ModalContent = styled.div`
   background: rgb(241, 216, 255);
   padding: 20px 40px;
@@ -153,6 +165,7 @@ const ModalContent = styled.div`
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 `;
 
+// 모달 버튼 스타일
 const ModalButton = styled.button`
   margin-top: 20px;
   width: 100px;
@@ -172,15 +185,17 @@ const ModalButton = styled.button`
   }
 `;
 
+// 비밀번호 유효성 검사 결과 스타일
 const PasswordCriteria = styled.div`
   font-size: 0.9rem;
   color: ${(props) => (props.isValid ? "green" : "red")};
 `;
 
+// 비밀번호 툴팁 스타일 (유효성 검사 박스스)
 const Tooltip = styled.div`
   position: absolute;
-  top: 320px;
-  right: 250px;
+  top: 370px;
+  right: 350px;
   width: 200px;
   background-color: white;
   border: 1px solid #ddd;
@@ -197,11 +212,14 @@ const Tooltip = styled.div`
 function Join() {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [name, setName] = useState(""); // 이름 입력값
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState(""); // 비밀번호 입력값
+  const [confirmPassword, setConfirmPassword] = useState(""); // 비밀번호 확인 입력값
+  const [email, setEmail] = useState(""); // 이메일 입력값
   const [tooltipVisible, setTooltipVisible] = useState(false); // 비밀번호 툴팁 보이기 여부
 
-  //로고
+  //로고 클릭 시 홈으로 이동
   const handleLogoClick = () => {
     navigate("/");
   };
@@ -223,9 +241,59 @@ function Join() {
     }
   };
 
-  //회원가입 버튼
+  //회원가입 버튼 클릭 시
   const handleJoinClick = () => {
-    // 현재는 버튼 클릭 시 모달만 열림
+    if (name.trim() === "") {
+      alert("이름을 입력해주세요.");
+      return;
+    }
+
+    if (username.trim() === "") {
+      alert("아이디를 입력해주세요.");
+      return;
+    }
+
+    if (existingUsernames.includes(username)) {
+      alert("사용이 불가한 아이디입니다. 다시 입력해 주세요.");
+      return;
+    }
+
+    if (
+      !isLengthValid ||
+      (!containsUppercase && !containsLowercase) ||
+      !containsNumber ||
+      !containsSpecialChar
+    ) {
+      alert(
+        "비밀번호 조건을 충족해야 합니다.\n(영문+숫자+특수문자 포함, 8자 이상)"
+      );
+      return;
+    }
+
+    if (confirmPassword !== password) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    // 이메일 비어있는지 확인
+    if (email.trim() === "") {
+      alert("이메일을 입력해주세요.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert("유효한 이메일 형식을 입력해주세요.");
+      return;
+    }
+
+    const agreement = document.querySelector('input[name="agreement"]:checked');
+    if (!agreement || agreement.value !== "동의함") {
+      alert("개인정보 수집에 동의해야 회원가입이 가능합니다.");
+      return;
+    }
+
+    // 모든 조건이 충족되면 회원가입 진행
     setIsModalOpen(true);
   };
 
@@ -235,10 +303,6 @@ function Join() {
     navigate("/"); // 메인 페이지로 이동
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false); // 모달 닫기
-  };
-
   //비밀번호 검증 (유효성 검사)
   const containsUppercase = /[A-Z]/.test(password);
   const containsLowercase = /[a-z]/.test(password);
@@ -246,10 +310,29 @@ function Join() {
   const containsSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
   const isLengthValid = password.length >= 8;
 
+  // 비밀번호 확인 시, 입력값이 다르면 alert 띄우는 함수
+  const handleConfirmPasswordBlur = () => {
+    if (confirmPassword !== "" && confirmPassword !== password) {
+      alert("비밀번호가 일치하지 않습니다.");
+    }
+  };
+
   return (
     <Wrapper>
       <Logo src={logo} alt="Berrecommend 로고" onClick={handleLogoClick} />{" "}
       <JoinBox>
+        <InputGroup>
+          <Label htmlFor="name">이름</Label>
+          <Input
+            id="name"
+            type="text"
+            placeholder="이름을 입력하세요"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </InputGroup>
+
+        {/* 아이디 입력란 */}
         <InputGroup>
           <Label htmlFor="username">아이디</Label>
           <Input
@@ -275,7 +358,7 @@ function Join() {
             onBlur={() => setTooltipVisible(false)} // 포커스 해제 시 툴팁 숨김
           />
 
-          {/* ✅ 툴팁 추가 */}
+          {/* 툴팁 추가 */}
           <Tooltip visible={tooltipVisible}>
             <PasswordCriteria isValid={containsUppercase || containsLowercase}>
               {containsUppercase || containsLowercase
@@ -297,12 +380,28 @@ function Join() {
         {/* 비밀번호 확인 입력란 */}
         <InputGroup>
           <Label htmlFor="confirm-password">비밀번호 확인</Label>
-          <Input id="confirm-password" type="password" />
+          <Input
+            id="confirm-password"
+            type="password"
+            placeholder="비밀번호 재입력"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            onBlur={handleConfirmPasswordBlur}
+          />
         </InputGroup>
+        {/* 이메일 입력란 */}
         <InputGroup>
           <Label htmlFor="email">이메일</Label>
-          <Input id="email" type="email" placeholder="유효한 이메일 입력" />
+          <Input
+            id="email"
+            type="email"
+            placeholder="유효한 이메일 입력"
+            value={email} // 이메일 입력값을 useState와 연결
+            onChange={(e) => setEmail(e.target.value)} // 입력 시 상태 업데이트
+          />
         </InputGroup>
+
+        {/* 개인정보 수집 동의 */}
         <AgreementGroup>
           <Label htmlFor="agreement">개인정보 수집 동의</Label>
           <Textarea
@@ -311,6 +410,8 @@ function Join() {
             defaultValue={`개인정보 수집 동의 내용:\n\n1. 수집하는 개인정보 항목\n- 이름, 이메일, 아이디, 비밀번호 등 회원가입 시 필수 정보\n\n2. 개인정보 이용 목적\n- 회원 관리, 서비스 제공 및 개선`}
           />
         </AgreementGroup>
+
+        {/* 동의함, 동의하지 않음 라디오 버튼 */}
         <RadioGroup>
           <label>
             <input type="radio" name="agreement" value="동의함" /> 동의함
@@ -320,6 +421,8 @@ function Join() {
             동의하지 않음
           </label>
         </RadioGroup>
+
+        {/* 회원가입 버튼 */}
         <ButtonWrapper>
           <Button onClick={handleJoinClick}>회원가입</Button>
         </ButtonWrapper>

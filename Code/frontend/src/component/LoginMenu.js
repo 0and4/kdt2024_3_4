@@ -13,12 +13,14 @@ const Wrapper = styled.div`
   background-color: #c69fda;
 `;
 
+/*로고 디자인*/
 const Logo = styled.img`
-  width: 400px;
+  width: 250px;
   margin-bottom: 35px;
   cursor: pointer;
 `;
 
+/*로그인 박스 디자인*/
 const LoginBox = styled.div`
   background-color: rgb(239, 224, 225);
   padding: 20px;
@@ -33,6 +35,7 @@ const LoginBox = styled.div`
   justify-content: space-evenly;
 `;
 
+/*로그인 버튼 디자인*/
 const Button = styled.button`
   width: 300px;
   height: 50px;
@@ -45,6 +48,7 @@ const Button = styled.button`
   cursor: pointer;
   transition: background-color 0.3s;
 
+  /*Google 로그인 버튼 디자인*/
   &:nth-child(1) {
     background-color: #fff;
     color: #757575;
@@ -56,6 +60,7 @@ const Button = styled.button`
     background-color: rgb(232, 232, 232);
   }
 
+  /*회원 ID 로그인 버튼 디자인*/
   &:nth-child(2) {
     background-color: #fff;
     color: #757575;
@@ -67,6 +72,7 @@ const Button = styled.button`
   }
 `;
 
+/*'회원가입', 'ID 찾기' & 'PW 찾기' 문구 디자인*/
 const TextLink = styled.p`
   margin-bottom: 0;
   font-size: 1.1em;
@@ -86,8 +92,9 @@ const TextLink = styled.p`
   }
 `;
 
+/*로그인 메뉴 컴포넌트*/
 function LoginMenu() {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // 페이지 이동 함수
 
   const handleIdLogin = () => {
     navigate("/login-id"); // 회원 ID 로그인 페이지로 이동
