@@ -39,7 +39,7 @@ public class DBConfig {
         //create --> 처음할 때 사용후 validate로 바꿀것
         //MySql에 show variables like 'lower_case_table_names'를 입력한 후 값이 1인지 확인;
         //0이면 1로 바꿔 줄것!!
-        properties.put("hibernate.hbm2ddl.auto", "validate");
+        properties.put("hibernate.hbm2ddl.auto", "create");
         properties.put("hibernate.show_sql", "true");
         properties.put("hibernate.format_sql", "true");
         properties.put("hibernate.physical_naming_strategy", "org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy");

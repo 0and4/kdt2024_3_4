@@ -20,7 +20,7 @@ public class ChartDetail {
     @JoinColumn(name = "song_id")
     private Song song;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "`rank`")
     private int rank;
 
     public ChartDetail(Chart chart,Song song, int rank) {

@@ -40,8 +40,7 @@ public class Song {
     private String url;
 
     //가사
-    @Column(nullable = false)
-    @Lob
+    @Column(nullable = false, columnDefinition = "TEXT")  // TEXT(64KB)로 변경
     private String lyric;
 
     public Song(Long id, String track, int playTime, Album album, String genre, String url, String lyric) {
