@@ -1,29 +1,18 @@
 package com.berry_comment.controller;
 
-import com.berry_comment.config.jwt.TokenProvider;
-import com.berry_comment.config.oauth.ConstantValue;
-import com.berry_comment.dto.EmailAndNameCheckDto;
-import com.berry_comment.dto.EmailCheckDto;
-import com.berry_comment.dto.JoinDto;
-import com.berry_comment.dto.TokenResponseDto;
+import com.berry_comment.dto.*;
 import com.berry_comment.entity.UserEntity;
-import com.berry_comment.repository.UserRepository;
 import com.berry_comment.service.MailService;
 import com.berry_comment.service.RedisUtils;
 import com.berry_comment.service.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.time.Duration;
 
 @RestController
 @RequestMapping("/user")
@@ -55,18 +44,26 @@ public class UserLoginController {
         response.sendRedirect(url);
     }
 
-    @PostMapping("/join")
-    public void join(@RequestBody JoinDto joinDto) {
-
+    @PostMapping("/form/login")
+    public ResponseEntity<?> loginForm(@RequestBody LoginFormDto loginFormDto) throws IOException {
+        TokenDto tokenDto = userService.login(loginFormDto);
+        return ResponseEntity.ok(tokenDto);
     }
 
-    @PostMapping("/check-email")
+    @PostMapping("/join")
+    public ResponseEntity<?> join(@RequestBody JoinDto joinDto) {
+        TokenDto tokenDto = userService.joinUser(joinDto);
+        return ResponseEntity.ok(tokenDto);
+    }
+
+    @PostMapping("/send-email")
     public ResponseEntity<?> validDateUser(@RequestBody EmailCheckDto emailCheckDto){
         Boolean checked = mailService.checkEmail(emailCheckDto.getEmail(), emailCheckDto.getPassword());
         if (checked){
             //임시 비밀번호 발급
             String password = redisUtils.createTempPass();
-            userService.updatePassword(emailCheckDto.getEmail(),password);
+            String passwordUpdate = userService.updatePassword(emailCheckDto.getEmail(),password);
+            mailService.sendMailPasswordUpdate(emailCheckDto.getEmail(),passwordUpdate);
             return ResponseEntity.ok("");
         }
         else {
@@ -80,5 +77,15 @@ public class UserLoginController {
         return ResponseEntity.ok("");
     }
 
+    @PostMapping("/get-id")
+    public ResponseEntity<IdDto> getUserById(@RequestBody IdRequestDto idRequestDto){
+        IdDto idDto = userService.findId(idRequestDto.getEmail(), idRequestDto.getName());
+        return ResponseEntity.ok(idDto);
+    }
 
+    @GetMapping("/refresh-token")
+    public ResponseEntity<TokenDto> refreshToken(HttpServletRequest request){
+        TokenDto tokenDto = userService.refreshToken(request);
+        return ResponseEntity.ok(tokenDto);
+    }
 }

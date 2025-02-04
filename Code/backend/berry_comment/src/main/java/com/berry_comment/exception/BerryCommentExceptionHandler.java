@@ -4,6 +4,7 @@ import com.berry_comment.dto.BerryCommentErrorResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,6 +42,16 @@ public class BerryCommentExceptionHandler {
         log.error(e.getMessage());
         return BerryCommentErrorResponse.builder()
                 .errorCode(ErrorCode.NOT_AUTHORIZATION)
+                .build();
+    }
+
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    @ExceptionHandler(value = DuplicateKeyException.class)
+    public BerryCommentErrorResponse handleException(DuplicateKeyException e, HttpServletRequest request) {
+        log.error(e.getMessage());
+        return BerryCommentErrorResponse.builder()
+                .errorMessage(e.getMessage())
+                .errorCode(ErrorCode.DUPLICATE_USER)
                 .build();
     }
 }

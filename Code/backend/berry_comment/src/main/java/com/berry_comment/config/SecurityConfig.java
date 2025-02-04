@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable);
 
+        http.csrf(AbstractHttpConfigurer::disable);
         http
                 .csrf((crsf)-> crsf.ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")));
 
@@ -41,9 +42,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/user/**").permitAll()// 로그인 API 허용
                         .requestMatchers("/h2-console/**").permitAll()// H2 콘솔 요청 허용
-                        .requestMatchers("/song/chart/**").hasAuthority("NORMAL")
-                        .requestMatchers("/stream/**").hasAuthority("NORMAL")
-                        .requestMatchers("/playList/**").hasAuthority("PREMIUM")
+                        .requestMatchers("/search/**").hasAnyAuthority("NORMAL", "PREMIUM")
+                        .requestMatchers("/stream/**").hasAnyAuthority("PREMIUM","NORMAL")
+                        .requestMatchers("/playList/normal/**").hasAnyAuthority("PREMIUM", "NORMAL")
+                        .requestMatchers("/playList/recommend/**").hasAnyAuthority("PREMIUM")
+                        .requestMatchers("/profile/**").hasAnyAuthority("NORMAL", "PREMIUM")
                         .anyRequest().permitAll() // 나머지 요청은 인증 필요X
 
                 );

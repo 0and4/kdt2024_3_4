@@ -10,29 +10,25 @@ spring:
           auth: true
           starttls:
             enable: true
-
   datasource-data:
-    driver-class-name: org.h2.Driver
-    jdbc-url: jdbc:h2:~/berry_comment
-    username: sa
-    password: ""
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbc-url: jdbc:mysql://localhost:3306/berrecommend?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    username: admin
+    password: qwer1234!@#$
 
   datasource-meta:
-    driver-class-name: org.h2.Driver
-    jdbc-url: jdbc:h2:~/berry_comment_meta
-    username: sa
-    password: ""
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbc-url: jdbc:mysql://localhost:3306/berrecommend_meta?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    username: admin
+    password: qwer1234!@#$
 
   #배치 자동 실행 방지
   batch:
     job:
       enabled: false
     jdbc:
-      initialize-schema: never
-      schema: classpath:org/springframework/batch/core/schema-@@platform@@.sql
-  jpa:
-    hibernate:
-      ddl-auto: validate
+      initialize-schema: always
+      schema: classpath:org/springframework/batch/core/schema-mysql.sql
   application:
     name: berry_comment
   security:

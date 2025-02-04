@@ -16,14 +16,14 @@ public class Artist {
     private Long id;
 
     //아티스트 이름
-    @Column(nullable = false)
+    @Column(nullable = false, length = 40)
     private String name;
 
     @OneToMany(mappedBy = "artist")
     private List<SongOfArtist> Songs;
 
     //아티스트 대표 이미지
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String image;
 
     public Artist(Long id,String name, String image) {

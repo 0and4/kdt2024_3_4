@@ -1,9 +1,6 @@
 package com.berry_comment.service;
 
-import com.berry_comment.dto.ListInfoDto;
-import com.berry_comment.dto.PlayListDto;
-import com.berry_comment.dto.RequestAddSongToPlayListDto;
-import com.berry_comment.dto.SongDto;
+import com.berry_comment.dto.*;
 import com.berry_comment.entity.PlayList;
 import com.berry_comment.entity.PlayListDetail;
 import com.berry_comment.entity.Song;
@@ -13,6 +10,7 @@ import com.berry_comment.repository.PlayListRepository;
 import com.berry_comment.repository.SongRepository;
 import com.berry_comment.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Pageable;
@@ -112,5 +110,16 @@ public class PlayListService {
         if(!userId.equals(playList.getUser().getId())) {
             throw new AuthorizationDeniedException("권한이 없습니다.");
         }
+    }
+
+    public RequestEditPlayListDto editTitle(Long playlistId, String title, String userId) {
+        validate(playlistId, userId);
+        PlayList playList = playListRepository.findById(playlistId).orElse(null);
+        playList.setPlayListName(title);
+        playListRepository.save(playList);
+        return RequestEditPlayListDto.builder()
+                .playlistId(playlistId)
+                .title(title)
+                .build();
     }
 }

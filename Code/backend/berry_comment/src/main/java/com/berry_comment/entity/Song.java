@@ -32,7 +32,7 @@ public class Song {
     private List<SongOfArtist> songOfArtistList;
 
     //곡의 장르
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String genre;
 
     //곡링크

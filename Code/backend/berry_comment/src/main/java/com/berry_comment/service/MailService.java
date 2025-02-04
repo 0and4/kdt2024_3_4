@@ -8,6 +8,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+
 @Slf4j
 @Service
 //smtp 메일 보내기
@@ -54,7 +56,9 @@ public class MailService {
     }
 
     public Boolean checkEmail(@Email String email, @NotEmpty String password) {
-        String validatePass = (String) redisUtils.getData(email);
+        String validatePass = new String(redisUtils.getData(email).toString().getBytes(), StandardCharsets.UTF_8);
+        System.out.println(validatePass);
+        System.out.println(password);
         if (validatePass.equals(password)) {
             redisUtils.delData(email);
             return true;

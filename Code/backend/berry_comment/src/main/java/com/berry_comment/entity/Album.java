@@ -28,11 +28,6 @@ public class Album {
     private List<Song> songList;
 
 
-    public Album(String imageUrl, String name) {
-        this.imageUrl = imageUrl;
-        this.name = name;
-    }
-
     public Album(Long id, String imageUrl, String name) {
         this.id = id;
         this.imageUrl = imageUrl;

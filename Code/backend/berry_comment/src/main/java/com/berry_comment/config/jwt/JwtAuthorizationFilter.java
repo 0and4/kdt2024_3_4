@@ -1,8 +1,10 @@
 package com.berry_comment.config.jwt;
 
 import com.berry_comment.entity.UserEntity;
+import com.berry_comment.exception.ErrorCode;
 import com.berry_comment.oauth.PrincipalDetails;
 import com.berry_comment.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,9 +15,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private final UserRepository userRepository;
@@ -29,8 +33,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         this.userRepository = userRepository;
         this.tokenProvider = tokenProvider;
         excludedUrls = new ArrayList<>();
-        //허용되는 url 얘는 토큰이 필요없어요~~
-        excludedUrls.add("/login");
         excludedUrls.add("/favicon.ico");
         excludedUrls.add("/h2-console");
 
@@ -38,6 +40,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         excludedUrls.add("/payment/success");
         excludedUrls.add("/payment/fail");
         excludedUrls.add("/payment/cancel");
+
+        //가입 관련 url
+        excludedUrls.add("/user");
     }
 
     @Override
@@ -54,17 +59,40 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             //오류 발생시키기...
-            chain.doFilter(request, response);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 반환
+            response.setContentType("text/plain; charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
 
+            Map<String, Object> map = new HashMap<>();
+            map.put("errorCode",ErrorCode.TOKEN_NOTFOUND);
+            map.put("detailMessage", ErrorCode.TOKEN_NOTFOUND.getMessage());
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(map);
+            response.getWriter().write(json);
+            response.getWriter().flush();
+            return;
         }
         System.out.println("header: " + authorizationHeader);
         //token을 가져옵니다.
         String token = authorizationHeader.replace("Bearer ", "");
         System.out.println("token: " + token);
         //토큰 유효성검사
-        if(!tokenProvider.validate(token)) {
+
+        if (!tokenProvider.validate(token)) {
             //토큰이 유효하지가 않음
-            throw new ServletException("token is invalid");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 반환
+            response.setContentType("text/plain; charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            Map<String, Object> map = new HashMap<>();
+            map.put("errorCode",ErrorCode.TOKEN_INVALID);
+            map.put("detailMessage", ErrorCode.TOKEN_INVALID.getMessage());
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(map);
+            response.getWriter().write(json);
+            response.getWriter().flush();
+            response.getWriter().write(json);
+            response.getWriter().flush();
+            return;
         }
         //토큰에서 유저아이디를 가져옵니다..
         String userId = tokenProvider.getClaims(token).get("id").toString();

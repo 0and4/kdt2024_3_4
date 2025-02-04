@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,22 +15,22 @@ import java.util.List;
 @Table(name = "user_entity")
 public class UserEntity {
     @Id
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 80)
     //사용자 Id
     private String id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     //사용자 이름
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 150)
     private String password;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 30)
     //사용자 이메일
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     //사용자 닉네임
     private String nickname;
 
@@ -49,7 +48,7 @@ public class UserEntity {
     private RefreshTokenEntity refreshToken;
 
     //플레이리스트 관련
-    @OneToMany(mappedBy = "user",orphanRemoval = true)
+    @OneToMany(mappedBy = "user")
     private List<PlayList> playList;
 
     //결제관련
@@ -73,5 +72,9 @@ public class UserEntity {
 
     public void setUserPassword(String password) {
         this.password = password;
+    }
+
+    public void setnickname(String nickname) {
+        this.nickname = nickname;
     }
 }

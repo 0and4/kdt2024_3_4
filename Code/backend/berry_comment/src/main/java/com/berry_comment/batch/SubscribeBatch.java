@@ -59,7 +59,7 @@ public class SubscribeBatch {
                 .name("userReader")
                 .pageSize(20)
                 .methodName("findLatestPayments")
-                .arguments(List.of(LocalDateTime.now().minusDays(expireDay), PageRequest.of(0, 20)))
+                .arguments(List.of(LocalDateTime.now().minusDays(expireDay)))
                 .repository(userRepository)
                 .sorts(Map.of("createdAt", Sort.Direction.DESC))
                 .build();
