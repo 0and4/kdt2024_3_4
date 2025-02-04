@@ -6,7 +6,7 @@ import {
   LiaPlusSolid,
   LiaPlaySolid,
 } from "react-icons/lia";
-import AddPopup from "./AddPopup";
+import AddPopup from "../Popup/AddPopup";
 export const Actions = styled.div`
   flex: 1;
   display: flex;
