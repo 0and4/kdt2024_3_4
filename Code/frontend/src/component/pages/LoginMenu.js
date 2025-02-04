@@ -1,8 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import logo from "../images/logo.png";
-import { Header, BackButton, Logo } from "./ui/LoginDiv";
+import logo from "../../images/logo.png";
+import { Header, BackButton, Logo } from "../ui/LoginDiv";
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;

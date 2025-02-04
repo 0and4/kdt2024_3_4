@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import { FaChevronRight, FaChevronUp } from "react-icons/fa";
-import SongList from "../SongList";
+import SongList from "../ui/SongList";
 import { Wrapper, Container } from "../ui/AllDiv";
 const ResultP = styled.p`
   font-size: 1.5rem;

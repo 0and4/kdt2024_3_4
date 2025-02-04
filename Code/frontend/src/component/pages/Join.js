@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import logo from "../images/logo.png";
-import { Header as jHeader, BackButton, Logo } from "./ui/LoginDiv";
+import logo from "../../images/logo.png";
+import { Header as jHeader, BackButton, Logo } from "../ui/LoginDiv";
 
 const Wrapper = styled.div`
   display: flex;
@@ -12,17 +12,24 @@ const Wrapper = styled.div`
   min-height: 100vh;
   width: 100vw;
   background-color: #c69fda;
-  overflow: auto;
   padding: 50px 0;
+  overflow-x: hidden;
+  margin: 0;
+  * {
+    box-sizing: border-box;
+  }
 `;
 
 const Header = styled(jHeader)`
-  margin-top: 38%;
+  margin-top: 24%;
+  @media (min-width: 769px) {
+    margin-top: 10%;
+  }
 `;
 
 // 회원가입 박스
 const JoinBox = styled.div`
-  width: 580px;
+  width: 600px;
   background-color: rgb(239, 224, 225);
   padding: 30px;
   border-radius: 20px;
@@ -67,12 +74,12 @@ const Input = styled.input`
   }
 `;
 
-// 작은 버튼 (중복확인인)
+// 작은 버튼 (중복확인)
 const SmallButton = styled.button`
   height: 35px;
-  width: 90px;
   padding: 0 10px;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
   color: white;
   background-color: #68009b;
   border: none;
@@ -110,12 +117,12 @@ const Textarea = styled.textarea`
   }
 `;
 
-// 라디오 버튼 그룹 (동의함, 동의하지 않음음)
+// 라디오 버튼 그룹 (동의함, 동의하지 않음)
 const RadioGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
-  margin-left: 350px;
+  margin-left: 310px;
   margin-bottom: 15px;
   label {
     font-size: 0.9rem;

@@ -1,9 +1,9 @@
 import React, { useState, useRef } from "react";
 import styled from "styled-components";
-import logo from "../images/logo.png";
-import ArrowImage from "../images/Arrow.png";
+import logo from "../../images/logo.png";
+import ArrowImage from "../../images/Arrow.png";
 import { useNavigate } from "react-router-dom";
-import Subscribe2 from "./Popup/Subscribe2";
+import Subscribe2 from "../Popup/Subscribe2";
 
 const Wrapper = styled.div`
   display: flex;

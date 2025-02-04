@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import ActionButtons from "./ui/ActionButtons";
+import ActionButtons from "./ActionButtons";
 
 const Wrapper = styled.div``;
 const Container = styled.table`

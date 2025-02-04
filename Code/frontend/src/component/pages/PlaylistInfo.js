@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import SongList from "../SongList";
+import SongList from "../ui/SongList";
 import { KeepBtn, BackBtn } from "../ui/Buttons";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 import { RiArrowGoBackFill } from "react-icons/ri";

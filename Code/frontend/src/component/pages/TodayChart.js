@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import SongList from "../SongList";
+import SongList from "../ui/SongList";
 import { Wrapper } from "../ui/AllDiv";
 import RecMenuDiv from "../ui/MenuDiv";
 const Container = styled.div``;
