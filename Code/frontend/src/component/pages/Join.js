@@ -1,60 +1,35 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import logo from "../images/logo.png"; // 로고 이미지 경로
+import logo from "../../images/logo.png";
+import { Header as jHeader, BackButton, Logo } from "../ui/LoginDiv";
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 100vh;
+  justify-content: flex-start;
+  min-height: 100vh;
   width: 100vw;
   background-color: #c69fda;
-`;
-
-const Header = styled.div`
-  display: flex;
-  align-items: center;
-  position: relative; /* 상대적 위치 */
-  width: 50%;
-  justify-content: center; /* 로고를 중앙 정렬 */
-`;
-
-// 뒤로 가기 버튼 스타일
-const BackButton = styled.button`
-  position: absolute;
-  left: 150px; /* 화면 왼쪽 여백 */
-  top: 20px; /* 화면 위쪽 여백 */
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0);
-  border: 3px solid rgba(255, 255, 255, 0.36);
-  font-size: 1.5rem;
-  color: rgba(255, 255, 255, 0.51);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.18);
-    color: rgba(126, 85, 176, 0.68);
+  padding: 50px 0;
+  overflow-x: hidden;
+  margin: 0;
+  * {
+    box-sizing: border-box;
   }
 `;
 
-// 로고 이미지
-const Logo = styled.img`
-  width: 250px;
-  margin-bottom: 35px;
-  cursor: pointer;
+const Header = styled(jHeader)`
+  margin-top: 24%;
+  @media (min-width: 769px) {
+    margin-top: 10%;
+  }
 `;
 
 // 회원가입 박스
 const JoinBox = styled.div`
-  width: 650px;
+  width: 600px;
   background-color: rgb(239, 224, 225);
   padding: 30px;
   border-radius: 20px;
@@ -99,12 +74,12 @@ const Input = styled.input`
   }
 `;
 
-// 작은 버튼 (중복확인인)
+// 작은 버튼 (중복확인)
 const SmallButton = styled.button`
   height: 35px;
-  width: 90px;
   padding: 0 10px;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
   color: white;
   background-color: #68009b;
   border: none;
@@ -142,13 +117,17 @@ const Textarea = styled.textarea`
   }
 `;
 
-// 라디오 버튼 그룹 (동의함, 동의하지 않음음)
+// 라디오 버튼 그룹 (동의함, 동의하지 않음)
 const RadioGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
-  margin-left: 350px; /* 라디오 버튼이 텍스트와 맞춰지도록 조정 */
+  margin-left: 310px;
   margin-bottom: 15px;
+  label {
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
 `;
 
 const ButtonWrapper = styled.div`

@@ -1,9 +1,9 @@
 import React, { useState, useRef } from "react";
 import styled from "styled-components";
-import logo from "../images/logo.png";
-import ArrowImage from "../images/Arrow.png";
+import logo from "../../images/logo.png";
+import ArrowImage from "../../images/Arrow.png";
 import { useNavigate } from "react-router-dom";
-import Subscribe2 from "./Popup/Subscribe2";
+import Subscribe2 from "../Popup/Subscribe2";
 
 const Wrapper = styled.div`
   display: flex;
@@ -33,7 +33,7 @@ const ArrowIcon = styled.img`
 `;
 
 const SubscriptionBox = styled.div`
-  width: 600px;
+  width: 560px;
   max-width: 90%;
   background-color: rgb(239, 224, 225);
   padding: 30px;
@@ -71,7 +71,7 @@ const SubscriptionButton = styled.button`
 `;
 
 const PaymentSection = styled.div`
-  width: 600px;
+  width: 560px;
   max-width: 90%;
   background-color: white;
   padding: 30px;
@@ -102,10 +102,11 @@ const PaymentButton = styled.button`
 
 const PaymentOptions = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2열 배치 */
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  row-gap: 20px;
   margin-top: 20px;
   justify-items: center;
+  padding: 0 40px;
 `;
 
 /* 이용 약관 */
@@ -198,7 +199,7 @@ function PR() {
           구독하러 가기
         </SubscriptionButton>
         <p>
-          <strong>월 8,900원에 제한 없이 모든 음악을 감상하세요</strong>
+          <strong>월 5,900원에 제한 없이 모든 음악을 감상하세요</strong>
         </p>
       </SubscriptionBox>
       <Title>결제 정보</Title>

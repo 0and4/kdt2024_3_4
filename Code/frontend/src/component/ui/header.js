@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
-import logo from "../images/logo.png";
+import logo from "../../images/logo.png";
 const Wrapper = styled.div`
   position: relative;
   border-bottom: 3px solid #dee2e6;

@@ -1,18 +1,18 @@
 import "./App.css";
 import styled from "styled-components";
-import Header from "./component/header";
+import Header from "./component/ui/header";
 import Main from "./component/Main";
-import Player from "./component/Player";
+import Player from "./component/ui/Player";
 import Search from "./component/pages/Search";
 import SongInfo from "./component/pages/SongInfo";
 import ArtistInfo from "./component/pages/ArtistInfo";
 import AlbumInfo from "./component/pages/AlbumInfo";
-import LoginMenu from "./component/LoginMenu";
-import Login from "./component/Login";
-import Join from "./component/Join";
-import FindId from "./component/FindId";
-import FindPW from "./component/FindPW";
-import PR from "./component/PR";
+import LoginMenu from "./component/pages/LoginMenu";
+import Login from "./component/pages/Login";
+import Join from "./component/pages/Join";
+import FindId from "./component/pages/FindId";
+import FindPW from "./component/pages/FindPW";
+import PR from "./component/pages/PR";
 
 import { useState } from "react";
 import {

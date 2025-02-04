@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { FaShuffle, FaRepeat } from "react-icons/fa6";
 import { CgPlayTrackPrevO, CgPlayTrackNextO } from "react-icons/cg";
 import { FaRegPlayCircle, FaRegPauseCircle } from "react-icons/fa";
-import PlaySongList from "./ui/PlaySongList";
+import PlaySongList from "./PlaySongList";
 
 const Wrapper = styled.div`
   position: fixed;

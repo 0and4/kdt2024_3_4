@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { BackBtn } from "../ui/Buttons";
-import SongList from "../SongList";
+import SongList from "../ui/SongList";
 import { FaChevronRight } from "react-icons/fa";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { Wrapper, Container, BackWrapper, InfoDiv } from "../ui/AllDiv";

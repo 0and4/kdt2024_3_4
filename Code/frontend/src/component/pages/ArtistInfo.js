@@ -4,7 +4,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { FaChevronRight, FaChevronUp } from "react-icons/fa";
 import { BackBtn } from "../ui/Buttons";
-import SongList from "../SongList"; // 기존 노래 목록 컴포넌트
+import SongList from "../ui/SongList"; // 기존 노래 목록 컴포넌트
 import { Wrapper, Container, BackWrapper, InfoDiv } from "../ui/AllDiv";
 import RecMenuDiv from "../ui/MenuDiv";
 const NameP = styled.p`
