@@ -18,7 +18,7 @@ const TabMenu = styled.ul`
   margin: 0;
   border-bottom: 2px solid #ccc;
   li {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     flex: 1;
     text-align: center;
     padding: 10px;
@@ -28,10 +28,13 @@ const TabMenu = styled.ul`
     &:last-child {
       border-right: none;
     }
+    &:hover {
+      border-bottom: 2px solid #c69fda;
+    }
     &.active {
       background-color: #fff;
       font-weight: bold;
-      border-bottom: 2px solid #007bff;
+      border-bottom: 2px solid #68009b;
     }
   }
 `;
@@ -46,6 +49,8 @@ const TabContent = styled.div`
   li {
     padding: 5px 10px;
     margin: 0;
+    border: none;
+    border-bottom: 1px solid #ccc;
   }
 `;
 const SongItem = styled.li`
@@ -118,14 +123,8 @@ const PlayButton = styled.button`
   border-radius: 3px;
   cursor: pointer;
 `;
-function PlaySongList() {
-  const [activeTab, setActiveTab] = useState("playlist"); // 현재 활성화된 탭 상태
-  const playlistData = [
-    { title: "노래 1", artist: "가수 1" },
-    { title: "노래 2", artist: "가수 2" },
-    { title: "노래 3", artist: "가수 3" },
-  ];
-
+function PlaySongList({ playlist, setCurrentSong, setCurrentIndex }) {
+  const [activeTab, setActiveTab] = useState("playlist");
   const mylistData = [
     { title: "플레이리스트 1" },
     { title: "플레이리스트 2" },
@@ -155,8 +154,14 @@ function PlaySongList() {
       <TabContent>
         {activeTab === "playlist" && (
           <ul>
-            {playlistData.map((song, index) => (
-              <SongItem key={index}>
+            {playlist.map((song, index) => (
+              <SongItem
+                key={index}
+                onClick={() => {
+                  setCurrentSong(song);
+                  setCurrentIndex(index);
+                }}
+              >
                 <AlbumCover />
                 <SongInfo>
                   <SongTitle>{song.title}</SongTitle>
