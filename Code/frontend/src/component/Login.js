@@ -24,7 +24,7 @@ const Header = styled.div`
 // 뒤로 가기 버튼 스타일
 const BackButton = styled.button`
   position: absolute;
-  left: 30px; /* 화면 왼쪽 여백 */
+  left: 150px; /* 화면 왼쪽 여백 */
   top: 20px; /* 화면 위쪽 여백 */
   width: 40px;
   height: 40px;
@@ -149,6 +149,23 @@ const TextLink = styled.p`
   }
 `;
 
+const StyledButton = styled.button`
+  margin-left: 5px;
+  color: #68009b;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.1s;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: inherit;
+  padding: 0;
+
+  &:hover {
+    color: rgb(231, 224, 236);
+  }
+`;
+
 function Login() {
   const navigate = useNavigate(); // 페이지 이동 함수
   const [username, setUsername] = useState(""); // 아이디 입력값
@@ -206,13 +223,19 @@ function Login() {
       <TextLinks>
         <TextLink>
           아직 회원이 아니신가요?
-          <a href="/signup">회원가입하기</a>
+          <StyledButton onClick={() => navigate("/signup")}>
+            회원가입하기
+          </StyledButton>
         </TextLink>
         <TextLink>
           회원 정보를 잊으셨나요?
-          <a onClick={() => navigate("/find-id")}>ID 찾기</a>
+          <StyledButton onClick={() => navigate("/find-id")}>
+            ID 찾기
+          </StyledButton>
           {" / "}
-          <a onClick={() => navigate("/find-pw")}>PW 찾기</a>
+          <StyledButton onClick={() => navigate("/find-pw")}>
+            PW 찾기
+          </StyledButton>
         </TextLink>
       </TextLinks>
     </Wrapper>
