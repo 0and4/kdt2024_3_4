@@ -16,11 +16,11 @@ public class PlayList {
     private Long id;
 
     //플레이리스트 이름
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String playListName;
 
 
-    @OneToMany(mappedBy = "playList")
+    @OneToMany(mappedBy = "playList", cascade = CascadeType.REMOVE)
     private List<PlayListDetail> playListSongInfoList;
     @ManyToOne
     @JoinColumn
@@ -29,5 +29,9 @@ public class PlayList {
     public PlayList(String playListName, UserEntity user) {
         this.playListName = playListName;
         this.user = user;
+    }
+
+    public void setPlayListName(String playListName) {
+        this.playListName = playListName;
     }
 }

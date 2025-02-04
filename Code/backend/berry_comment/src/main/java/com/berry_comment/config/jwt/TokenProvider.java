@@ -2,17 +2,17 @@ package com.berry_comment.config.jwt;
 
 import com.berry_comment.entity.RefreshTokenEntity;
 import com.berry_comment.entity.UserEntity;
+import com.berry_comment.exception.BerryCommentException;
+import com.berry_comment.exception.ErrorCode;
 import com.berry_comment.repository.RefreshTokenRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @RequiredArgsConstructor
@@ -23,14 +23,15 @@ public class TokenProvider {
     //토큰 반환
     public String generateToken(UserEntity userEntity, Duration expiration) {
         Date now = new Date();
-        return makeToken(new Date( now.getTime() + expiration.toMillis() ), userEntity);
+        return makeToken(new Date( now.getTime() + expiration.toMillis()), userEntity);
     }
 
     private String makeToken(Date date, UserEntity userEntity) {
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .setIssuer(jwtProperties.getIssuer())
-                .setIssuedAt(date)
+                .setIssuedAt(new Date())
+                .setExpiration(date)
                 .claim("id", userEntity.getId())
                 .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey())
                 .compact();
@@ -55,12 +56,22 @@ public class TokenProvider {
 
     public boolean validate(String token) {
         try {
-            Jwts
+            Claims claims = Jwts
                     .parser()
                     .setSigningKey(jwtProperties.getSecretKey())
-                    .parseClaimsJws(token);
+                    .parseClaimsJws(token)
+                    .getBody();
+            // 만료시간(exp) 체크
+            Date expiration = claims.getExpiration();
+            System.out.println("만료시간" + expiration.toString());
+            System.out.println("현재시간 " + new Date().toString());
+            // 만약 토큰이 유효하면 true 반환
             return true;
-        } catch (Exception e) {
+        }catch (ExpiredJwtException e) {
+            return false;
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }

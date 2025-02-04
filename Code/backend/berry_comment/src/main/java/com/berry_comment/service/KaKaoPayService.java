@@ -4,6 +4,8 @@ import com.berry_comment.dto.KaKaoReadyResponse;
 import com.berry_comment.dto.KakaoApproveResponse;
 import com.berry_comment.entity.Payment;
 import com.berry_comment.entity.UserEntity;
+import com.berry_comment.exception.BerryCommentException;
+import com.berry_comment.exception.ErrorCode;
 import com.berry_comment.property.KakaoPayProperty;
 import com.berry_comment.repository.PaymentRepository;
 import com.berry_comment.repository.UserRepository;
@@ -49,6 +51,11 @@ public class KaKaoPayService {
     }
 
     public KaKaoReadyResponse kaKaoReady(String userId) {
+        UserEntity userEntity = userService.getUserById(userId);
+        //이미 결제한 유저라면
+        if(userEntity.getRoleUser() == RoleUser.PREMIUM) {
+            throw new BerryCommentException(ErrorCode.ALREADY_PAID, ErrorCode.ALREADY_PAID.getMessage());
+        }
         Map<String, Object> params = new HashMap<>();
         this.userId = userId;
         //테스트용 가맹정 이름

@@ -12,10 +12,10 @@ public class Recommendation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String title;
 
-    @OneToMany(mappedBy = "recommendation")
+    @OneToMany(mappedBy = "recommendation", cascade = CascadeType.REMOVE)
     private List<RecommendationDetail>recommendationDetailList;
 
     public Recommendation(String title) {

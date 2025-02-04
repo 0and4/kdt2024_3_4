@@ -20,7 +20,7 @@ public class Chart {
     //생성된 차트날짜
     private LocalDateTime dateTime;
 
-    @OneToMany(mappedBy = "chart", orphanRemoval = true)
+    @OneToMany(mappedBy = "chart", cascade = CascadeType.REMOVE)
     private List<ChartDetail> chartDetailList;
 
     public Chart(LocalDateTime dateTime) {

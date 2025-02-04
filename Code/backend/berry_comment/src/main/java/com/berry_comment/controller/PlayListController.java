@@ -3,6 +3,7 @@ package com.berry_comment.controller;
 import com.berry_comment.dto.ListInfoDto;
 import com.berry_comment.dto.PlayListDto;
 import com.berry_comment.dto.RequestAddSongToPlayListDto;
+import com.berry_comment.dto.RequestEditPlayListDto;
 import com.berry_comment.entity.Song;
 import com.berry_comment.service.AlbumService;
 import com.berry_comment.service.PlayListService;
@@ -24,11 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/playList")
+@RequestMapping("/playList/normal")
 @RequiredArgsConstructor
 public class PlayListController {
     private final PlayListService playListService;
-    private final RecommendService recommendService;
 
     @PostMapping("/addSong")
     public ResponseEntity<?> addSongToPlayList(
@@ -36,8 +36,20 @@ public class PlayListController {
             ) {
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         String userId = (String)principalDetails.getUser().getId();
-        ResponseEntity<?> response = playListService.addSongToPlayList(dataDto, userId);
-        return response;
+        return playListService.addSongToPlayList(dataDto, userId);
+    }
+
+    @PatchMapping("/edit")
+    public ResponseEntity<?> editPlayList(
+            @RequestBody RequestEditPlayListDto requestEditPlayListDto,
+            Authentication authentication
+    ){
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        String userId = (String)principalDetails.getUser().getId();
+        System.out.println("유저 아이디"+userId);
+        System.out.println("유저 아이디"+requestEditPlayListDto.getPlaylistId());
+        RequestEditPlayListDto responseDto = playListService.editTitle(requestEditPlayListDto.getPlaylistId(), requestEditPlayListDto.getTitle(), userId);
+        return ResponseEntity.ok(responseDto);
     }
 
     @PostMapping("/create")
@@ -56,45 +68,6 @@ public class PlayListController {
         return ResponseEntity.ok(playListDto);
     }
 
-    @GetMapping("/recommend-thumb")
-    public ResponseEntity<?> recommendThumb(
-            @PageableDefault(
-                    page = 0,
-                    size = 10,
-                    sort = "id",
-                    direction = Sort.Direction.ASC)
-            Pageable pageable
-    ){
-        ListInfoDto listInfoDto = recommendService.getRecommendation(pageable);
-        return ResponseEntity.ok(listInfoDto);
-    }
-
-    @GetMapping("/recommend-detail")
-    public ResponseEntity<?> recommendDetail(
-            @RequestParam(name = "id") int id,
-            @PageableDefault(
-                    page = 0,
-                    size = 10,
-                    sort = "id",
-                    direction = Sort.Direction.ASC
-            )
-            Pageable pageable)
-    {
-        ListInfoDto listInfoDto = recommendService.getRecommendationDetail(id, pageable);
-        return ResponseEntity.ok(listInfoDto);
-    }
-
-    //AI기반 플레이리스트 추가하기
-    @PostMapping("/recommend-add")
-    public ResponseEntity<?> recommendAddSongToPlayList(
-            @RequestParam(name="id") int id,
-            Authentication authentication
-    ){
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        String userId = (String)principalDetails.getUser().getId();
-        recommendService.addPlayListFromRecommendation(userId, id);
-        return ResponseEntity.ok("");
-    }
 
     @GetMapping("/my-thumb")
     public ResponseEntity<?> myThumb(

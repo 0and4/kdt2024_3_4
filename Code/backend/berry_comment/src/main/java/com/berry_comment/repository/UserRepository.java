@@ -17,6 +17,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     @Query("SELECT p FROM Payment p WHERE p.user = :user ORDER BY p.createdAt DESC")
     Optional<Payment> findLatestPaymentByUser(@Param("user") UserEntity user);
 
-    @Query("SELECT p from Payment  p WHERE p.createdAt > :localDateTime")
-    Page<Payment> findLatestPayments(@Param("localDateTime") LocalDateTime localDateTime, Pageable pageable);
+    @Query("SELECT p.user from Payment  p WHERE p.createdAt < :localDateTime")
+    Page<UserEntity> findLatestPayments(@Param("localDateTime") LocalDateTime localDateTime, Pageable pageable);
 }

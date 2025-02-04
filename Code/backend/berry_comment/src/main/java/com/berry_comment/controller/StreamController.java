@@ -1,6 +1,8 @@
 package com.berry_comment.controller;
 
+import com.berry_comment.oauth.PrincipalDetails;
 import com.berry_comment.service.StreamService;
+import com.berry_comment.type.RoleUser;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -9,6 +11,7 @@ import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,8 +22,12 @@ public class StreamController {
     @GetMapping("/play/{songId}")
     public void stream(
             @PathVariable(name = "songId") int songId,
-            HttpServletResponse response
+            HttpServletResponse response,
+            Authentication authentication
             ) {
-        streamService.getSongFile(response,songId);
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        RoleUser roleUser = principal.getUser().getRoleUser();
+        System.out.println(roleUser.getRoleName());
+        streamService.getSongFile(response,songId, roleUser);
     }
 }
