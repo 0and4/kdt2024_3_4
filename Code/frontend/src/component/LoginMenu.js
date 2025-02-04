@@ -17,7 +17,7 @@ const Header = styled.div`
   display: flex;
   align-items: center;
   position: relative; /* 상대적 위치 */
-  width: 100%;
+  width: 50%;
   justify-content: center; /* 로고를 중앙 정렬 */
 `;
 
