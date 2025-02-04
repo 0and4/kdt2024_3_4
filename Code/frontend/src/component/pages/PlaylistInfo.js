@@ -2,18 +2,34 @@ import styled from "styled-components";
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import SongList from "../SongList";
-import { AllBtn, BasketBtn, KeepBtn, ShuffleBtn, BackBtn } from "../ui/Buttons";
+import { KeepBtn, BackBtn } from "../ui/Buttons";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 import { RiArrowGoBackFill } from "react-icons/ri";
-const Wrapper = styled.div`
-  position: relative;
-`;
-const Container = styled.div`
+import {
+  Wrapper as plWrapper,
+  Container as plContainer,
+  BackWrapper as plBackWrapper,
+} from "../ui/AllDiv";
+import RecMenuDiv from "../ui/MenuDiv";
+const Wrapper = styled(plWrapper)`
   width: 100%;
+  padding: 0;
+`;
+const Container = styled(plContainer)`
+  width: 100%;
+  padding: 0;
+`;
+const BackWrapper = styled(plBackWrapper)`
+  right: 20px;
+  top: 20px;
+  @media (min-width: 769px) {
+    right: 0;
+  }
 `;
 const InfoDiv = styled.div`
   display: flex;
   flex-direction: row;
+  width: 100%;
   margin: 20px;
 `;
 const PlaylistJacket = styled.div`
@@ -31,38 +47,6 @@ const ControlDiv = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
-`;
-const MenuDiv = styled.div`
-  display: flex;
-  align-self: flex-end;
-  gap: 10px;
-  margin: 10px 20px;
-  button {
-    padding: 6px 10px;
-    font-size: 0.9rem;
-    border: 1px solid #dadada;
-    background-color: #ffffff;
-    cursor: pointer;
-    transition: border-bottom 0.3s, color 0.2s;
-
-    &:hover {
-      background-color: #c69fda;
-      color: #fafafa;
-    }
-    &:active {
-      color: #495057;
-    }
-    &:nth-child(3) {
-      background-color: initial;
-      color: initial;
-    }
-  }
-`;
-const BackWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-end;
 `;
 function PlaylistInfo() {
   const { id } = useParams(); // URL에서 id 값 가져오기
@@ -160,32 +144,32 @@ function PlaylistInfo() {
   return (
     <Wrapper>
       <Container>
+        <BackWrapper>
+          <BackBtn onClick={() => navigate("/recommend")}>
+            <RiArrowGoBackFill /> 이전으로
+          </BackBtn>
+        </BackWrapper>
         {playlist ? (
           <>
-            <InfoDiv>
-              <PlaylistJacket>{playlist.image}</PlaylistJacket>
-              <ControlDiv>
-                <div>
+            <ControlDiv>
+              <InfoDiv>
+                <PlaylistJacket>{playlist.image}</PlaylistJacket>
+                <div style={{ width: "100%" }}>
                   <ListTitle>{playlist.title}</ListTitle>
-                  <MenuDiv>
-                    <AllBtn>전체 듣기</AllBtn>
-                    <ShuffleBtn>셔플 듣기</ShuffleBtn>
-                    <KeepBtn
-                      $isBookmarked={isBookmarked}
-                      onClick={toggleBookmark}
-                    >
-                      {isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
-                    </KeepBtn>
-                  </MenuDiv>
+                  <RecMenuDiv
+                    extraButton={
+                      <KeepBtn
+                        $isBookmarked={isBookmarked}
+                        onClick={toggleBookmark}
+                      >
+                        {isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
+                      </KeepBtn>
+                    }
+                  />
                 </div>
-                <BackWrapper>
-                  <BackBtn onClick={() => navigate("/recommend")}>
-                    <RiArrowGoBackFill /> 이전으로
-                  </BackBtn>
-                  <BasketBtn>담기</BasketBtn>
-                </BackWrapper>
-              </ControlDiv>
-            </InfoDiv>
+              </InfoDiv>
+            </ControlDiv>
+
             <SongList showAll={50} headerTitle="번호" songs={playlist.songs} />
           </>
         ) : (

@@ -20,12 +20,13 @@ export const BasketBtn = styled.button`
 export const KeepBtn = styled.button`
   border-radius: 20px;
   border: 1px solid black;
-  background-color: ${(props) => (props.$isBookmarked ? "black" : "#ffffff")};
-  color: ${(props) => (props.$isBookmarked ? "#fff" : "black")};
+  background-color: ${(props) =>
+    props.$isBookmarked ? "#68009b" : "#ffffff"} !important;
+  color: ${(props) => (props.$isBookmarked ? "#fff" : "black")} !important;
   &:hover,
   &:active {
-    border: 1px solid #c69fda;
-    color: #c69fda;
+    border: 1px solid #68009b;
+    background-color: #68009b;
   }
 `;
 export const BackBtn = styled.button`

@@ -1,50 +1,8 @@
 import styled from "styled-components";
-import { AllBtn, BasketBtn, ShuffleBtn } from "../ui/Buttons";
 import SongList from "../SongList";
-const Wrapper = styled.div`
-  width: 100%;
-  position: relative;
-  overflow-x: hidden;
-`;
-
-const Container = styled.div`
-  width: 100%;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  div {
-    margin-left: 10px;
-  }
-  max-width: 100%;
-`;
-const MenuDiv = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin: 25px 2vw 10px 2vw;
-  button {
-    padding: 6px 10px;
-    font-size: 0.9rem;
-    border: 1px solid #dadada;
-    background-color: #ffffff;
-    cursor: pointer;
-    transition: border-bottom 0.3s, color 0.2s;
-
-    &:hover {
-      background-color: #c69fda;
-      color: #fafafa;
-    }
-    &:active {
-      color: #495057;
-    }
-    &:last-child {
-      margin-left: auto;
-    }
-  }
-`;
-const ListenDiv = styled.div`
-  display: flex;
-  gap: 5px;
-`;
+import { Wrapper } from "../ui/AllDiv";
+import RecMenuDiv from "../ui/MenuDiv";
+const Container = styled.div``;
 const TodayP = styled.p`
   font-size: 1.5rem;
   margin-bottom: 0;
@@ -141,14 +99,7 @@ function TodayChart() {
         <TodayP>
           <span id="current_date">{getCurrentDate()}</span> TOP 100
         </TodayP>
-        <MenuDiv>
-          <ListenDiv>
-            <AllBtn>전체 듣기</AllBtn>
-            <ShuffleBtn>셔플 듣기</ShuffleBtn>
-          </ListenDiv>
-
-          <BasketBtn>담기</BasketBtn>
-        </MenuDiv>
+        <RecMenuDiv />
       </Container>
       <SongList showAll={100} headerTitle="순위" songs={songs} />
     </Wrapper>

@@ -9,17 +9,52 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: center;
   height: 100vh;
+  width: 100vw;
   background-color: #c69fda;
 `;
 
+const Header = styled.div`
+  display: flex;
+  align-items: center;
+  position: relative; /* 상대적 위치 */
+  width: 50%;
+  justify-content: center; /* 로고를 중앙 정렬 */
+`;
+
+// 뒤로 가기 버튼 스타일
+const BackButton = styled.button`
+  position: absolute;
+  left: 150px; /* 화면 왼쪽 여백 */
+  top: 20px; /* 화면 위쪽 여백 */
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0);
+  border: 3px solid rgba(255, 255, 255, 0.36);
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.51);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+    color: rgba(126, 85, 176, 0.68);
+  }
+`;
+
+// 로고 스타일
 const Logo = styled.img`
-  width: 400px;
+  width: 250px;
   margin-bottom: 35px;
   cursor: pointer;
 `;
 
+// 비밀번호 찾기 박스 스타일
 const FindBox = styled.div`
-  width: 600px;
+  width: 500px;
   background-color: rgb(239, 224, 225);
   padding: 30px;
   border-radius: 20px;
@@ -30,6 +65,7 @@ const FindBox = styled.div`
   align-items: center;
 `;
 
+// 비밀번호 찾기 설명 스타일
 const Description = styled.p`
   font-size: 1.1rem;
   color: #333;
@@ -37,16 +73,17 @@ const Description = styled.p`
   margin-bottom: 20px;
 `;
 
-/* 아이디와 입력창 스타일 */
+// 아이디와 입력창 스타일 //
 const IdInputGroup = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 20px;
   width: 100%;
-  margin-left: 150px;
+  margin-left: 50px;
 `;
 
+// 아이디 입력창 스타일
 const IdLabel = styled.label`
   font-size: 1rem;
   color: #333;
@@ -69,7 +106,7 @@ const IdInput = styled.input`
   }
 `;
 
-/* 나머지 입력창 스타일 */
+// 나머지 입력창 스타일 //
 const InputGroup = styled.div`
   display: flex;
   align-items: center;
@@ -78,6 +115,7 @@ const InputGroup = styled.div`
   width: 100%;
 `;
 
+// 라벨 스타일
 const Label = styled.label`
   font-size: 1rem;
   color: #333;
@@ -85,6 +123,7 @@ const Label = styled.label`
   width: 90px;
 `;
 
+// 입력창 스타일
 const Input = styled.input`
   width: 230px;
   height: 40px;
@@ -100,6 +139,7 @@ const Input = styled.input`
   }
 `;
 
+// 작은 버튼 스타일
 const SmallButton = styled.button`
   height: 35px;
   width: 90px;
@@ -117,6 +157,7 @@ const SmallButton = styled.button`
   }
 `;
 
+// 확인 버튼 스타일
 const ButtonWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -129,19 +170,23 @@ const Button = styled.button`
   font-size: 1rem;
   font-weight: bold;
   color: white;
-  background-color: rgb(121, 16, 174);
+  background-color: ${(props) =>
+    props.disabled ? "rgba(172, 172, 172, 0.83)" : "rgb(121, 16, 174)"};
   border: none;
   border-radius: 5px;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
   transition: background-color 0.3s, box-shadow 0.3s;
   margin-bottom: 10px;
 
   &:hover {
-    background-color: rgb(95, 31, 137);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    background-color: ${(props) =>
+      props.disabled ? "#b0b0b0" : "rgb(95, 31, 137)"};
+    box-shadow: ${(props) =>
+      props.disabled ? "none" : "0 4px 6px rgba(194, 194, 194, 0.2)"};
   }
 `;
 
+// 모달 스타일
 const Modal = styled.div`
   position: fixed;
   top: 0;
@@ -187,6 +232,7 @@ const ModalButton = styled.button`
   }
 `;
 
+// 타이머 스타일
 const TimerText = styled.span`
   position: absolute;
   right: 10px;
@@ -196,31 +242,45 @@ const TimerText = styled.span`
   color: ${(props) => (props.timer === 0 ? "red" : "rgba(43, 43, 43, 0.61)")};
 `;
 
+// 입력창 래퍼 스타일
 const InputWrapper = styled.div`
   position: relative;
   width: 250px;
 `;
 
 function FindPw() {
-  const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [email, setEmail] = useState("");
+  const navigate = useNavigate(); // 페이지 이동 함수
+  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 열림 여부
+  const [email, setEmail] = useState(""); // 사용자가 입력한 이메일
   const [timer, setTimer] = useState(300); // 5분 (300초)
   const [isCounting, setIsCounting] = useState(false); // 타이머 작동 여부
+  const [username, setUsername] = useState(""); // 사용자가 입력한 아이디
+  const [code, setCode] = useState(""); // 사용자가 입력한 인증 코드
+  const [isVerified, setIsVerified] = useState(false); // 인증 완료 여부
 
   //로고
   const handleLogoClick = () => {
     navigate("/");
   };
 
+  // 인증코드 전송 함수
   const handleSendVerificationCode = () => {
-    if (!email) {
-      alert("이메일을 입력해주세요."); //
+    if (!email || !username) {
+      alert("아이디와 이메일을 모두 입력해주세요.");
       return;
     }
+
+    // 아이디와 이메일이 일치하는지 확인
+    if (username !== "user123" || email !== "user123@naver.com") {
+      alert(
+        "회원정보를 찾을 수 없습니다. 아이디와 이메일을 다시 입력해주세요."
+      );
+      return;
+    }
+
     alert(
       "입력한 이메일로 인증번호를 발송했습니다.\n5분 내로 번호를 입력해 주세요."
-    ); //
+    );
     startTimer();
   };
 
@@ -238,6 +298,7 @@ function FindPw() {
           if (prevTimer <= 1) {
             clearInterval(interval);
             setIsCounting(false); // 타이머 멈추기
+            alert("시간이 초과되었습니다. 다시 시도해 주세요."); // 시간이 초과되면 알림
             return 0;
           }
           return prevTimer - 1;
@@ -257,62 +318,103 @@ function FindPw() {
       .padStart(2, "0")}`;
   };
 
-  const handleButtonClick = () => {
-    setIsModalOpen(true);
+  // 인증코드 확인 함수
+  const handleVerifyCode = () => {
+    if (!code) {
+      alert("인증 코드를 입력해 주세요."); // 입력하지 않은 경우 알림
+      return;
+    }
+
+    if (code === "123456") {
+      alert("인증이 완료되었습니다."); // 인증 성공 시 알림
+      setIsVerified(true); // 확인 버튼 활성화
+    } else {
+      alert("잘못된 인증 코드입니다. 다시 확인해 주세요."); // 인증 실패 시 알림
+    }
   };
 
+  // 모달 열기
+  const handleButtonClick = () => {
+    if (isVerified) {
+      setIsModalOpen(true);
+    }
+  };
+
+  // 모달 닫기
   const closeModal = () => {
     setIsModalOpen(false);
     navigate("/login-id");
   };
 
-  const handleVerifyCode = () => {
-    alert("인증이 완료되었습니다."); // ✅ 인증 완료 alert 표시
-  };
-
   return (
     <Wrapper>
-      <Logo src={logo} alt="Berrecommend 로고" onClick={handleLogoClick} />{" "}
+      <Header>
+        <BackButton onClick={() => navigate(-1)}>{"<"}</BackButton>{" "}
+        {/* 뒤로 가기 버튼 */}
+        <Logo src={logo} alt="Berrecommend 로고" onClick={handleLogoClick} />
+      </Header>
       <FindBox>
         <Description>
           비밀번호 찾기를 위해 회원가입 시 입력한 <br />
           아이디와 이메일을 입력해주세요.
         </Description>
+
+        {/* 아이디 입력창 */}
         <IdInputGroup>
           <IdLabel htmlFor="username">아이디</IdLabel>
-          <IdInput id="username" type="text" placeholder="아이디" />
+          <IdInput
+            id="username"
+            type="text"
+            placeholder="아이디"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
         </IdInputGroup>
 
+        {/* 이메일 입력창 */}
         <InputGroup>
           <Label htmlFor="email">이메일</Label>
           <Input
             id="email"
             type="email"
             placeholder="이메일"
-            value={email} // 🔥 입력값을 `email` 상태와 연결
-            onChange={(e) => setEmail(e.target.value)} // 🔥 입력값이 변경될 때 `setEmail`로 상태 업데이트
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <SmallButton onClick={handleSendVerificationCode}>
             코드 전송
           </SmallButton>
         </InputGroup>
 
+        {/* 이메일 인증코드 입력창 */}
         <InputGroup>
           <Label htmlFor="emailCode">이메일 인증</Label>
           <InputWrapper>
-            <Input id="emailCode" type="text" placeholder="인증코드 입력" />
-            {/* ✅ 타이머 표시 */}
+            <Input
+              id="emailCode"
+              type="text"
+              placeholder="인증코드 입력"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              disabled={!isCounting} // 타이머가 진행 중일 때만 입력 가능
+            />
+            {/* 타이머 표시 */}
             {timer !== null && (
               <TimerText expired={timer === 0}>
                 {timer > 0 ? formatTime(timer) : "시간 초과"}
               </TimerText>
             )}
           </InputWrapper>
+
+          {/* 인증번호 확인 버튼 */}
           <SmallButton onClick={handleVerifyCode}>인증하기</SmallButton>
         </InputGroup>
 
         <ButtonWrapper>
-          <Button onClick={handleButtonClick}>확인</Button>
+          {/* 인증 완료되지 않으면 버튼 비활성화 (회색, 마우스 비활성) */}
+          <Button onClick={handleButtonClick} disabled={!isVerified}>
+            확인
+          </Button>
         </ButtonWrapper>
       </FindBox>
       {/* 팝업 모달 */}

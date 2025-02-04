@@ -1,8 +1,9 @@
-import React, { useRef } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import logo from "../images/logo.png";
 import ArrowImage from "../images/Arrow.png";
 import { useNavigate } from "react-router-dom";
+import Subscribe2 from "./Popup/Subscribe2";
 
 const Wrapper = styled.div`
   display: flex;
@@ -165,6 +166,12 @@ const CancelButton = styled.button`
 function PR() {
   const navigate = useNavigate();
   const paymentRef = useRef(null);
+  const [isSubscribe2Open, setIsSubscribe2Open] = useState(false);
+
+  // 해지 팝업 열기
+  const handleCancelSubscription = () => {
+    setIsSubscribe2Open(true);
+  };
 
   const scrollToPayment = () => {
     paymentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -215,8 +222,16 @@ function PR() {
         </ButtonWrapper>
       </PaymentSection>
       <CancelButtonWrapper>
-        <CancelButton>해지하기</CancelButton>
+        {/* 🔥 해지하기 버튼 클릭 시 팝업 열기 */}
+        <CancelButton onClick={handleCancelSubscription}>해지하기</CancelButton>
       </CancelButtonWrapper>
+      {/* 🔥 Subscribe2 팝업 추가 (isOpen 상태에 따라 표시) */}
+      {isSubscribe2Open && (
+        <Subscribe2
+          isOpen={isSubscribe2Open}
+          onClose={() => setIsSubscribe2Open(false)}
+        />
+      )}
     </Wrapper>
   );
 }

@@ -3,32 +3,38 @@ import styled from "styled-components";
 import MPEdit1 from "../Popup/MPEdit1";
 import Subscribe1 from "../Popup/Subscribe1";
 import EditPL from "../Popup/EditPL";
-
-const Wrapper = styled.div`
+import { Wrapper as mpWrapper, Container as mpContainer } from "../ui/AllDiv";
+const Wrapper = styled(mpWrapper)`
   width: 100%;
-  position: relative;
-  overflow-x: hidden;
+  padding: 0;
 `;
-
-const Container = styled.div`
+const Container = styled(mpContainer)`
   width: 100%;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  div {
-    margin-left: 10px;
+  padding: 0;
+  @media (min-width: 769px) {
+    width: calc(100% - 70px);
+    margin: 0 auto;
   }
-  max-width: 100%;
+  @media (min-width: 1171px) {
+    width: calc(100% - 350px);
+    margin: 0 auto;
+  }
 `;
-
+// 프로필 섹션
 const ProfileSection = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 20px;
+  gap: 16px;
+
   border-bottom: 1px solid #dadada;
+  @media (max-width: 768px) {
+    width: 85%;
+    margin: 0 auto;
+  }
 `;
 
+// 프로필 이미지
 const ProfileImage = styled.div`
   width: 130px;
   height: 130px;
@@ -43,26 +49,39 @@ const ProfileImage = styled.div`
   flex-shrink: 0;
 `;
 
+// 프로필 정보
 const UsernameContainer = styled.div`
   display: flex;
+  justify-content: flex-start;
   align-items: center;
   gap: 10px;
+  text-align: left;
 `;
-
+const UserDiv = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
 const ProfileInfo = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 3px;
   flex-grow: 1;
+  text-align: left;
+  p {
+    margin: 0;
+  }
 `;
 
 const Username = styled.p`
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: bold;
   margin: 0;
 `;
 
+// 프로필 수정 버튼
 const EditButton = styled.button`
   background: none;
   border: none;
@@ -75,13 +94,14 @@ const EditButton = styled.button`
 `;
 
 const Email = styled.p`
-  font-size: 1.3rem;
+  font-size: 1rem;
   color: #666;
   margin: 0;
 `;
 
+// 플레이리스트 섹션
 const PlaylistSection = styled.div`
-  padding: 20px;
+  padding: 15px 20px;
 `;
 
 const PlaylistHeader = styled.div`
@@ -92,16 +112,19 @@ const PlaylistHeader = styled.div`
   padding: 0 10px;
 `;
 
-const PlaylistTitle = styled.h3`
-  font-size: 1.2rem;
+const PlaylistTitle = styled.p`
+  font-size: 1.1rem;
   text-align: left;
+  font-weight: 900;
 `;
 
+// 플레이리스트 수정 버튼
 const EditButtons = styled.div`
   display: flex;
   gap: 10px;
 `;
 
+// 수정, 삭제 버튼
 const Button = styled.button`
   background: none;
   border: none;
@@ -117,6 +140,7 @@ const Button = styled.button`
   }
 `;
 
+// 플레이리스트 아이템
 const PlaylistItem = styled.div`
   display: flex;
   align-items: center;
@@ -137,7 +161,8 @@ const PlaylistThumbnail = styled.div`
 `;
 
 const PlaylistName = styled.p`
-  font-size: 1.3rem;
+  font-size: 1rem;
+  font-weight: bold;
   margin: 0;
   flex-grow: 1;
   text-align: left;
@@ -149,11 +174,15 @@ const Checkbox = styled.input`
   cursor: pointer;
 `;
 
+// 구독정보 버튼
 const SubscriptionButton = styled.button`
   padding: 8px 12px;
-  font-size: 1rem;
+  height: 36px;
+  font-size: 0.9rem;
+  white-space: nowrap;
   background-color: #dadada;
   border: none;
+  border-radius: 5px;
   cursor: pointer;
   &:hover {
     background-color: rgb(146, 92, 173);
@@ -167,6 +196,7 @@ function MyPage() {
   const [isEditPLOpen, setIsEditPLOpen] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
 
+  //임의의 플레이리스트 데이터, 실제 데이터 연결 시 PlaylistInfo.js로 이동하도록 설정 필요
   const playlists = [
     "내가 좋아하는 노래 💜",
     "플레이리스트 1",
@@ -188,24 +218,32 @@ function MyPage() {
       <Container>
         <ProfileSection>
           <ProfileImage>S</ProfileImage>
-          <ProfileInfo>
-            <UsernameContainer>
-              <Username>즐거운 자몽</Username>
-              <EditButton onClick={() => setIsMPEdit1Open(true)}>✏️</EditButton>
-              <MPEdit1
-                isOpen={isMPEdit1Open}
-                onClose={() => setIsMPEdit1Open(false)}
-              />
-            </UsernameContainer>
-            <Email>kim0408@gmail.com</Email>
-          </ProfileInfo>
-          <SubscriptionButton onClick={() => setIsSubscribe1Open(true)}>
-            구독정보
-          </SubscriptionButton>
-          <Subscribe1
-            isOpen={isSubscribe1Open}
-            onClose={() => setIsSubscribe1Open(false)}
-          />
+          <UserDiv>
+            <ProfileInfo>
+              <UsernameContainer>
+                <Username>
+                  <span id="nickname">즐거운 자몽</span>
+                </Username>
+                <EditButton onClick={() => setIsMPEdit1Open(true)}>
+                  ✏️
+                </EditButton>
+                <MPEdit1
+                  isOpen={isMPEdit1Open}
+                  onClose={() => setIsMPEdit1Open(false)}
+                />
+              </UsernameContainer>
+              <Email>
+                <span id="email">kim0408@gmail.com</span>
+              </Email>
+            </ProfileInfo>
+            <SubscriptionButton onClick={() => setIsSubscribe1Open(true)}>
+              구독정보
+            </SubscriptionButton>
+            <Subscribe1
+              isOpen={isSubscribe1Open}
+              onClose={() => setIsSubscribe1Open(false)}
+            />
+          </UserDiv>
         </ProfileSection>
 
         <PlaylistSection>
@@ -218,6 +256,7 @@ function MyPage() {
               >
                 수정
               </Button>
+              |
               <Button
                 onClick={() =>
                   selectedPlaylist && handleDelete(selectedPlaylist)

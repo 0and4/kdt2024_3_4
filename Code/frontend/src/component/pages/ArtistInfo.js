@@ -3,40 +3,10 @@ import styled from "styled-components";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { FaChevronRight, FaChevronUp } from "react-icons/fa";
-import { AllBtn, BasketBtn, ShuffleBtn, BackBtn } from "../ui/Buttons";
+import { BackBtn } from "../ui/Buttons";
 import SongList from "../SongList"; // 기존 노래 목록 컴포넌트
-
-const Wrapper = styled.div`
-  position: relative;
-`;
-const Container = styled.div`
-  width: calc(100% - 310px);
-  padding: 30px;
-  @media (max-width: 768px) {
-    width: calc(100% - 56px);
-  }
-`;
-const ArtistInfoDiv = styled.div`
-  display: flex;
-  align-items: center;
-  text-align: left;
-  gap: 15px;
-  img {
-    width: 150px;
-    height: 150px;
-    border-radius: 100%;
-    object-fit: cover;
-    background-color: #ccc;
-  }
-  p {
-    margin: 0;
-  }
-  div {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-`;
+import { Wrapper, Container, BackWrapper, InfoDiv } from "../ui/AllDiv";
+import RecMenuDiv from "../ui/MenuDiv";
 const NameP = styled.p`
   font-weight: bold;
   font-size: 1.2rem;
@@ -52,30 +22,9 @@ const ControlDiv = styled.div`
   margin: 10px 0;
   width: 100%;
 `;
-const MenuDiv = styled.div`
-  display: flex;
-  flex-direction: row !important;
-  gap: 10px;
-  button {
-    padding: 6px 12px;
-    font-size: 0.9rem;
-    border: 1px solid #dadada;
-    background-color: #ffffff;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.2s;
-
-    &:hover {
-      background-color: #c69fda;
-      color: #fafafa;
-    }
-    &:active {
-      color: #495057;
-    }
-  }
-`;
 const Section = styled.div`
   margin-bottom: 20px;
-  button {
+  button.more-btn {
     background: none;
     border: none;
     cursor: pointer;
@@ -122,13 +71,6 @@ const TitleP = styled.p`
 const SubtitleP = styled.p`
   font-weight: 100;
   font-size: 0.9rem;
-`;
-const BackWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  align-self: flex-start;
-  justify-content: flex-end;
-  flex-grow: 1;
 `;
 function ArtistInfo() {
   const { artistName } = useParams();
@@ -189,38 +131,37 @@ function ArtistInfo() {
   return (
     <Wrapper>
       <Container>
+        <BackWrapper>
+          <BackBtn onClick={handleBackClick}>
+            <RiArrowGoBackFill /> 이전으로
+          </BackBtn>
+        </BackWrapper>
         {/* 아티스트 정보 섹션 */}
         <ControlDiv>
-          <ArtistInfoDiv>
+          <InfoDiv>
             <img src="https://via.placeholder.com/150" alt="artist cover" />
             <div>
               <NameP>{artistName}</NameP>
               <CategoryP>
                 <span>솔로</span>, <span>랩/힙합</span>
               </CategoryP>
-              <MenuDiv>
-                <AllBtn>전체 듣기</AllBtn>
-                <ShuffleBtn>셔플 듣기</ShuffleBtn>
-                <BasketBtn>담기</BasketBtn>
-              </MenuDiv>
             </div>
-          </ArtistInfoDiv>
-          <BackWrapper>
-            <BackBtn onClick={handleBackClick}>
-              <RiArrowGoBackFill /> 이전으로
-            </BackBtn>
-          </BackWrapper>
+          </InfoDiv>
         </ControlDiv>
 
         {/* 발매곡 섹션 */}
         <Section>
           <ResultDiv>
             <TitleP>발매곡</TitleP>
-            <button onClick={() => setShowAllSongs((prev) => !prev)}>
+            <button
+              onClick={() => setShowAllSongs((prev) => !prev)}
+              className="more-btn"
+            >
               {showAllSongs ? "접기" : "더보기"}{" "}
               {showAllSongs ? <FaChevronUp /> : <FaChevronRight />}
             </button>
           </ResultDiv>
+          <RecMenuDiv />
           <SongList showAll={showAllSongs} headerTitle="번호" songs={songs} />
         </Section>
 
@@ -228,7 +169,10 @@ function ArtistInfo() {
         <Section>
           <ResultDiv>
             <TitleP>발매 앨범</TitleP>
-            <button onClick={() => setShowAllAlbums((prev) => !prev)}>
+            <button
+              onClick={() => setShowAllAlbums((prev) => !prev)}
+              className="more-btn"
+            >
               {showAllAlbums ? "접기" : "더보기"}{" "}
               {showAllAlbums ? <FaChevronUp /> : <FaChevronRight />}
             </button>
