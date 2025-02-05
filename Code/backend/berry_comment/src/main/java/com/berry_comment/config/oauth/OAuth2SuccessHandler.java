@@ -46,6 +46,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String uri = UriComponentsBuilder.fromUriString(URI).build().toString();
         System.out.println("리다이렉트 경로 "+ uri);
 //        getRedirectStrategy().sendRedirect(request, response, uri);
-        response.sendRedirect("http://localhost:3000/");
+        response.sendRedirect("http://localhost:3030/");
     }
 }
