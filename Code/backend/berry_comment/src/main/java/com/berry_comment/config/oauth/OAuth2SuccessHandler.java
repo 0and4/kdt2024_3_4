@@ -37,14 +37,18 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         System.out.println("인증에 성공하셨습니다.");
         //accessToken 및 refreshToken 발급
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        //만약 유저가 없다면 오류 발생시키기
-        UserEntity user = userRepository.findByEmail(oAuth2User.getAttributes().get("email").toString()).orElseThrow(EntityNotFoundException::new);
+        UserEntity user = userRepository.findByEmail(oAuth2User.getAttributes().get("email").toString())
+                .orElseThrow(EntityNotFoundException::new);
+
         String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_TIMEOUT);
         String refreshToken = tokenProvider.generateRefreshToken(user, REFRESH_TOKEN_TIMEOUT);
-        request.getSession().setAttribute("access_token", accessToken);
-        request.getSession().setAttribute("refresh_token", refreshToken);
-        String uri = UriComponentsBuilder.fromUriString(URI).build().toString();
-        System.out.println("리다이렉트 경로 "+ uri);
-        getRedirectStrategy().sendRedirect(request, response, uri);
+
+        // JSON 형태로 응답 설정
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        String jsonResponse = String.format("{\"access_token\": \"%s\", \"refresh_token\": \"%s\"}", accessToken, refreshToken);
+        response.getWriter().write(jsonResponse);
+        response.getWriter().flush();
     }
 }

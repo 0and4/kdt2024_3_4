@@ -42,9 +42,9 @@ public class DBConfig {
         properties.put("hibernate.hbm2ddl.auto", "validate");
         properties.put("hibernate.show_sql", "true");
         properties.put("hibernate.format_sql", "true");
-        properties.put("hibernate.physical_naming_strategy", "org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy");
+//        properties.put("hibernate.physical_naming_strategy", "org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy");
         properties.put("hibernate.globally_quoted_identifiers", "true"); // 예약어 처리
-
+        em.setJpaPropertyMap(properties);
         return em;
     }
 
