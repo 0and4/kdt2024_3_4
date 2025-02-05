@@ -225,7 +225,7 @@ function Join() {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState(""); // 이름 입력값
-  const [username, setUsername] = useState("");
+  const [id, setUsername] = useState("");
   const [password, setPassword] = useState(""); // 비밀번호 입력값
   const [confirmPassword, setConfirmPassword] = useState(""); // 비밀번호 확인 입력값
   const [email, setEmail] = useState(""); // 이메일 입력값
@@ -241,12 +241,12 @@ function Join() {
 
   //아이디 중복 확인 버튼
   const handleCheckUsername = () => {
-    if (username.trim() === "") {
+    if (id.trim() === "") {
       alert("아이디를 입력하세요.");
       return;
     }
 
-    if (existingUsernames.includes(username)) {
+    if (existingUsernames.includes(id)) {
       alert("사용이 불가한 아이디입니다. 다시 입력해 주세요.");
     } else {
       alert("사용이 가능합니다!");
@@ -254,18 +254,18 @@ function Join() {
   };
 
   //회원가입 버튼 클릭 시
-  const handleJoinClick = () => {
+  const handleJoinClick = async () => {
     if (name.trim() === "") {
       alert("이름을 입력해주세요.");
       return;
     }
 
-    if (username.trim() === "") {
+    if (id.trim() === "") {
       alert("아이디를 입력해주세요.");
       return;
     }
 
-    if (existingUsernames.includes(username)) {
+    if (existingUsernames.includes(id)) {
       alert("사용이 불가한 아이디입니다. 다시 입력해 주세요.");
       return;
     }
@@ -304,7 +304,34 @@ function Join() {
       alert("개인정보 수집에 동의해야 회원가입이 가능합니다.");
       return;
     }
+    // 서버로 보낼 회원가입 데이터
+  const requestData = {
+    id,
+    email,
+    name,
+    password,
+  };
+  try {
+    const response = await fetch("http://localhost:8080/user/join", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestData),
+    });
 
+    if (!response.ok) {
+      throw new Error("회원가입에 실패했습니다.");
+    }
+
+    const data = await response.json();
+    console.log("회원가입 성공:", data);
+
+    setIsModalOpen(true); // 모달 열기
+  } catch (error) {
+    console.error("Error:", error);
+    alert("회원가입 중 오류가 발생했습니다. 다시 시도해주세요.");
+  }
     // 모든 조건이 충족되면 회원가입 진행
     setIsModalOpen(true);
   };
@@ -355,7 +382,7 @@ function Join() {
             id="username"
             type="text"
             placeholder="8~15자"
-            value={username}
+            value={id}
             onChange={(e) => setUsername(e.target.value)}
           />
           <SmallButton onClick={handleCheckUsername}>중복확인</SmallButton>
@@ -448,7 +475,7 @@ function Join() {
         <Modal>
           <ModalContent>
             <p>
-              000님,
+              {name}님,
               <br /> 베리코멘드의 회원이 된 것을 환영합니다!
             </p>
             <ModalButton onClick={handleModalConfirm}>확인</ModalButton>
