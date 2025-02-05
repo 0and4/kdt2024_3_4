@@ -11,7 +11,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class BerryCommentApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(BerryCommentApplication.class, args);
+        try {
+            SpringApplication.run(BerryCommentApplication.class, args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
