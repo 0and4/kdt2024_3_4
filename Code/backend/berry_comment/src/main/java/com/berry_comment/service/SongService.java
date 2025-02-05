@@ -25,6 +25,8 @@ public class SongService {
 
     //곡이름으로 검색한 결과
     public ListInfoDto getSongList(String track, Pageable pageable) {
+        System.out.println("곡을 검색합니다..");
+        System.out.println(track);
         //키워드별 검색 음악 목록 가져오기
         Slice<Song> songSlice = songRepository.findByTrackContaining(track, pageable);
         List<SongDto> songDtos = new ArrayList<>();
@@ -42,6 +44,7 @@ public class SongService {
                     .image(song.getAlbum().getImageUrl())
                     .artist(artist.toString())
                     .playTime(song.getPlayTime())
+                    .album(song.getAlbum().getName())
                     .build();
             songDtos.add(songDto);
         }

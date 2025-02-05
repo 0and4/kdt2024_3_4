@@ -63,6 +63,7 @@ public class ArtistService {
                     .track(song.getTrack())
                     .image(song.getAlbum().getImageUrl())
                     .playTime(song.getPlayTime())
+                    .album(song.getAlbum().getName())
                     .build();
             songDtoList.add(songDto);
         });

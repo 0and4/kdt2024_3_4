@@ -43,6 +43,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
         //가입 관련 url
         excludedUrls.add("/user");
+        excludedUrls.add("/search");
     }
 
     @Override

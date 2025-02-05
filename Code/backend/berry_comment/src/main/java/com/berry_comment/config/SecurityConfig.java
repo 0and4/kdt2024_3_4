@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/user/**").permitAll()// 로그인 API 허용
                         .requestMatchers("/h2-console/**").permitAll()// H2 콘솔 요청 허용
-                        .requestMatchers("/search/**").hasAnyAuthority("NORMAL", "PREMIUM")
+                        .requestMatchers("/search/**").permitAll()
                         .requestMatchers("/stream/**").hasAnyAuthority("PREMIUM","NORMAL")
                         .requestMatchers("/playList/normal/**").hasAnyAuthority("PREMIUM", "NORMAL")
                         .requestMatchers("/playList/recommend/**").hasAnyAuthority("PREMIUM")
