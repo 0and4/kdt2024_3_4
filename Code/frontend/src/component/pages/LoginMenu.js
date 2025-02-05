@@ -107,6 +107,11 @@ const StyledButton = styled.button`
   }
 `;
 
+//구글 로그인 서버 연결
+const onGoogleLogin = () => {
+  window.location.href = "http://localhost:8080/oauth2/authorization/google";
+}
+
 /*로그인 메뉴 컴포넌트*/
 function LoginMenu() {
   const navigate = useNavigate(); // 페이지 이동 함수
@@ -128,7 +133,7 @@ function LoginMenu() {
       </Header>
 
       <LoginBox>
-        <Button>Google로 로그인하기</Button>
+      <Button onClick={onGoogleLogin}>Google로 로그인하기</Button>
         <Button onClick={handleIdLogin}>회원 ID로 로그인하기</Button>
       </LoginBox>
       <TextLinks>
