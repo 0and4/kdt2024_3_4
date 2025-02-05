@@ -3,6 +3,10 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import logo from "../../images/logo.png";
 import { Header, BackButton, Logo } from "../ui/LoginDiv";
+
+import axios from 'axios';
+axios.defaults.withCredentials = false;
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -129,27 +133,82 @@ const StyledButton = styled.button`
 
 function Login() {
   const navigate = useNavigate(); // 페이지 이동 함수
-  const [username, setUsername] = useState(""); // 아이디 입력값
+  const [id, setUsername] = useState(""); // 아이디 입력값
   const [password, setPassword] = useState(""); // 비밀번호 입력값
+  const [error, setError] = useState(""); // 에러 메시지
 
   // 로고 클릭 시 메인 페이지로 이동
   const handleLogoClick = () => {
     navigate("/"); //
   };
 
+  //axios 방식
   // 로그인 버튼 클릭 시 로그인 검증
-  const handleLogin = () => {
-    // 🔹 실제 로그인 검증 (여기서는 예제용으로 간단한 하드코딩)
-    const validUsername = "user123"; // 실제 DB가 있다면 이 값은 API 요청으로 확인
-    const validPassword = "password123!";
+  // const handleLogin = async () => {
+  //   const loginData = { id, password };
 
-    if (username === validUsername && password === validPassword) {
-      alert("로그인 성공. 환영합니다:)");
-      navigate("/"); // 메인 페이지로 이동
-    } else {
-      alert("로그인 실패: 아이디 또는 비밀번호가 올바르지 않습니다."); // 로그인 실패 알림
+  //   try {
+  //     // Spring Boot 서버에 로그인 요청 보내기
+  //     const response = await axios.post('http://localhost:8080/user/form/login', loginData, {
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     });
+
+  //     // 로그인 성공 시
+  //     if (response.status === 200) {
+  //       // 응답 바디에서 토큰 추출
+  //       const token = response.data.access_token;
+        
+  //       // 토큰을 콘솔에 출력
+  //       console.log("받은 토큰:", token);
+  //       alert("로그인 성공. 환영합니다!");
+  //       navigate("/"); // 메인 페이지로 이동
+  //     }
+  //   } catch (error) {
+  //     // 로그인 실패 시
+  //     setError("로그인 실패: 아이디 또는 비밀번호가 올바르지 않습니다.");
+  //     console.error("로그인 오류:", error.response ? error.response.data : error.message);
+  //   }
+  // };
+
+
+  //fetch방식
+  const handleLogin = async () => {
+    const loginData = { id, password };
+  
+    try {
+      // 로그인 요청을 fetch로 보내기
+      const response = await fetch('http://localhost:8080/user/form/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      });
+  
+      // 응답이 정상일 경우
+      if (response.ok) {
+        const data = await response.json();
+        const token = data.access_token;
+        
+        // 토큰을 콘솔에 출력
+        console.log("받은 토큰:", token);
+        alert("로그인 성공. 환영합니다!");
+        navigate("/"); // 메인 페이지로 이동
+      } else {
+        // 로그인 실패 시
+        const errorData = await response.json();
+        setError("로그인 실패: 아이디 또는 비밀번호가 올바르지 않습니다.");
+        console.error("로그인 오류:", errorData);
+      }
+    } catch (error) {
+      // 네트워크 오류 등
+      setError("로그인 실패: 네트워크 오류 발생.");
+      console.error("로그인 오류:", error);
     }
   };
+  
 
   return (
     <Wrapper>
@@ -162,10 +221,10 @@ function Login() {
         <InputGroup>
           <Label htmlFor="username">아이디</Label>
           <Input
-            id="username"
+            id="id"
             type="text"
             placeholder="아이디를 입력하세요"
-            value={username}
+            value={id}
             onChange={(e) => setUsername(e.target.value)}
           />
         </InputGroup>
