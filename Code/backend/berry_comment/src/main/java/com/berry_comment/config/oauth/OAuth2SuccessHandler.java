@@ -45,6 +45,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         request.getSession().setAttribute("refresh_token", refreshToken);
         String uri = UriComponentsBuilder.fromUriString(URI).build().toString();
         System.out.println("리다이렉트 경로 "+ uri);
-        getRedirectStrategy().sendRedirect(request, response, uri);
+//        getRedirectStrategy().sendRedirect(request, response, uri);
+        response.sendRedirect("http://localhost:3000/");
     }
 }
