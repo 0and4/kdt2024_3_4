@@ -43,12 +43,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_TIMEOUT);
         String refreshToken = tokenProvider.generateRefreshToken(user, REFRESH_TOKEN_TIMEOUT);
 
-        // JSON 형태로 응답 설정
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+//        // JSON 형태로 응답 설정
+//        response.setContentType("application/json");
+//        response.setCharacterEncoding("UTF-8");
 
         String jsonResponse = String.format("{\"access_token\": \"%s\", \"refresh_token\": \"%s\"}", accessToken, refreshToken);
-        response.getWriter().write(jsonResponse);
-        response.getWriter().flush();
+        // 리디렉션 (localhost:3030으로 이동)
+        response.sendRedirect("http://localhost:3030");
+//        response.getWriter().write(jsonResponse);
+//        response.getWriter().flush();
     }
 }

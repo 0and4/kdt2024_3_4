@@ -40,7 +40,7 @@ public class Song {
     private String url;
 
     //가사
-    @Lob
+ 
     @Column(nullable = false)
     private String lyric;
 
