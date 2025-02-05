@@ -60,26 +60,28 @@ function SongList({ showAll, headerTitle, songs = [] }) {
   const [allSelected, setAllSelected] = useState(false);
   const [likedSongs, setLikedSongs] = useState({});
 
-  const handleCheckboxChange = (rank) => {
+  const handleCheckboxChange = (id) => {
     setSelectedSongs((prev) => {
-      const newSelected = prev.includes(rank)
-        ? prev.filter((id) => id !== rank)
-        : [...prev, rank];
-
+      const newSelected = prev.includes(id)
+        ? prev.filter((songId) => songId !== id)
+        : [...prev, id];
+  
       setAllSelected(newSelected.length === songs.length);
       return newSelected;
     });
   };
+  
   const handleSelectAll = () => {
     if (allSelected) {
       setSelectedSongs([]);
     } else {
-      setSelectedSongs(songs.map((song) => song.rank));
+      setSelectedSongs(songs.map((song) => song.id));
     }
     setAllSelected(!allSelected);
   };
-
+  
   const displayedSongs = showAll ? songs : songs.slice(0, 5);
+  
 
   const handleToggleLike = (songId) => {
     console.log(`찜하기 버튼 클릭된 노래: ${songId}`);
@@ -116,20 +118,28 @@ function SongList({ showAll, headerTitle, songs = [] }) {
 
         <tbody>
           {displayedSongs.map((song) => (
-            <TableRow key={song.rank || `${song.title}-${song.artist}`}>
+            <TableRow key={song.id}>
               <TableData>
                 <input
                   type="checkbox"
-                  checked={selectedSongs.includes(song.rank)}
-                  onChange={() => handleCheckboxChange(song.rank)}
+                  checked={selectedSongs.includes(song.id)}
+                  onChange={() => handleCheckboxChange(song.id)}
                 />
               </TableData>
-              <TableData>{song.rank}</TableData>
+              <TableData>{song.id}</TableData>
               <TableData>
                 <SongInfoContainer>
-                  <SongCover />
+                  <SongCover>
+                  <img
+              src={song.image}
+              alt={song.track}
+              width="50"
+              height="50"
+              style={{ borderRadius: "5px" }}
+            />
+                  </SongCover>
                   <SongInfo>
-                    <SongLink to={`/song/${song.rank}`}>{song.title}</SongLink>
+                    <SongLink to={`/song/${song.id}`}>{song.track}</SongLink>
                     <SongLink to={`/artist/${song.artist}`}>
                       {song.artist}
                     </SongLink>
@@ -139,20 +149,20 @@ function SongList({ showAll, headerTitle, songs = [] }) {
               <TableData>
                 <SongLink to={`/album/${song.album}`}>{song.album}</SongLink>
               </TableData>
-              <TableData>{song.duration}</TableData>
+              <TableData>{song.playTime === 0 ? "정보 없음" : song.playTime}</TableData>
               <TableData>
                 <ActionButtons
-                  songId={song.rank}
+                  songId={song.id}
                   type="like"
-                  liked={!!likedSongs[song.rank]}
+                  liked={!!likedSongs[song.id]}
                   onToggleLike={handleToggleLike}
                 />
               </TableData>
               <TableData>
-                <ActionButtons songId={song.rank} type="add" />
+                <ActionButtons songId={song.id} type="add" />
               </TableData>
               <TableData>
-                <ActionButtons songId={song.rank} type="play" />
+                <ActionButtons songId={song.id} type="play" />
               </TableData>
             </TableRow>
           ))}
