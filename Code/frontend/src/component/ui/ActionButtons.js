@@ -37,7 +37,7 @@ const Button = styled.button`
     border-color: #e41111;
   }
   ${(props) =>
-    props.liked
+    props.$liked
       ? `
     color: #e41111;
     border-color: #e41111;
@@ -96,7 +96,7 @@ function ActionButtons({ songId, type, liked, onToggleLike }) {
       <Actions>
         {/* 좋아요 버튼 */}
         {type === "like" && (
-          <Button onClick={toggleLike} liked={liked}>
+          <Button onClick={toggleLike} $liked={liked}>
             {liked ? <LiaHeartSolid /> : <LiaHeart />}
           </Button>
         )}

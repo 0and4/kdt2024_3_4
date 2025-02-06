@@ -126,7 +126,7 @@ function SongList({ showAll, headerTitle, songs = [] }) {
                   onChange={() => handleCheckboxChange(song.id)}
                 />
               </TableData>
-              <TableData>{song.id}</TableData>
+              <TableData>{song.number}</TableData>
               <TableData>
                 <SongInfoContainer>
                   <SongCover>
@@ -149,7 +149,7 @@ function SongList({ showAll, headerTitle, songs = [] }) {
               <TableData>
                 <SongLink to={`/album/${song.album}`}>{song.album}</SongLink>
               </TableData>
-              <TableData>{song.playTime === 0 ? "정보 없음" : song.playTime}</TableData>
+              <TableData>{song.playTimeFormatted}</TableData>
               <TableData>
                 <ActionButtons
                   songId={song.id}

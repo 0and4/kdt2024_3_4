@@ -124,6 +124,15 @@ function Search() {
   if (loading) return <p>로딩 중...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
+  // playTime을 변환하는 함수
+const formatPlayTime = (playTime) => {
+  if (!playTime || playTime === 0) return "3:00"; // playTime이 0이면 기본값 3:00
+
+  const minutes = Math.floor(playTime / 60000); // 밀리초 → 분 변환
+  const seconds = Math.floor((playTime % 60000) / 1000); // 밀리초 → 초 변환
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`; // 2자리 초 포맷
+};
+
   return (
     <Wrapper>
       <Container>
@@ -140,7 +149,7 @@ function Search() {
             </button>
           </ResultDiv>
           <ListDiv>
-            <SongList showAll={showAllSongs} headerTitle="번호" songs={songs} />
+            <SongList showAll={showAllSongs} headerTitle="번호" songs={songs.map((song, index) => ({ ...song, number: index + 1, playTimeFormatted: formatPlayTime(song.playTime), }))}  />
           </ListDiv>
         </Section>
 
@@ -157,7 +166,7 @@ function Search() {
             <ListGrid>
               {(showAllAlbums ? albums : albums.slice(0, 4)).map((album) => (
                 <ListItem key={album.id}>
-                  <img src={album.cover || "https://via.placeholder.com/100"} alt={album.name} />
+                  <img src={album.url || "https://via.placeholder.com/100"} alt={album.name} />
                   <div>
                     <Link to={`/album/${album.name}`} style={{ textDecoration: "none", color: "black" }}>
                       <TitleP>{album.name}</TitleP>
@@ -182,20 +191,20 @@ function Search() {
           </ResultDiv>
 
           {artists.length > 0 && (
-            <ListGrid>
-              {(showAllArtists ? artists : artists.slice(0, 4)).map((artist) => (
-                <ArtistItem key={artist.id}>
-                  <img src={artist.photo || "https://via.placeholder.com/100"} alt={artist.name} />
-                  <div>
-                    <Link to={`/artist/${artist.name}`} style={{ textDecoration: "none", color: "black" }}>
-                      <TitleP>{artist.name}</TitleP>
-                      <SubtitleP>{artist.category}, {artist.genre}</SubtitleP>
-                    </Link>
-                  </div>
-                </ArtistItem>
-              ))}
-            </ListGrid>
-          )}
+  <ListGrid>
+    {(showAllArtists ? artists : artists.slice(0, 4)).map((artist) => (
+      <ArtistItem key={artist.id}>
+        <img src={artist.image || "https://via.placeholder.com/100"} alt={artist.name} />
+        <div>
+          <Link to={`/artist/${artist.name}`} style={{ textDecoration: "none", color: "black" }}>
+            <TitleP>{artist.name}</TitleP>
+            <SubtitleP>{artist.genre.join(", ")}</SubtitleP>
+          </Link>
+        </div>
+      </ArtistItem>
+    ))}
+  </ListGrid>
+)}
         </Section>
       </Container>
     </Wrapper>
