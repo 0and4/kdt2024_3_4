@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,8 +35,9 @@ public class ChartService {
             throw new BerryCommentException(ErrorCode.INVALID_TIME_REQUEST);
         }
 
-        localDateTime = LocalDateTime.of(localDateTime.getYear(), localDateTime.getMonth(), localDateTime.getDayOfMonth(), localDateTime.getHour(), 0, 0);
-        Chart chart = chartRepository.findByDateTime(localDateTime);
+        String formattedDateTime = localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH"));
+
+        Chart chart = chartRepository.findByLocalDateTime(formattedDateTime);
         if(chart == null) {
             throw new EntityNotFoundException("차트를 찾기 못했습니다.");
         }
