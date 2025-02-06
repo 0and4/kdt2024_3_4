@@ -75,7 +75,7 @@ function TodayChart() {
     
         const data = await response.json();
         
-        setSongs(data.songs); // 서버에서 받은 songs 배열로 업데이트
+        setSongs(data.song); // 서버에서 받은 songs 배열로 업데이트
         console.log(JSON.stringify(data, null, 2));
         console.log(data);
       } catch (error) {
