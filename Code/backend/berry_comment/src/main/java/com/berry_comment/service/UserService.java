@@ -61,12 +61,17 @@ public class UserService {
         return password;
     }
 
-    public void validateUserCheckByEmailAndPassword(@Email String email, @NotNull String name) {
-        UserEntity userEntity = userRepository.findByEmail(email).orElse(null);
+    public void validateUserCheckByEmailAndId(@Email String email, @NotNull String id) {
+        System.out.println(id);
+        UserEntity userEntity = userRepository.findById(id);
         if (userEntity == null) {
             throw new EntityNotFoundException("해당하는 유저가 없습니다.");
         }
-        if(!userEntity.getName().equals(name)) {
+
+        System.out.println("유저 아이디" + id);
+        System.out.println(userEntity.getId());
+
+        if(!userEntity.getEmail().equals(email)) {
             throw new EntityNotFoundException("해당하는 유저가 없습니다.");
         }
         String temp = redisUtils.setPassword(email);

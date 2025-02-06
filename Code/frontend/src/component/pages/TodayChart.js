@@ -14,77 +14,14 @@ const TodayP = styled.p`
   }
 `;
 // 임의의 노래 목록
-const songs = [
+const initialSongs = [
   {
     rank: 1,
     title: "Song A",
     artist: "Artist A",
     album: "Album A",
     duration: "3:45",
-  },
-  {
-    rank: 2,
-    title: "Song B",
-    artist: "Artist B",
-    album: "Album B",
-    duration: "4:00",
-  },
-  {
-    rank: 3,
-    title: "Song C",
-    artist: "Artist C",
-    album: "Album C",
-    duration: "3:30",
-  },
-  {
-    rank: 4,
-    title: "Song D",
-    artist: "Artist D",
-    album: "Album D",
-    duration: "3:50",
-  },
-  {
-    rank: 5,
-    title: "Song E",
-    artist: "Artist E",
-    album: "Album E",
-    duration: "4:10",
-  },
-  {
-    rank: 6,
-    title: "Song F",
-    artist: "Artist F",
-    album: "Album F",
-    duration: "3:25",
-  },
-  {
-    rank: 7,
-    title: "Song G",
-    artist: "Artist G",
-    album: "Album G",
-    duration: "3:15",
-  },
-  {
-    rank: 8,
-    title: "Song H",
-    artist: "Artist H",
-    album: "Album H",
-    duration: "4:05",
-  },
-  {
-    rank: 9,
-    title: "Song I",
-    artist: "Artist I",
-    album: "Album I",
-    duration: "3:40",
-  },
-  {
-    rank: 10,
-    title: "Song J",
-    artist: "Artist J",
-    album: "Album J",
-    duration: "3:55",
-  },
+  }
 ];
 function TodayChart() {
   //날짜 동적 표시
@@ -94,11 +31,14 @@ function TodayChart() {
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     const hours = String(date.getHours()).padStart(2, "0"); // 24시간제 시간
-    return `${year}.${month}.${day} ${hours}`;
+    const minutes = String(date.getMinutes()).padStart(2, "0"); // 분 추가
+    const seconds = String(date.getSeconds()).padStart(2, "0"); // 초 추가
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   };
 
   // 현재 시간 표시를 위한 상태
   const [currentDateTime, setCurrentDateTime] = useState(getCurrentDate());
+  const [songs, setSongs] = useState(initialSongs);
 
   useEffect(() => {
     // 1초마다 시간을 갱신
@@ -118,6 +58,32 @@ function TodayChart() {
         }, 5 * 60 * 1000); // 5분 후
       }
     }, 1000); // 1초마다 체크
+
+    const fetchSongs = async () => {
+      const currentDate = getCurrentDate(); // 현재 시간 가져오기
+      try {
+        const response = await fetch(`http://localhost:8080/search/chart?dateTime=${encodeURIComponent(currentDate)}`, {
+          method: 'GET', // GET 요청에서는 body 사용 불가
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+    
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+    
+        const data = await response.json();
+        
+        setSongs(data.song); // 서버에서 받은 songs 배열로 업데이트
+        console.log(JSON.stringify(data, null, 2));
+        console.log(data);
+      } catch (error) {
+        console.error('Error fetching songs:', error);
+      }
+    };
+    
+    fetchSongs(); // 컴포넌트가 처음 렌더링될 때 서버로 요청
 
     // 클린업: 컴포넌트가 언마운트되면 인터벌 정리
     return () => {

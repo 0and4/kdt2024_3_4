@@ -165,7 +165,15 @@ function SongList({ showAll, headerTitle, songs = [] }) {
 <tbody>
   {displayedSongs.map((song, index) => {
     const songId = song.id || index + 1;
-    const playTime = song.playTimeFormatted || "3:00";
+
+    const convertToMinSec = (milliseconds) => {
+      const totalSeconds = Math.floor(milliseconds / 1000); // 밀리초를 초로 변환
+      const minutes = Math.floor(totalSeconds / 60); // 분 계산
+      const remainingSeconds = totalSeconds % 60; // 초 계산
+      return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
+    };
+    
+    const playTime = song.playTime ? convertToMinSec(song.playTime) : "03:00";
 
     return (
       <TableRow key={songId}>
@@ -176,7 +184,7 @@ function SongList({ showAll, headerTitle, songs = [] }) {
             onChange={() => handleCheckboxChange(songId)}
           />
         </CheckboxColumn>
-        <NumberColumn>{song.number}</NumberColumn>
+        <NumberColumn>{song.rank}</NumberColumn>
         <SongInfoColumn>
           <SongInfoContainer>
             <SongCover>

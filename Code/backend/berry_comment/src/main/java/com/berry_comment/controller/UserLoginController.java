@@ -1,7 +1,6 @@
 package com.berry_comment.controller;
 
 import com.berry_comment.dto.*;
-import com.berry_comment.entity.UserEntity;
 import com.berry_comment.service.MailService;
 import com.berry_comment.service.RedisUtils;
 import com.berry_comment.service.UserService;
@@ -72,8 +71,8 @@ public class UserLoginController {
     }
 
     @PostMapping("/validate")
-    public ResponseEntity<?> validateUser(@RequestBody EmailAndNameCheckDto emailAndNameCheckDto){
-        userService.validateUserCheckByEmailAndPassword(emailAndNameCheckDto.getEmail(), emailAndNameCheckDto.getName());
+    public ResponseEntity<?> validateUser(@RequestBody EmailAndIdCheckDto emailAndNameCheckDto){
+        userService.validateUserCheckByEmailAndId(emailAndNameCheckDto.getEmail(), emailAndNameCheckDto.getId());
         return ResponseEntity.ok("");
     }
 
