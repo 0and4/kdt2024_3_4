@@ -32,7 +32,7 @@ public class SearchController {
     public ResponseEntity<?> getChartList(
             @PageableDefault(
                     page = 0,
-                    size = 10,
+                    size = 20,
                     sort = "rank",
                     direction = Sort.Direction.ASC)
             Pageable pageable,
