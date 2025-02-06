@@ -35,16 +35,18 @@ const ResultDiv = styled.div`
 const ListDiv = styled.div`
   margin: 0;
   padding: 0;
+  width: 100%;
 `;
 
 const ListGrid = styled.div`
   margin: 10px 40px;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+ grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 10px;
 `;
 
 const ListItem = styled.div`
+width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -70,11 +72,19 @@ const ListItem = styled.div`
 
 const TitleP = styled.p`
   font-weight: bold;
+  max-width: 200px; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const SubtitleP = styled.p`
   font-weight: 100;
   font-size: 0.9rem;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const ArtistItem = styled(ListItem)`
@@ -82,6 +92,12 @@ const ArtistItem = styled(ListItem)`
     border-radius: 50%;
     object-fit: cover;
   }
+`;
+const NoResultsText = styled.p`
+  color: #777;
+  font-size: 1rem;
+  text-align: center;
+  margin-top: 10px;
 `;
 
 function Search() {
@@ -102,9 +118,9 @@ function Search() {
     if (!query) return;
 
     setLoading(true);
-    const songUrl = `http://localhost:8080/search/?keyword=SONG&value=${query}&size=5`;
-    const albumUrl = `http://localhost:8080/search/?keyword=ALBUM&value=${query}&size=4`;
-    const artistUrl = `http://localhost:8080/search/?keyword=ARTIST&value=${query}&size=4`;
+    const songUrl = `http://localhost:8080/search/?keyword=SONG&value=${query}&size=${showAllSongs ? 20 : 5}`;
+  const albumUrl = `http://localhost:8080/search/?keyword=ALBUM&value=${query}&size=${showAllAlbums ? 20 : 4}`;
+  const artistUrl = `http://localhost:8080/search/?keyword=ARTIST&value=${query}&size=${showAllArtists ? 20 : 4}`;
 
     Promise.all([
       fetch(songUrl).then((res) => res.json()),
@@ -116,9 +132,12 @@ function Search() {
         setAlbums(albumData.dataList || []);
         setArtists(artistData.dataList || []);
       })
-      .catch((error) => console.error("Error fetching data:", error))
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setError("데이터를 불러오는 데 오류가 발생했습니다."); // 에러 메시지를 상태에 설정
+      })
       .finally(() => setLoading(false));
-}, [query]);
+}, [query, showAllSongs, showAllAlbums, showAllArtists]);
 
 
   if (loading) return <p>로딩 중...</p>;
@@ -149,7 +168,19 @@ const formatPlayTime = (playTime) => {
             </button>
           </ResultDiv>
           <ListDiv>
-            <SongList showAll={showAllSongs} headerTitle="번호" songs={songs.map((song, index) => ({ ...song, number: index + 1, playTimeFormatted: formatPlayTime(song.playTime), }))}  />
+            {songs.length > 0 ? (
+              <SongList
+                showAll={showAllSongs}
+                headerTitle="번호"
+                songs={songs.map((song, index) => ({
+                  ...song,
+                  number: index + 1,
+                  playTimeFormatted: formatPlayTime(song.playTime),
+                }))}
+              />
+            ) : (
+              <NoResultsText>검색결과가 없습니다</NoResultsText>
+            )}
           </ListDiv>
         </Section>
 
@@ -162,7 +193,7 @@ const formatPlayTime = (playTime) => {
             </button>
           </ResultDiv>
 
-          {albums.length > 0 && (
+          {albums.length > 0 ? (
             <ListGrid>
               {(showAllAlbums ? albums : albums.slice(0, 4)).map((album) => (
                 <ListItem key={album.id}>
@@ -178,6 +209,8 @@ const formatPlayTime = (playTime) => {
                 </ListItem>
               ))}
             </ListGrid>
+          ) : (
+            <NoResultsText>검색결과가 없습니다</NoResultsText>
           )}
         </Section>
 
@@ -190,21 +223,23 @@ const formatPlayTime = (playTime) => {
             </button>
           </ResultDiv>
 
-          {artists.length > 0 && (
-  <ListGrid>
-    {(showAllArtists ? artists : artists.slice(0, 4)).map((artist) => (
-      <ArtistItem key={artist.id}>
-        <img src={artist.image || "https://via.placeholder.com/100"} alt={artist.name} />
-        <div>
-          <Link to={`/artist/${artist.name}`} style={{ textDecoration: "none", color: "black" }}>
-            <TitleP>{artist.name}</TitleP>
-            <SubtitleP>{artist.genre.join(", ")}</SubtitleP>
-          </Link>
-        </div>
-      </ArtistItem>
-    ))}
-  </ListGrid>
-)}
+          {artists.length > 0 ? (
+            <ListGrid>
+              {(showAllArtists ? artists : artists.slice(0, 4)).map((artist) => (
+                <ArtistItem key={artist.id}>
+                  <img src={artist.image || "https://via.placeholder.com/100"} alt={artist.name} />
+                  <div>
+                    <Link to={`/artist/${artist.name}`} style={{ textDecoration: "none", color: "black" }}>
+                      <TitleP>{artist.name}</TitleP>
+                      <SubtitleP>{artist.genre.join(", ")}</SubtitleP>
+                    </Link>
+                  </div>
+                </ArtistItem>
+              ))}
+            </ListGrid>
+          ) : (
+            <NoResultsText>검색결과가 없습니다</NoResultsText>
+          )}
         </Section>
       </Container>
     </Wrapper>
