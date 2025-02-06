@@ -5,6 +5,7 @@ import com.berry_comment.entity.UserEntity;
 import com.berry_comment.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String jsonResponse = String.format("{\"access_token\": \"%s\", \"refresh_token\": \"%s\"}", accessToken, refreshToken);
         // 리디렉션 (localhost:3030으로 이동)
         response.sendRedirect("http://localhost:3030");
+//        response.sendRedirect("http://localhost:3030?access_token=" + accessToken + "&refresh_token=" + refreshToken);
 //        response.getWriter().write(jsonResponse);
 //        response.getWriter().flush();
     }
