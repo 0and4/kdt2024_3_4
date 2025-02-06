@@ -2,6 +2,9 @@ import styled from "styled-components";
 import SongList from "../ui/SongList";
 import { Wrapper } from "../ui/AllDiv";
 import RecMenuDiv from "../ui/MenuDiv";
+import React, { useEffect, useState } from 'react';
+
+
 const Container = styled.div``;
 const TodayP = styled.p`
   font-size: 1.5rem;
@@ -90,14 +93,44 @@ function TodayChart() {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
-    return `${year}.${month}.${day}`;
+    const hours = String(date.getHours()).padStart(2, "0"); // 24시간제 시간
+    return `${year}.${month}.${day} ${hours}`;
   };
+
+  // 현재 시간 표시를 위한 상태
+  const [currentDateTime, setCurrentDateTime] = useState(getCurrentDate());
+
+  useEffect(() => {
+    // 1초마다 시간을 갱신
+    const interval = setInterval(() => {
+      setCurrentDateTime(getCurrentDate());
+    }, 1000);
+
+    // 정시마다 5분 뒤에 페이지 새로 고침
+    const refreshInterval = setInterval(() => {
+      const currentMinute = new Date().getMinutes();
+      const currentSecond = new Date().getSeconds();
+
+      // 정시에 5분 뒤에 새로 고침
+      if (currentMinute === 0 && currentSecond === 0) {
+        setTimeout(() => {
+          window.location.reload(); // 5분 뒤 페이지 새로 고침
+        }, 5 * 60 * 1000); // 5분 후
+      }
+    }, 1000); // 1초마다 체크
+
+    // 클린업: 컴포넌트가 언마운트되면 인터벌 정리
+    return () => {
+      clearInterval(interval);
+      clearInterval(refreshInterval);
+    };
+  }, []);
 
   return (
     <Wrapper>
       <Container>
         <TodayP>
-          <span id="current_date">{getCurrentDate()}</span> TOP 100
+          <span id="current_date">{currentDateTime}시 기준</span> TOP 100
         </TodayP>
         <RecMenuDiv />
       </Container>
