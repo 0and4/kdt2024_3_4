@@ -109,8 +109,8 @@ const StyledButton = styled.button`
 
 //구글 로그인 서버 연결
 const onGoogleLogin = () => {
-  window.location.href = "http://localhost:8080/oauth2/authorization/google";
-  // window.location.href = "http://localhost:8080/oauth/login";
+  // window.location.href = "http://localhost:8080/oauth2/authorization/google";
+  window.location.href = "http://localhost:8080/user/oauth/login";
 }
 
 /*로그인 메뉴 컴포넌트*/

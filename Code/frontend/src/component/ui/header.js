@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { FaSearch } from "react-icons/fa";
@@ -147,7 +147,14 @@ const MyMenuDiv = styled.div`
 `;
 function Header({ activeMenu, onMenuClick }) {
   const [searchTerm, setSearchTerm] = useState(""); // 검색어 상태
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // 페이지 로드 시, 세션에 토큰이 있으면 로그인 상태로 설정
+    const token = sessionStorage.getItem("access_token");
+    setIsLoggedIn(!!token); // 토큰이 있으면 로그인 상태로 변경
+  }, []);
 
   // 검색 실행 함수
   const handleSearch = (e) => {
@@ -166,12 +173,21 @@ function Header({ activeMenu, onMenuClick }) {
     navigate("/login"); // 로그인 페이지로 이동
   };
 
+  const handleLogoutClick = () => {
+    // 세션에서 토큰 삭제
+    sessionStorage.removeItem("access_token");
+    setIsLoggedIn(false); // 로그인 상태 변경
+  };
+
   return (
     <Wrapper>
       <Container>
         <LoginDiv>
-          <button onClick={handleLoginClick}>로그인</button>{" "}
-          {/* 로그인 버튼 클릭 시 이동 */}
+        {isLoggedIn ? (
+            <button onClick={handleLogoutClick}>로그아웃</button> // 로그아웃 버튼
+          ) : (
+            <button onClick={handleLoginClick}>로그인</button> // 로그인 버튼
+          )}
         </LoginDiv>
 
         <SearchDiv>

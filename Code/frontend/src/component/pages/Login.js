@@ -191,9 +191,17 @@ function Login() {
       if (response.ok) {
         const data = await response.json();
         const token = data.access_token;
+        const name = data.name;
+
+        // 토큰을 sessionStorage에 저장
+      sessionStorage.setItem("access_token", token);
+      sessionStorage.setItem("name", name);
         
         // 토큰을 콘솔에 출력
         console.log("받은 토큰:", token);
+
+        // 사용자 이름을 콘솔에 출력
+        console.log("받은 이름:", name);
         alert("로그인 성공. 환영합니다!");
         navigate("/"); // 메인 페이지로 이동
       } else {
