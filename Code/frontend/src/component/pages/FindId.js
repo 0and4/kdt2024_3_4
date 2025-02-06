@@ -144,11 +144,13 @@ const ModalButton = styled.button`
 `;
 
 function FindId() {
-  const navigate = useNavigate(); // 페이지 이동 함수
+  const navigate = useNavigate(); 
   const [isModalOpen, setIsModalOpen] = useState(false); // 팝업 상태 저장
   const [modalType, setModalType] = useState(""); // 성공 또는 오류 상태 저장
   const [name, setName] = useState(""); // 이름 저장
   const [email, setEmail] = useState(""); // 이메일 저장
+
+  const [foundId, setFoundId] = useState(""); // 찾은 아이디 저장
 
   // 로고 클릭 시 메인 페이지로 이동
   const handleLogoClick = () => {
@@ -156,18 +158,32 @@ function FindId() {
   };
 
   // 확인 버튼 클릭 시 실행
-  const handleButtonClick = () => {
+  const handleButtonClick = async () => {
     if (!name || !email) {
       alert("이름과 이메일을 모두 입력해주세요.");
       return;
     }
-
-    // 이름과 이메일이 일치하는지 확인
-    if (name === "홍길동" && email === "user123@naver.com") {
-      setIsModalOpen(true);
-      setModalType("success");
-    } else {
-      alert("일치하는 회원 정보가 없습니다. 다시 한 번 확인해주세요.");
+  
+    try {
+      const response = await fetch("http://localhost:8080/user/get-id", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, name }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        setIsModalOpen(true);
+        setModalType("success");
+        setFoundId(data.id); // 서버에서 받은 아이디 저장
+      } else {
+        alert("일치하는 회원 정보가 없습니다. 다시 한 번 확인해주세요.");
+      }
+    } catch (error) {
+      console.error("아이디 찾기 요청 중 오류 발생:", error);
+      alert("서버와의 연결이 원활하지 않습니다. 다시 시도해주세요.");
     }
   };
 
@@ -239,7 +255,7 @@ function FindId() {
             <p>
               {name} 회원님의 아이디는
               <br />
-              <b>user123</b> 입니다.
+              <b>{foundId}</b> 입니다.
             </p>
             <ModalButton onClick={closeModal}>확인</ModalButton>
           </ModalContent>
