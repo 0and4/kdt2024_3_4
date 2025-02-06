@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EmailAndNameCheckDto {
+public class EmailAndIdCheckDto {
     @Email
     private String email;
 
     @NotNull
-    private String name;
+    private String id;
 }
