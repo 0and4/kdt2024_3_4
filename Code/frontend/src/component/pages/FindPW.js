@@ -226,25 +226,32 @@ function FindPw() {
   };
 
   // 인증코드 전송 함수
-  const handleSendVerificationCode = () => {
+  const handleSendVerificationCode = async () => {
     if (!email || !username) {
       alert("아이디와 이메일을 모두 입력해주세요.");
       return;
     }
-
-    // 아이디와 이메일이 일치하는지 확인
-    if (username !== "user123" || email !== "user123@naver.com") {
-      alert(
-        "회원정보를 찾을 수 없습니다. 아이디와 이메일을 다시 입력해주세요."
-      );
-      return;
+  
+    try {
+      const response = await fetch("http://localhost:8080/user/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, id: username }),
+      });
+  
+      if (!response.ok) {
+        alert("회원정보를 찾을 수 없습니다. 아이디와 이메일을 다시 입력해주세요.");
+        return;
+      }
+  
+      alert("입력한 이메일로 인증번호를 발송했습니다.\n5분 내로 번호를 입력해 주세요.");
+      startTimer();
+    } catch (error) {
+      console.error("인증 코드 전송 오류:", error);
+      alert("인증 코드 전송 중 오류가 발생했습니다.");
     }
-
-    alert(
-      "입력한 이메일로 인증번호를 발송했습니다.\n5분 내로 번호를 입력해 주세요."
-    );
-    startTimer();
   };
+  
 
   // 타이머 시작 함수
   const startTimer = () => {
@@ -281,17 +288,28 @@ function FindPw() {
   };
 
   // 인증코드 확인 함수
-  const handleVerifyCode = () => {
+  const handleVerifyCode = async () => {
     if (!code) {
-      alert("인증 코드를 입력해 주세요."); // 입력하지 않은 경우 알림
+      alert("인증 코드를 입력해 주세요.");
       return;
     }
-
-    if (code === "123456") {
-      alert("인증이 완료되었습니다."); // 인증 성공 시 알림
-      setIsVerified(true); // 확인 버튼 활성화
-    } else {
-      alert("잘못된 인증 코드입니다. 다시 확인해 주세요."); // 인증 실패 시 알림
+  
+    try {
+      const response = await fetch("http://localhost:8080/user/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password: code }),
+      });
+  
+      if (response.ok) {
+        alert("인증이 완료되었습니다. 임시 비밀번호를 이메일에서 확인하세요.");
+        setIsVerified(true);
+      } else {
+        alert("잘못된 인증 코드입니다. 다시 확인해 주세요.");
+      }
+    } catch (error) {
+      console.error("이메일 인증 오류:", error);
+      alert("이메일 인증 중 오류가 발생했습니다.");
     }
   };
 
