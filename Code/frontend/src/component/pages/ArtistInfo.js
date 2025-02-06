@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { RiArrowGoBackFill } from "react-icons/ri";
@@ -11,10 +11,7 @@ const NameP = styled.p`
   font-weight: bold;
   font-size: 1.2rem;
 `;
-const CategoryP = styled.p`
-  font-size: 0.9rem;
-  color: #717171;
-`;
+
 const ControlDiv = styled.div`
   display: flex;
   justify-content: space-between;
@@ -68,61 +65,111 @@ const AlbumItem = styled.div`
 const TitleP = styled.p`
   font-weight: bold;
 `;
-const SubtitleP = styled.p`
-  font-weight: 100;
-  font-size: 0.9rem;
-`;
+
+const formatPlayTime = (playTime) => {
+  if (!playTime || playTime === 0) return "3:00"; // 기본값 설정
+  const minutes = Math.floor(playTime / 60);
+  const seconds = Math.floor(playTime % 60);
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+};
+
 function ArtistInfo() {
   const { artistName } = useParams();
   const navigate = useNavigate();
   const [showAllSongs, setShowAllSongs] = useState(false);
   const [showAllAlbums, setShowAllAlbums] = useState(false);
+  const [artistData, setArtistData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [songs, setSongs] = useState([]);
+  const [albums, setAlbums] = useState([]);
 
-  // 더미 데이터 (실제 API 데이터와 연동 시 변경 필요)
-  const songs = [
-    {
-      rank: 1,
-      title: "Song A",
-      artist: artistName,
-      album: "Album A",
-      duration: "3:45",
-    },
-    {
-      rank: 2,
-      title: "Song B",
-      artist: artistName,
-      album: "Album B",
-      duration: "4:00",
-    },
-    {
-      rank: 3,
-      title: "Song C",
-      artist: artistName,
-      album: "Album C",
-      duration: "3:30",
-    },
-    {
-      rank: 4,
-      title: "Song D",
-      artist: artistName,
-      album: "Album D",
-      duration: "3:50",
-    },
-  ];
-  const albums = [
-    {
-      id: 1,
-      name: "Album A",
-      artist: artistName,
-      cover: "https://via.placeholder.com/100",
-    },
-    {
-      id: 2,
-      name: "Album B",
-      artist: artistName,
-      cover: "https://via.placeholder.com/100",
-    },
-  ];
+  useEffect(() => {
+    if (!artistName) {
+      setError("아티스트 이름이 제공되지 않았습니다.");
+      setLoading(false);
+      return;
+    }
+
+    const fetchArtistInfo = async () => {
+      try {
+        // 1️⃣ 아티스트 ID 가져오기
+        const idResponse = await fetch(
+          `http://localhost:8080/search/?keyword=ARTIST&value=${encodeURIComponent(
+            artistName
+          )}`
+        );
+        if (!idResponse.ok)
+          throw new Error("아티스트 ID를 가져오는데 실패했습니다.");
+        const idData = await idResponse.json();
+        if (!idData?.dataList?.length)
+          throw new Error("해당 아티스트를 찾을 수 없습니다.");
+
+        const artistId = idData.dataList[0].id;
+
+        // 2️⃣ 아티스트 상세 정보 가져오기
+        const infoResponse = await fetch(
+          `http://localhost:8080/search/detail?keyword=ARTIST&id=${artistId}`
+        );
+        if (!infoResponse.ok)
+          throw new Error("아티스트 정보를 가져오는데 실패했습니다.");
+        const artistInfo = await infoResponse.json();
+
+        // 아티스트 정보 저장
+        setArtistData({
+          name: artistInfo.artist.artistName,
+          imageUrl: artistInfo.artist.imageUrl,
+        });
+
+        // ✅ 중복 제거하면서 곡 정보 저장 (track을 사용)
+        const uniqueSongs = new Map();
+        (artistInfo.songList?.dataList || []).forEach((song) => {
+          const songTitle = song.track?.trim() || "제목 없음";
+          if (!uniqueSongs.has(songTitle)) {
+            uniqueSongs.set(songTitle, {
+              id: song.id,
+              track: songTitle, // ✅ `track` 사용
+              artist: song.artist?.trim() || artistName,
+              album: song.album?.trim() || "알 수 없음",
+              image: song.image || "https://via.placeholder.com/150",
+              playTimeFormatted: formatPlayTime(song.playTime),
+            });
+          }
+        });
+
+        // ✅ 번호를 1부터 부여하여 곡 목록 저장
+        setSongs(
+          Array.from(uniqueSongs.values()).map((song, index) => ({
+            ...song,
+            number: index + 1,
+          }))
+        );
+
+        // ✅ 앨범 데이터 처리
+        const albumArray = (artistInfo.albumList?.dataList || []).map(
+          (album) => ({
+            id: album.id, // ✅ API에서 `id`로 제공됨
+            name: album.name || "제목 없음",
+            cover: album.url || "https://via.placeholder.com/150", // ✅ `url` 사용
+          })
+        );
+
+        console.log("✅ 정리된 앨범 데이터:", albumArray); // 데이터 확인
+
+        setAlbums(albumArray); // 상태 업데이트
+      } catch (err) {
+        console.error("Error fetching artist info:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArtistInfo();
+  }, [artistName]);
+
+  if (loading) return <p>로딩 중...</p>;
+  if (error) return <p>오류 발생: {error}</p>;
 
   const handleBackClick = () => {
     navigate(-1);
@@ -139,20 +186,23 @@ function ArtistInfo() {
         {/* 아티스트 정보 섹션 */}
         <ControlDiv>
           <InfoDiv>
-            <img src="https://via.placeholder.com/150" alt="artist cover" />
+            {/* 🔹 API에서 받아온 아티스트 이미지 & 이름 적용 */}
+            <img
+              src={artistData?.imageUrl || "https://via.placeholder.com/150"}
+              alt="artist cover"
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/150";
+              }} // 🔹 이미지 깨질 경우 기본 이미지 적용
+              style={{ width: "150px", height: "150px", borderRadius: "8px" }} // 🔹 이미지 스타일 조정
+            />
             <div>
-              <NameP>{artistName}</NameP>
-              <CategoryP>
-                <span>솔로</span>, <span>랩/힙합</span>
-              </CategoryP>
+              <NameP>{artistData?.name || "알 수 없음"}</NameP>
             </div>
           </InfoDiv>
         </ControlDiv>
-
-        {/* 발매곡 섹션 */}
         <Section>
           <ResultDiv>
-            <TitleP>발매곡</TitleP>
+            <h2>발매곡</h2>
             <button
               onClick={() => setShowAllSongs((prev) => !prev)}
               className="more-btn"
@@ -164,7 +214,6 @@ function ArtistInfo() {
           <RecMenuDiv />
           <SongList showAll={showAllSongs} headerTitle="번호" songs={songs} />
         </Section>
-
         {/* 발매 앨범 섹션 */}
         <Section>
           <ResultDiv>
@@ -177,23 +226,24 @@ function ArtistInfo() {
               {showAllAlbums ? <FaChevronUp /> : <FaChevronRight />}
             </button>
           </ResultDiv>
-          {albums.length > 0 && (
+          {albums.length > 0 ? (
             <AlbumGrid>
               {(showAllAlbums ? albums : albums.slice(0, 4)).map((album) => (
                 <AlbumItem key={album.id}>
                   <img src={album.cover} alt={album.name} />
                   <div>
                     <Link
-                      to={`/album/${album.name}`}
+                      to={`/album/${album.id}`}
                       style={{ textDecoration: "none", color: "black" }}
                     >
                       <TitleP>{album.name}</TitleP>
                     </Link>
-                    <SubtitleP>{album.artist}</SubtitleP>
                   </div>
                 </AlbumItem>
               ))}
             </AlbumGrid>
+          ) : (
+            <p>앨범 정보가 없습니다.</p>
           )}
         </Section>
       </Container>
