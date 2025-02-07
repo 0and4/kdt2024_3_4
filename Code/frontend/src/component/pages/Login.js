@@ -195,6 +195,7 @@ function Login() {
 
         // 토큰을 sessionStorage에 저장
       sessionStorage.setItem("access_token", token);
+      sessionStorage.setItem("refresh_token", token);
       sessionStorage.setItem("name", name);
         
         // 토큰을 콘솔에 출력

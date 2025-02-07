@@ -113,6 +113,19 @@ const onGoogleLogin = () => {
   window.location.href = "http://localhost:8080/user/oauth/login";
 }
 
+window.onload = function() {
+  // URL에서 access_token과 refresh_token을 추출
+  const urlParams = new URLSearchParams(window.location.search);
+  const accessToken = urlParams.get('access_token');
+  const refreshToken = urlParams.get('refresh_token');
+  
+  if (accessToken && refreshToken) {
+      // sessionStorage에 토큰 저장
+      sessionStorage.setItem('access_token', accessToken);
+      sessionStorage.setItem('refresh_token', refreshToken);
+  }
+};
+
 /*로그인 메뉴 컴포넌트*/
 function LoginMenu() {
   const navigate = useNavigate(); // 페이지 이동 함수

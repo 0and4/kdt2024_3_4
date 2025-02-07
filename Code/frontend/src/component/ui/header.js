@@ -176,6 +176,8 @@ function Header({ activeMenu, onMenuClick }) {
   const handleLogoutClick = () => {
     // 세션에서 토큰 삭제
     sessionStorage.removeItem("access_token");
+    sessionStorage.removeItem("refresh_token");
+    sessionStorage.removeItem("name");
     setIsLoggedIn(false); // 로그인 상태 변경
   };
 
