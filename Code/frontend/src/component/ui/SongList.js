@@ -152,26 +152,6 @@ function SongList({ showAll, headerTitle, songs = [] }) {
     });
   };
 
-  const handleAddSong = (songId) => {
-    const token = sessionStorage.getItem("access_token"); // 세션에서 access token 확인
-    if (!token) {
-      alert("로그인 후 곡 추가 기능을 이용할 수 있습니다.");
-      return; // 로그인 안 된 상태에서는 함수 실행을 멈춤
-    }
-    console.log(`곡 추가 버튼 클릭된 노래: ${songId}`);
-    // 추가할 로직 여기에 작성
-  };
-
-  const handlePlaySong = (songId) => {
-    const token = sessionStorage.getItem("access_token"); // 세션에서 access token 확인
-    if (!token) {
-      alert("로그인 후 곡 재생 기능을 이용할 수 있습니다.");
-      return; // 로그인 안 된 상태에서는 함수 실행을 멈춤
-    }
-    console.log(`곡 재생 버튼 클릭된 노래: ${songId}`);
-    // 재생할 로직 여기에 작성
-  };
-
   return (
     <Wrapper>
       <Container>
@@ -243,10 +223,10 @@ function SongList({ showAll, headerTitle, songs = [] }) {
           />
         </LikeColumn>
         <ActionColumn>
-          <ActionButtons songId={songId} type="add" onClick={() => handleAddSong(songId)} />
+          <ActionButtons songId={songId} type="add" />
         </ActionColumn>
         <PlayColumn>
-          <ActionButtons songId={songId} type="play" onClick={() => handlePlaySong(songId)} />
+          <ActionButtons songId={songId} type="play" />
         </PlayColumn>
       </TableRow>
     );

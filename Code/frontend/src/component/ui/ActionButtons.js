@@ -87,7 +87,9 @@ function ActionButtons({ songId, type, liked, onToggleLike }) {
       left: rect.left + window.scrollX - 200,
     });
   };
+  
   const closePopup = () => setPopupPosition(null);
+  
   const handlePlay = () => {
     const token = sessionStorage.getItem("access_token"); // 세션에서 access token 확인
     if (!token) {
