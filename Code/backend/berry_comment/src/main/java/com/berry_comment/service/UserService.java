@@ -34,6 +34,7 @@ public class UserService {
     private final MailService mailService;
     private final RedisUtils redisUtils;
     private final TokenProvider tokenProvider;
+    private final PlayListService playListService;
     //액세스 토큰 만료시간
     private final Duration ACCESSTOKEN_DURATION = ConstantValue.ACCESS_TOKEN_EXPIRE;
 
@@ -97,6 +98,9 @@ public class UserService {
         String refreshToken = tokenProvider.generateToken(userEntity, REFRESH_TOKEN_DURATION);
         RefreshTokenEntity refreshTokenEntity = new RefreshTokenEntity(refreshToken, userEntity);
         refreshTokenRepository.save(refreshTokenEntity);
+        //내가 좋아하는 플레이리스트 만들기
+        System.out.println("유저저장 완료");
+        playListService.createMyFavouriteSongList(userEntity);
         mailService.sendMailJoinSuccess(userEmail);
         return TokenDto.builder()
                 .access_token(accessToken)
