@@ -226,7 +226,7 @@ function SongList({ showAll, headerTitle, songs = [] }) {
           <ActionButtons songId={songId} type="add" />
         </ActionColumn>
         <PlayColumn>
-          <ActionButtons songId={songId} type="play" />
+          <ActionButtons songId={songId} song={song} type="play" />
         </PlayColumn>
       </TableRow>
     );
