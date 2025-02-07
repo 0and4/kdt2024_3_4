@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import SongList from "../ui/SongList";
 import { KeepBtn, BackBtn } from "../ui/Buttons";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
@@ -32,10 +32,11 @@ const InfoDiv = styled.div`
   width: 100%;
   margin: 20px;
 `;
-const PlaylistJacket = styled.div`
+const PlaylistJacket = styled.img`
   width: 100px;
   height: 100px;
   background-color: #ccc;
+  object-fit: cover;
 `;
 const ListTitle = styled.p`
   text-align: left;
@@ -48,98 +49,53 @@ const ControlDiv = styled.div`
   display: flex;
   justify-content: space-between;
 `;
+
 function PlaylistInfo() {
-  const { id } = useParams(); // URL에서 id 값 가져오기
+  const { id } = useParams();
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const [playlist, setPlaylist] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
+
   const toggleBookmark = () => {
     setIsBookmarked((prev) => !prev);
   };
 
-  // 실제 데이터는 API나 상태 관리에서 가져오기
-  const playlistData = [
-    {
-      id: 1,
-      title: "오늘 하루는 상쾌하게 시작해볼까?",
-      image: "",
-      songs: [
-        {
-          rank: 1,
-          title: "Song A",
-          artist: "Artist A",
-          album: "Album A",
-          duration: "3:45",
-        },
-        {
-          rank: 2,
-          title: "Song B",
-          artist: "Artist B",
-          album: "Album B",
-          duration: "4:00",
-        },
-      ],
-    },
-    {
-      id: 2,
-      title: "오늘의 베스트 플레이리스트",
-      image: "",
-      songs: [
-        {
-          rank: 1,
-          title: "Song C",
-          artist: "Artist C",
-          album: "Album C",
-          duration: "3:30",
-        },
-        {
-          rank: 2,
-          title: "Song D",
-          artist: "Artist D",
-          album: "Album D",
-          duration: "3:50",
-        },
-      ],
-    },
-    {
-      id: 3,
-      title: "그룹 운동으로 스트레스 풀기",
-      image: "",
-      songs: [
-        {
-          rank: 1,
-          title: "Song E",
-          artist: "Artist E",
-          album: "Album E",
-          duration: "4:10",
-        },
-        {
-          rank: 2,
-          title: "Song F",
-          artist: "Artist F",
-          album: "Album F",
-          duration: "3:25",
-        },
-      ],
-    },
-    { id: 4, title: "힐링을 위한 클래식 음악", image: "", songs: [] },
-    {
-      id: 5,
-      title: "여름을 위한 파티 플레이리스트",
-      image: "",
-      songs: [
-        {
-          rank: 1,
-          title: "Song G",
-          artist: "Artist G",
-          album: "Album G",
-          duration: "3:15",
-        },
-      ],
-    },
-    { id: 6, title: "하루를 마무리하는 잔잔한 음악", image: "", songs: [] },
-  ];
+  useEffect(() => {
+    async function fetchPlaylist() {
+      const token = sessionStorage.getItem("access_token");
+      try {
+        const response = await fetch(`http://localhost:8080/playList/recommend/detail?id=${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) throw new Error("Failed to fetch playlist");
+        const data = await response.json();
+        const firstSongImage = data.dataList[0].image;
+        const playlistData = {
+          title: state?.playlistTitle || `추천 플레이리스트 ${id}`, // 제목을 `id`를 기준으로 예시로 설정
+          image: firstSongImage, // 기본 이미지 또는 첫 번째 앨범 이미지로 설정
+          songs: data.dataList, // 노래 목록은 응답에서 받은 `dataList`로 설정
+        };
+        setPlaylist(playlistData);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPlaylist();
+  }, [id, state]);
 
-  const playlist = playlistData.find((item) => item.id === parseInt(id));
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+  if (!playlist) return <p>Playlist not found</p>;
+  if (!playlist || !playlist.songs || playlist.songs.length === 0) return <p>No songs available in this playlist</p>;
+  
+  
 
   return (
     <Wrapper>
@@ -149,13 +105,13 @@ function PlaylistInfo() {
             <RiArrowGoBackFill /> 이전으로
           </BackBtn>
         </BackWrapper>
-        {playlist ? (
+        {playlist && (
           <>
             <ControlDiv>
               <InfoDiv>
-                <PlaylistJacket>{playlist.image}</PlaylistJacket>
+              <PlaylistJacket src={playlist.image || "/default-thumbnail.jpg"} alt="Playlist Cover" />
                 <div style={{ width: "100%" }}>
-                  <ListTitle>{playlist.title}</ListTitle>
+                  <ListTitle>{playlist.title.replace(/\\/g, "")}</ListTitle>
                   <RecMenuDiv
                     extraButton={
                       <KeepBtn
@@ -172,8 +128,6 @@ function PlaylistInfo() {
 
             <SongList showAll={50} headerTitle="번호" songs={playlist.songs} />
           </>
-        ) : (
-          <p>Playlist not found</p>
         )}
       </Container>
     </Wrapper>

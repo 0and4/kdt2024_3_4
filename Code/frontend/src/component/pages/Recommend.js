@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 const StyledLink = styled(Link)`
@@ -20,7 +20,19 @@ const Container = styled.div`
   }
   max-width: 100%;
 `;
-
+const TitleDiv=styled.div`
+  text-align:left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  h2{
+    margin:5px 0;
+  }
+  p{
+    margin:0 0 20px 0;
+    font-size:small;
+  }
+`;
 const PlaylistDiv = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -28,6 +40,7 @@ const PlaylistDiv = styled.div`
   gap: 20px;
   width: 100%;
   box-sizing: border-box;
+  position: relative;
 `;
 
 const PlaylistItem = styled.div`
@@ -38,6 +51,8 @@ const PlaylistItem = styled.div`
   gap: 15px;
   align-items: center;
   box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
   p {
     font-weight: bold;
     font-size: 0.9rem;
@@ -51,12 +66,13 @@ const PlaylistItem = styled.div`
   }
 `;
 
-const PlaylistJacket = styled.div`
+const PlaylistJacket = styled.img`
   width: 60px;
   height: 60px;
   background-color: yellow;
   object-fit: cover;
   cursor: pointer;
+  border:none;
 `;
 
 const Divider = styled.div`
@@ -66,35 +82,120 @@ const Divider = styled.div`
   left: 50%;
   width: 1px;
   background-color: #ccc;
+  z-index:-1;
+`;
+const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 30px;
+  span{
+  width:40px;
+  }
 `;
 
+const PageButton = styled.button`
+  padding: 8px 12px;
+  border: none;
+  background-color: ${(props) => (props.disabled ? "#ccc" : "#68009b")};
+  color: white;
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
+  border-radius: 5px;
+  &:hover {
+    background-color: ${(props) => (props.disabled ? "#ccc" : "#4a0073")};
+  }
+`;
+const getFirstSongImage = (songs) => {
+  // 첫 번째 노래의 이미지 반환, 없으면 랜덤 색상 생성
+  if (songs && songs[0] && songs[0].image) {
+    return songs[0].image;
+  }
+  // 랜덤 색상 생성 (RGB값으로)
+  const randomColor = `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`;
+  return randomColor;
+};
+
 function Recommend() {
-  const playlistData = [
-    { id: 1, title: "오늘 하루는 상쾌하게 시작해볼까?" },
-    { id: 2, title: "오늘의 베스트 플레이리스트" },
-    { id: 3, title: "그룹 운동으로 스트레스 풀기" },
-    { id: 4, title: "힐링을 위한 클래식 음악" },
-    { id: 5, title: "여름을 위한 파티 플레이리스트" },
-    { id: 6, title: "하루를 마무리하는 잔잔한 음악" },
-  ];
+  const [playlists, setPlaylists] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+    async function fetchPlaylists() {
+      setLoading(true);
+      try {
+        const token = sessionStorage.getItem("access_token");
+        const response = await fetch(
+          `http://localhost:8080/playList/recommend/thumb?page=${page}&size=10`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+  
+        if (!response.ok) throw new Error("Failed to fetch playlists");
+  
+        const data = await response.json();
+        setPlaylists(data.dataList || []);
+        const totalItems = 20;
+        setTotalPages(Math.ceil(totalItems/10));
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPlaylists();
+  }, [page]);
+  
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+  if (playlists.length === 0) return <p>No playlists available</p>;
 
   return (
     <Wrapper>
       <Container>
+        <TitleDiv>
+          <h2>Mood Recommend</h2>
+          <p>베리코멘드에서 추천하는 맞춤 음악</p>
+        </TitleDiv>
         <PlaylistDiv>
           <Divider />
-          {playlistData.map((playlist) => (
-            <StyledLink key={playlist.id} to={`/playlist/${playlist.id}`}>
+          {playlists.map((playlist, index) => (
+            <StyledLink
+             key={playlist.id || `playlist-${index}`}
+              to={`/playlist/${playlist.id}`}
+              state={{playlistTitle: playlist.title}}
+              >
               <PlaylistItem>
-                <PlaylistJacket />
-                <p>{playlist.title}</p>
+                <PlaylistJacket
+                  src={getFirstSongImage(playlist.id)}
+                  alt=""
+                  aria-hidden="true"
+                  style={{ backgroundColor: getFirstSongImage(playlist.songs)}}
+                />
+                <p>{playlist.title.replace(/\\/g, "")}</p>
               </PlaylistItem>
             </StyledLink>
           ))}
         </PlaylistDiv>
+        {/* 페이지네이션 버튼 */}
+        <Pagination>
+          <PageButton disabled={page === 0} onClick={() => setPage((prev) => prev - 1)}>
+            ◀
+          </PageButton>
+          <span>
+            {page + 1} / {totalPages}
+          </span>
+          <PageButton disabled={page >= totalPages - 1} onClick={() => setPage((prev) => prev + 1)}>
+            ▶
+          </PageButton>
+        </Pagination>
       </Container>
     </Wrapper>
   );
+
 }
 
 export default Recommend;
