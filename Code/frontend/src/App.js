@@ -100,8 +100,8 @@ function App() {
               <Route path="/login-id" element={<Login />} />
               <Route path="/song/:songId" element={<SongInfo />} />
               <Route path="/artist/:artistName" element={<ArtistInfo />} />
-              <Route path="/album/:albumName" element={<AlbumInfo />} />
               <Route path="/pr" element={<PR />} />
+              <Route path="/album/:albumId" element={<AlbumInfo />} />
             </Routes>
           </Container>
           <Player />

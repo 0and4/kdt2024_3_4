@@ -4,7 +4,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { FaChevronRight, FaChevronUp } from "react-icons/fa";
 import { BackBtn } from "../ui/Buttons";
-import SongList from "../ui/SongList"; // 기존 노래 목록 컴포넌트
+import SongList from "../ui/SongList";
 import { Wrapper, Container, BackWrapper, InfoDiv } from "../ui/AllDiv";
 import RecMenuDiv from "../ui/MenuDiv";
 const NameP = styled.p`
@@ -67,7 +67,7 @@ const TitleP = styled.p`
 `;
 
 const formatPlayTime = (playTime) => {
-  if (!playTime || playTime === 0) return "3:00"; // 기본값 설정
+  if (!playTime || playTime === 0) return "3:00";
   const minutes = Math.floor(playTime / 60);
   const seconds = Math.floor(playTime % 60);
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
@@ -93,7 +93,7 @@ function ArtistInfo() {
 
     const fetchArtistInfo = async () => {
       try {
-        // 1️⃣ 아티스트 ID 가져오기
+        // 아티스트 ID 가져오기
         const idResponse = await fetch(
           `http://localhost:8080/search/?keyword=ARTIST&value=${encodeURIComponent(
             artistName
@@ -107,7 +107,7 @@ function ArtistInfo() {
 
         const artistId = idData.dataList[0].id;
 
-        // 2️⃣ 아티스트 상세 정보 가져오기
+        // 아티스트 상세 정보 가져오기
         const infoResponse = await fetch(
           `http://localhost:8080/search/detail?keyword=ARTIST&id=${artistId}`
         );
@@ -121,14 +121,14 @@ function ArtistInfo() {
           imageUrl: artistInfo.artist.imageUrl,
         });
 
-        // ✅ 중복 제거하면서 곡 정보 저장 (track을 사용)
+        // 중복 제거하면서 곡 정보 저장 (track을 사용)
         const uniqueSongs = new Map();
         (artistInfo.songList?.dataList || []).forEach((song) => {
           const songTitle = song.track?.trim() || "제목 없음";
           if (!uniqueSongs.has(songTitle)) {
             uniqueSongs.set(songTitle, {
               id: song.id,
-              track: songTitle, // ✅ `track` 사용
+              track: songTitle,
               artist: song.artist?.trim() || artistName,
               album: song.album?.trim() || "알 수 없음",
               image: song.image || "https://via.placeholder.com/150",
@@ -137,7 +137,6 @@ function ArtistInfo() {
           }
         });
 
-        // ✅ 번호를 1부터 부여하여 곡 목록 저장
         setSongs(
           Array.from(uniqueSongs.values()).map((song, index) => ({
             ...song,
@@ -145,16 +144,13 @@ function ArtistInfo() {
           }))
         );
 
-        // ✅ 앨범 데이터 처리
         const albumArray = (artistInfo.albumList?.dataList || []).map(
           (album) => ({
-            id: album.id, // ✅ API에서 `id`로 제공됨
+            id: album.id,
             name: album.name || "제목 없음",
-            cover: album.url || "https://via.placeholder.com/150", // ✅ `url` 사용
+            cover: album.url || "https://via.placeholder.com/150",
           })
         );
-
-        console.log("✅ 정리된 앨범 데이터:", albumArray); // 데이터 확인
 
         setAlbums(albumArray); // 상태 업데이트
       } catch (err) {
@@ -186,14 +182,13 @@ function ArtistInfo() {
         {/* 아티스트 정보 섹션 */}
         <ControlDiv>
           <InfoDiv>
-            {/* 🔹 API에서 받아온 아티스트 이미지 & 이름 적용 */}
             <img
               src={artistData?.imageUrl || "https://via.placeholder.com/150"}
               alt="artist cover"
               onError={(e) => {
                 e.target.src = "https://via.placeholder.com/150";
-              }} // 🔹 이미지 깨질 경우 기본 이미지 적용
-              style={{ width: "150px", height: "150px", borderRadius: "8px" }} // 🔹 이미지 스타일 조정
+              }}
+              style={{ width: "150px", height: "150px", borderRadius: "8px" }}
             />
             <div>
               <NameP>{artistData?.name || "알 수 없음"}</NameP>
@@ -228,19 +223,23 @@ function ArtistInfo() {
           </ResultDiv>
           {albums.length > 0 ? (
             <AlbumGrid>
-              {(showAllAlbums ? albums : albums.slice(0, 4)).map((album) => (
-                <AlbumItem key={album.id}>
-                  <img src={album.cover} alt={album.name} />
-                  <div>
-                    <Link
-                      to={`/album/${album.id}`}
-                      style={{ textDecoration: "none", color: "black" }}
-                    >
-                      <TitleP>{album.name}</TitleP>
-                    </Link>
-                  </div>
-                </AlbumItem>
-              ))}
+              {(showAllAlbums ? albums : albums.slice(0, 4)).map((album) => {
+                console.log("앨범 데이터 확인:", album);
+                return (
+                  <AlbumItem key={album.id}>
+                    <img src={album.cover} alt={album.name} />
+                    <div>
+                      <Link
+                        to={`/album/${album.id}?artist=${encodeURIComponent(
+                          artistData.name
+                        )}`}
+                      >
+                        <TitleP>{album.name}</TitleP>
+                      </Link>
+                    </div>
+                  </AlbumItem>
+                );
+              })}
             </AlbumGrid>
           ) : (
             <p>앨범 정보가 없습니다.</p>
