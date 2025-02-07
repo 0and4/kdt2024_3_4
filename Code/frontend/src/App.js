@@ -102,6 +102,7 @@ function App() {
               <Route path="/artist/:artistName" element={<ArtistInfo />} />
               <Route path="/pr" element={<PR />} />
               <Route path="/album/:albumId" element={<AlbumInfo />} />
+              <Route path="/album/:albumName" element={<AlbumInfo />} />
             </Routes>
           </Container>
           <Player />

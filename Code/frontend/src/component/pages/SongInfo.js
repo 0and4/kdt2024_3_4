@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useParams } from "react-router-dom";
 import { BackBtn } from "../ui/Buttons";
 import { FaChevronRight } from "react-icons/fa";
 import { RiArrowGoBackFill } from "react-icons/ri";
@@ -19,15 +19,14 @@ const SongInfoDiv = styled(songinfo)`
     margin: 5px;
   }
 `;
+
 const ControlDiv = styled.div`
   display: flex;
   width: calc(100% - 200px);
-  @media (max-width: 768px) {
-    width: calc(100% - 200px);
-  }
   flex-direction: row;
   justify-content: space-between;
 `;
+
 const LiricDiv = styled.div`
   text-align: left;
   margin: 20px 10px;
@@ -38,61 +37,58 @@ const LiricDiv = styled.div`
     margin: 20px 0;
   }
 `;
+
 const TitleP = styled.p`
   font-weight: bold;
 `;
+
 function SongInfo() {
-  //임의의 가사
-  const lyrics = `
-    Lorem ipsum dolor sit amet
-    consectetur adipiscing elit
-    Integer nec odio
-    Praesent libero
-    Sed cursus ante dapibus diam
-    Sed nisi
-    Nulla quis sem at nibh elementum imperdiet
-
-    Lorem ipsum dolor sit amet
-    consectetur adipiscing elit
-    Integer nec odio
-    Praesent libero
-    Sed cursus ante dapibus diam
-    Sed nisi
-    Nulla quis sem at nibh elementum imperdiet
-
-    Lorem ipsum dolor sit amet
-    consectetur adipiscing elit
-    Integer nec odio
-    Praesent libero
-    Sed cursus ante dapibus diam
-    Sed nisi
-    Nulla quis sem at nibh elementum imperdiet
-  `;
-  const paragraphs = lyrics
-    .trim()
-    .split("\n\n")
-    .map((paragraph, index) => {
-      const lines = paragraph
-        .split("\n")
-        .map((line, idx) => <p key={idx}>{line.trim()}</p>);
-      return (
-        <div key={index} className="paragraph">
-          {lines}
-        </div>
-      );
-    });
-
+  const { songId } = useParams();
   const navigate = useNavigate();
+  const [songData, setSongData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // 임의의 음악 정보
-  const albumName = "Album 1";
-  const artistName = "Artist A";
-  const albumLink = `/album/${albumName}`;
-  const artistLink = `/artist/${artistName}`;
+  useEffect(() => {
+    const fetchSongInfo = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/search/detail?keyword=SONG&id=${songId}`
+        );
+        if (!response.ok) throw new Error("데이터 불러오기 실패");
+
+        const data = await response.json();
+        console.log("API 응답 데이터:", data);
+        setSongData(data);
+      } catch (error) {
+        console.error("노래 정보를 불러오는 중 오류 발생:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSongInfo();
+  }, [songId]);
+
+  if (loading) {
+    return <p>로딩 중...</p>;
+  }
+
+  if (!songData || !songData.artistName) {
+    return <p>노래 정보를 불러올 수 없습니다.</p>;
+  }
+
+  // API에서 가져온 데이터 매핑
+  const songTitle = songData?.songName || "제목 없음";
+  const artistName = songData?.artistName || "아티스트 정보 없음";
+  const albumName = songData?.albumName || "앨범 정보 없음";
+  const albumId = songData?.albumId || "unknown";
+  const lyrics = songData?.songLyrics || "가사 정보 없음";
+  const albumImage = songData?.imageUrl || "/default-album.png";
 
   const handleBackClick = () => {
-    navigate(-1); // 이전 페이지로 돌아가기
+    navigate(-1);
   };
+
   return (
     <Wrapper>
       <Container>
@@ -102,21 +98,23 @@ function SongInfo() {
               <RiArrowGoBackFill /> 이전으로
             </BackBtn>
           </BackWrapper>
-          <img src={""} alt={"albumImage"} />
+          <img src={albumImage} alt="앨범 이미지" />
           <ControlDiv>
             <div>
               <TitleP>
                 <Link
-                  to={albumLink}
+                  to={`/album?album=${encodeURIComponent(
+                    albumName
+                  )}&artist=${encodeURIComponent(artistName)}`}
                   style={{ textDecoration: "none", color: "black" }}
                 >
                   {albumName} <FaChevronRight />
                 </Link>
               </TitleP>
-              <p>Song 1</p>
+              <p>{songTitle}</p>
               <p>
                 <Link
-                  to={artistLink}
+                  to={`/artist/${encodeURIComponent(artistName)}`}
                   style={{ textDecoration: "none", color: "black" }}
                 >
                   {artistName} <FaChevronRight />
@@ -129,10 +127,11 @@ function SongInfo() {
 
         <LiricDiv>
           <TitleP>가사</TitleP>
-          {paragraphs}
+          <p dangerouslySetInnerHTML={{ __html: lyrics }} />
         </LiricDiv>
       </Container>
     </Wrapper>
   );
 }
+
 export default SongInfo;
