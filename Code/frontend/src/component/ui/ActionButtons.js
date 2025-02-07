@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   LiaHeart,
   LiaHeartSolid,
@@ -61,7 +62,8 @@ const LikePopup = styled.div`
   transition: opacity 0.5s ease-in-out;
   visibility: ${(props) => (props.show ? "visible" : "hidden")};
 `;
-function ActionButtons({ songId, type, liked, onToggleLike }) {
+function ActionButtons({ songId, song, type, liked, onToggleLike }) {
+  const navigate = useNavigate(); // 페이지 이동 함수
   const [showLikePopup, setShowLikePopup] = useState(false);
   const [popupPosition, setPopupPosition] = useState(null);
 
@@ -72,15 +74,32 @@ function ActionButtons({ songId, type, liked, onToggleLike }) {
   };
 
   const handleAddClick = (e) => {
+    const token = sessionStorage.getItem("access_token"); // 세션에서 access token 확인
+    if (!token) {
+      alert("로그인 후 곡 추가 기능을 이용할 수 있습니다.");
+      navigate("/login");
+      return; // 로그인 안 되면 함수 실행을 멈춤
+    }
+
     const rect = e.target.getBoundingClientRect();
     setPopupPosition({
       top: rect.top + window.scrollY - 300,
       left: rect.left + window.scrollX - 200,
     });
   };
+  
   const closePopup = () => setPopupPosition(null);
+  
   const handlePlay = () => {
+    const token = sessionStorage.getItem("access_token"); // 세션에서 access token 확인
+    if (!token) {
+      alert("로그인 후 곡 재생 기능을 이용할 수 있습니다.");
+      navigate("/login");
+      return; // 로그인 안 되면 함수 실행을 멈춤
+    }
+
     console.log("재생 버튼 클릭됨", songId);
+    console.log("곡 정보", song);
     // 여기에 실제 노래 재생 로직 추가
   };
   return (
