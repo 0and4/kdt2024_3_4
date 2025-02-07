@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ActionButtons from "./ActionButtons";
 
 const Wrapper = styled.div``;
@@ -106,6 +106,7 @@ const SongInfo = styled.div`
 `;
 
 function SongList({ showAll, headerTitle, songs = [] }) {
+  const navigate = useNavigate(); // 페이지 이동 함수
   const [selectedSongs, setSelectedSongs] = useState([]);
   const [allSelected, setAllSelected] = useState(false);
   const [likedSongs, setLikedSongs] = useState({});
@@ -134,6 +135,13 @@ function SongList({ showAll, headerTitle, songs = [] }) {
   
 
   const handleToggleLike = (songId) => {
+    const token = sessionStorage.getItem("access_token"); // 세션에서 access token 확인
+    if (!token) {
+      alert("로그인 후 이용할 수 있습니다.");
+      navigate("/login");
+      return; // 로그인 안 된 상태에서는 함수 실행을 멈춤
+    }
+
     console.log(`찜하기 버튼 클릭된 노래: ${songId}`);
     setLikedSongs((prev) => {
       const isLiked = prev[songId] ?? false; // 기존 값이 undefined이면 false 처리
@@ -142,6 +150,26 @@ function SongList({ showAll, headerTitle, songs = [] }) {
         [songId]: !isLiked, // 반대 값으로 업데이트
       };
     });
+  };
+
+  const handleAddSong = (songId) => {
+    const token = sessionStorage.getItem("access_token"); // 세션에서 access token 확인
+    if (!token) {
+      alert("로그인 후 곡 추가 기능을 이용할 수 있습니다.");
+      return; // 로그인 안 된 상태에서는 함수 실행을 멈춤
+    }
+    console.log(`곡 추가 버튼 클릭된 노래: ${songId}`);
+    // 추가할 로직 여기에 작성
+  };
+
+  const handlePlaySong = (songId) => {
+    const token = sessionStorage.getItem("access_token"); // 세션에서 access token 확인
+    if (!token) {
+      alert("로그인 후 곡 재생 기능을 이용할 수 있습니다.");
+      return; // 로그인 안 된 상태에서는 함수 실행을 멈춤
+    }
+    console.log(`곡 재생 버튼 클릭된 노래: ${songId}`);
+    // 재생할 로직 여기에 작성
   };
 
   return (
@@ -215,10 +243,10 @@ function SongList({ showAll, headerTitle, songs = [] }) {
           />
         </LikeColumn>
         <ActionColumn>
-          <ActionButtons songId={songId} type="add" />
+          <ActionButtons songId={songId} type="add" onClick={() => handleAddSong(songId)} />
         </ActionColumn>
         <PlayColumn>
-          <ActionButtons songId={songId} type="play" />
+          <ActionButtons songId={songId} type="play" onClick={() => handlePlaySong(songId)} />
         </PlayColumn>
       </TableRow>
     );
