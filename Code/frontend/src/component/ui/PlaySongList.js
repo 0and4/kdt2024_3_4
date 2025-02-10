@@ -40,6 +40,10 @@ const TabMenu = styled.ul`
 `;
 
 const TabContent = styled.div`
+  max-height: 350px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
   ul {
     padding: 0;
     margin: 0;
