@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { Link } from "react-router-dom";
 const StyledLink = styled(Link)`
   text-decoration: none;
@@ -20,17 +20,31 @@ const Container = styled.div`
   }
   max-width: 100%;
 `;
+const colorChange = keyframes`
+  0% {
+    color: black;
+  }
+  50% {
+    color: #68009b;
+  }
+  100% {
+    color: black;
+  }
+`;
 const TitleDiv=styled.div`
   text-align:left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  h2{
-    margin:5px 0;
+  h2,
+  p {
+    margin: 5px 0;
+    color: black;
+    animation: ${colorChange} 2s ease-in-out forwards;
   }
-  p{
-    margin:0 0 20px 0;
-    font-size:small;
+  p {
+    font-size: small;
+    margin-bottom: 20px;
   }
 `;
 const PlaylistDiv = styled.div`
@@ -59,9 +73,11 @@ const PlaylistItem = styled.div`
     cursor: pointer;
     color: black;
     text-decoration: none;
+    padding: 5px 8vw 5px 1px;
     &:hover {
-      color: #68009b;
-      text-decoration: underline;
+      background-color: #c69fda;
+      color:#fafafa;
+      text-decoration: none;
     }
   }
 `;
