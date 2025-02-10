@@ -105,12 +105,14 @@ const SongInfo = styled.div`
   min-width:100px;
 `;
 
-function SongList({ showAll, headerTitle, songs = [], onPlay }) {
+function SongList({ showAll, headerTitle, songs = [] }) {
   const navigate = useNavigate();
   const [selectedSongs, setSelectedSongs] = useState([]);
   const [allSelected, setAllSelected] = useState(false);
   const [likedSongs, setLikedSongs] = useState({});
   const [albumIds, setAlbumIds] = useState({});
+  const [popupPosition, setPopupPosition] = useState(null);
+const [selectedSongId, setSelectedSongId] = useState(null);
 
   const fetchAlbumId = async (albumName) => {
     try {
@@ -215,11 +217,11 @@ function SongList({ showAll, headerTitle, songs = [], onPlay }) {
     return (
       <TableRow key={songId}>
         <CheckboxColumn>
-          <input
-            type="checkbox"
-            checked={selectedSongs.includes(songId)}
-            onChange={() => handleCheckboxChange(songId)}
-          />
+        <input
+          type="checkbox"
+          checked={Array.isArray(selectedSongs) && selectedSongs.includes(songId)}
+          onChange={() => handleCheckboxChange(songId)}
+        />
         </CheckboxColumn>
         <NumberColumn>{displayNumber}</NumberColumn>
         <SongInfoColumn>
@@ -257,10 +259,17 @@ function SongList({ showAll, headerTitle, songs = [], onPlay }) {
           />
         </LikeColumn>
         <ActionColumn>
-          <ActionButtons songId={songId} type="add" />
+        <ActionButtons 
+  songId={songId} 
+  type="add" 
+  onAddClick={(songId, position) => {
+    setPopupPosition(position); // 팝업 위치 설정
+    setSelectedSongId(songId); // 선택한 노래 ID 저장
+  }} 
+/>
         </ActionColumn>
         <PlayColumn>
-          <ActionButtons songId={songId} song={song} type="play" onPlay={onPlay} />
+          <ActionButtons songId={songId} song={song} type="play" />
         </PlayColumn>
       </TableRow>
     );
