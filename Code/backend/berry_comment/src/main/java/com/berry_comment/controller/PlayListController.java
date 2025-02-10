@@ -52,6 +52,27 @@ public class PlayListController {
         return ResponseEntity.ok(responseDto);
     }
 
+    @DeleteMapping("/delete/{playlistId}")
+    public ResponseEntity<?> deletePlayList(
+            @PathVariable Long playlistId,
+            Authentication authentication
+    ) {
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        String userId = (String) principalDetails.getUser().getId();
+
+        boolean isDeleted = playListService.deletePlayList(playlistId, userId);
+
+        if (isDeleted) {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "플레이리스트 삭제 완료");
+            return ResponseEntity.ok(response);
+        } else {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "삭제 권한이 없거나 존재하지 않는 플레이리스트입니다.");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
     @PostMapping("/create")
     public ResponseEntity<?> createPlayList(
             Authentication authentication,

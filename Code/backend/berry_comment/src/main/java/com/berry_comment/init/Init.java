@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 public class Init {
-    Path path = Paths.get("E:\\kdt2024_3_4\\Document\\학습 DB\\플레이리스트");
+    Path path = Paths.get("C:\\berry\\RPlaylist");
 
     ArrayList<Path> fileList = new ArrayList<>();
     private final CrawlerService crawlerService;
@@ -51,6 +51,7 @@ public class Init {
                     // 추천 플레이리스트 이름
                     String recommendationName = file.toString().replace(path.toString(), "");
                     recommendationName = recommendationName.replace(".csv", ""); // 수정: replace()는 원본을 변경하지 않음
+                    recommendationName = recommendationName.replace("/","");
                     System.out.println(recommendationName);
 
                     //추천 음악이름 저장
