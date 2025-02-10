@@ -171,6 +171,7 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
   const [previousPressedOnce, setPreviousPressedOnce] = useState(false);
   const progressRef = useRef(null);
   const [playlist, setLocalPlaylist] = useState(propPlaylist); // 내부 상태 관리
+  const audioRef = useRef(new Audio());
   // const [playlist] = useState([
   //   { title: "title 1", artist: "artist 1", duration: 188 },
   //   { title: "title 2", artist: "artist 2", duration: 192 },
@@ -180,6 +181,19 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
   useEffect(() => {
     setLocalPlaylist(propPlaylist);
   }, [propPlaylist]);
+
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      audioRef.current.muted = false; // 🔥 자동 재생 차단 해결
+      document.removeEventListener("click", handleUserInteraction);
+    };
+
+    document.addEventListener("click", handleUserInteraction);
+
+    return () => {
+      document.removeEventListener("click", handleUserInteraction);
+    };
+  }, []);
 
   // ✅ 최신 곡이 자동으로 재생되도록 설정
   useEffect(() => {
@@ -241,6 +255,13 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
         throw new Error(`서버 오류: ${response.status}`);
       }
 
+      const audioBlob = await response.blob(); // 🔥 스트림을 Blob으로 변환
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      audioRef.current.src = audioUrl;
+      audioRef.current.volume = 1.0; // 🔊 볼륨 조절
+      audioRef.current.play(); // 🔥 실제 재생 시작
+
       console.log(`🎵 서버에서 재생 요청 성공: ${currentSong.track}`);
       setIsPlaying(true); // ✅ 실제 재생 상태 변경
 
@@ -255,6 +276,7 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
     if (!isPlaying) {
       requestPlayFromServer(); // ✅ 서버에 요청 후 재생
     } else {
+      audioRef.current.pause(); // ⏸️ 일시정지
       setIsPlaying(false); // ✅ 일시정지
     }
   };
