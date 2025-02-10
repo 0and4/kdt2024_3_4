@@ -40,6 +40,10 @@ const TabMenu = styled.ul`
 `;
 
 const TabContent = styled.div`
+  max-height: 350px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
   ul {
     padding: 0;
     margin: 0;
@@ -162,9 +166,16 @@ function PlaySongList({ playlist, setCurrentSong, setCurrentIndex }) {
                   setCurrentIndex(index);
                 }}
               >
-                <AlbumCover />
+                <AlbumCover>
+                <img
+                  src={song.image}
+                  alt={song.track}
+                  width="100%"
+                  height="100%"
+                />
+                </AlbumCover>
                 <SongInfo>
-                  <SongTitle>{song.title}</SongTitle>
+                  <SongTitle>{song.track}</SongTitle>
                   <ArtistName>{song.artist}</ArtistName>
                 </SongInfo>
               </SongItem>

@@ -108,6 +108,7 @@ const PageButton = styled.button`
 const getFirstSongImage = (songs) => {
   // 첫 번째 노래의 이미지 반환, 없으면 랜덤 색상 생성
   if (songs && songs[0] && songs[0].image) {
+    console.log("First song image:", songs[0].image);  // 디버깅용 로그
     return songs[0].image;
   }
   // 랜덤 색상 생성 (RGB값으로)

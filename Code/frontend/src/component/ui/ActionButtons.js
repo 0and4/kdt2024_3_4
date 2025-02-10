@@ -62,7 +62,7 @@ const LikePopup = styled.div`
   transition: opacity 0.5s ease-in-out;
   visibility: ${(props) => (props.show ? "visible" : "hidden")};
 `;
-function ActionButtons({ songId, song, type, liked, onToggleLike }) {
+function ActionButtons({ songId, song, type, liked, onToggleLike, onPlay }) {
   const navigate = useNavigate(); // 페이지 이동 함수
   const [showLikePopup, setShowLikePopup] = useState(false);
   const [popupPosition, setPopupPosition] = useState(null);
@@ -100,6 +100,12 @@ function ActionButtons({ songId, song, type, liked, onToggleLike }) {
 
     console.log("재생 버튼 클릭됨", songId);
     console.log("곡 정보", song);
+
+    if (!onPlay) {
+      console.error("onPlay 함수가 정의되지 않았습니다.");
+      return;
+    }
+    onPlay(song); // Player.js의 handlePlaySong 호출
     // 여기에 실제 노래 재생 로직 추가
   };
   return (
