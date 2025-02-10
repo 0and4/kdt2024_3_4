@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import MPEdit1 from "../Popup/MPEdit1";
 import Subscribe1 from "../Popup/Subscribe1";
@@ -20,7 +20,7 @@ const Container = styled(mpContainer)`
     margin: 0 auto;
   }
 `;
-// 프로필 섹션
+
 const ProfileSection = styled.div`
   display: flex;
   align-items: center;
@@ -34,7 +34,6 @@ const ProfileSection = styled.div`
   }
 `;
 
-// 프로필 이미지
 const ProfileImage = styled.div`
   width: 130px;
   height: 130px;
@@ -49,7 +48,6 @@ const ProfileImage = styled.div`
   flex-shrink: 0;
 `;
 
-// 프로필 정보
 const UsernameContainer = styled.div`
   display: flex;
   justify-content: flex-start;
@@ -81,7 +79,6 @@ const Username = styled.p`
   margin: 0;
 `;
 
-// 프로필 수정 버튼
 const EditButton = styled.button`
   background: none;
   border: none;
@@ -93,13 +90,6 @@ const EditButton = styled.button`
   }
 `;
 
-const Email = styled.p`
-  font-size: 1rem;
-  color: #666;
-  margin: 0;
-`;
-
-// 플레이리스트 섹션
 const PlaylistSection = styled.div`
   padding: 15px 20px;
 `;
@@ -118,13 +108,11 @@ const PlaylistTitle = styled.p`
   font-weight: 900;
 `;
 
-// 플레이리스트 수정 버튼
 const EditButtons = styled.div`
   display: flex;
   gap: 10px;
 `;
 
-// 수정, 삭제 버튼
 const Button = styled.button`
   background: none;
   border: none;
@@ -140,7 +128,6 @@ const Button = styled.button`
   }
 `;
 
-// 플레이리스트 아이템
 const PlaylistItem = styled.div`
   display: flex;
   align-items: center;
@@ -174,7 +161,6 @@ const Checkbox = styled.input`
   cursor: pointer;
 `;
 
-// 구독정보 버튼
 const SubscriptionButton = styled.button`
   padding: 8px 12px;
   height: 36px;
@@ -190,13 +176,106 @@ const SubscriptionButton = styled.button`
   }
 `;
 
+const generateRandomNickname = () => {
+  const adjectives = [
+    "달달한",
+    "새콤한",
+    "상큼한",
+    "고소한",
+    "시원한",
+    "부드러운",
+    "향긋한",
+    "진한",
+  ];
+  const fruits = [
+    "자몽",
+    "사과",
+    "바나나",
+    "포도",
+    "복숭아",
+    "딸기",
+    "수박",
+    "오렌지",
+  ];
+
+  const randomAdjective =
+    adjectives[Math.floor(Math.random() * adjectives.length)];
+  const randomFruit = fruits[Math.floor(Math.random() * fruits.length)];
+
+  return `${randomAdjective} ${randomFruit}`;
+};
+
 function MyPage() {
   const [isMPEdit1Open, setIsMPEdit1Open] = useState(false);
   const [isSubscribe1Open, setIsSubscribe1Open] = useState(false);
   const [isEditPLOpen, setIsEditPLOpen] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+  const [email, setEmail] = useState("loading...");
+  const [nickname, setNickname] = useState("로딩 중...");
 
-  //임의의 플레이리스트 데이터, 실제 데이터 연결 시 PlaylistInfo.js로 이동하도록 설정 필요
+  useEffect(() => {
+    fetch("http://localhost:8080/profile/me", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
+      },
+      credentials: "include",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`요청 실패: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("사용자 정보:", data);
+        setEmail(data.email || "이메일 없음");
+
+        // 각 계정(email)마다 닉네임을 다르게 저장하기 위해 키값을 "nickname_email" 형식으로 저장
+        const nicknameKey = `nickname_${data.email}`;
+        let storedNickname = sessionStorage.getItem(nicknameKey);
+
+        // 닉네임이 Anonymous가 아니라면 그대로 사용하고, sessionStorage에 저장
+        if (data.nickname && data.nickname !== "Anonymous") {
+          setNickname(data.nickname);
+          sessionStorage.setItem(nicknameKey, data.nickname);
+          return;
+        }
+
+        // sessionStorage에 닉네임이 없고, 서버에서 받은 닉네임도 Anonymous라면 랜덤 생성
+        if (!storedNickname) {
+          storedNickname = generateRandomNickname();
+
+          // 서버에도 한 번만 저장 (Anonymous인 경우에만)
+          fetch("http://localhost:8080/profile/edit?editType=NICKNAME", {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
+            },
+            credentials: "include",
+            body: JSON.stringify({ value: storedNickname }),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`닉네임 업데이트 실패: ${response.status}`);
+              }
+              return response.json();
+            })
+            .then((updatedData) => {
+              console.log("닉네임 업데이트 성공:", updatedData);
+              setNickname(updatedData.nickname);
+              sessionStorage.setItem(nicknameKey, updatedData.nickname);
+            })
+            .catch((error) => console.error("닉네임 업데이트 오류:", error));
+        } else {
+          setNickname(storedNickname);
+        }
+      })
+      .catch((error) => console.error("사용자 정보 요청 실패:", error));
+  }, []);
+
   const playlists = [
     "내가 좋아하는 노래 💜",
     "플레이리스트 1",
@@ -217,13 +296,12 @@ function MyPage() {
     <Wrapper>
       <Container>
         <ProfileSection>
-          <ProfileImage>S</ProfileImage>
+          <ProfileImage>{email.charAt(0).toUpperCase()}</ProfileImage>{" "}
+          {/* 이메일 첫 글자 표시 */}
           <UserDiv>
             <ProfileInfo>
               <UsernameContainer>
-                <Username>
-                  <span id="nickname">즐거운 자몽</span>
-                </Username>
+                <Username>{nickname}</Username>
                 <EditButton onClick={() => setIsMPEdit1Open(true)}>
                   ✏️
                 </EditButton>
@@ -232,9 +310,7 @@ function MyPage() {
                   onClose={() => setIsMPEdit1Open(false)}
                 />
               </UsernameContainer>
-              <Email>
-                <span id="email">kim0408@gmail.com</span>
-              </Email>
+              <p>{email}</p>
             </ProfileInfo>
             <SubscriptionButton onClick={() => setIsSubscribe1Open(true)}>
               구독정보
