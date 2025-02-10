@@ -171,15 +171,25 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
   const [previousPressedOnce, setPreviousPressedOnce] = useState(false);
   const progressRef = useRef(null);
   const [playlist, setLocalPlaylist] = useState(propPlaylist); // 내부 상태 관리
-  // const [playlist] = useState([
-  //   { title: "title 1", artist: "artist 1", duration: 188 },
-  //   { title: "title 2", artist: "artist 2", duration: 192 },
-  //   { title: "title 3", artist: "artist 3", duration: 220 },
-  // ]);
+  const audioRef = useRef(new Audio());
+
   // ✅ propPlaylist가 변경될 때, Player 내부 상태 업데이트
   useEffect(() => {
     setLocalPlaylist(propPlaylist);
   }, [propPlaylist]);
+
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      audioRef.current.muted = false; // 🔥 자동 재생 차단 해결
+      document.removeEventListener("click", handleUserInteraction);
+    };
+
+    document.addEventListener("click", handleUserInteraction);
+
+    return () => {
+      document.removeEventListener("click", handleUserInteraction);
+    };
+  }, []);
 
   // ✅ 최신 곡이 자동으로 재생되도록 설정
   useEffect(() => {
@@ -212,10 +222,61 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
       setCurrentSong(playlist[currentIndex]);
     }
   }, [currentIndex, playlist]);
+  // ✅ 서버에 재생 요청을 보내는 함수
+  const requestPlayFromServer = async () => {
+    if (!currentSong) {
+      alert("재생할 곡이 없습니다.");
+      return;
+    }
 
-  const togglePlay = () => {
-    setIsPlaying((prev) => !prev);
+    const token = sessionStorage.getItem("access_token");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      console.log(`🎵 서버로 재생 요청: ${currentSong.id}`);
+      console.log(`서버로 보내는 토큰 :  ${token}`);
+
+      const response = await fetch(`http://localhost:8080/stream/play/${currentSong.id}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`서버 오류: ${response.status}`);
+      }
+
+      const audioBlob = await response.blob(); // 🔥 스트림을 Blob으로 변환
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      audioRef.current.src = audioUrl;
+      audioRef.current.volume = 1.0; // 🔊 볼륨 조절
+      audioRef.current.play(); // 🔥 실제 재생 시작
+
+      console.log(`🎵 서버에서 재생 요청 성공: ${currentSong.track}`);
+      setIsPlaying(true); // ✅ 실제 재생 상태 변경
+
+    } catch (error) {
+      console.error("🚨 재생 요청 중 오류 발생:", error);
+      alert("음악을 재생하는 도중 오류가 발생했습니다.");
+    }
   };
+
+  // ✅ Play/Pause 버튼 클릭 이벤트
+  const togglePlay = () => {
+    if (!isPlaying) {
+      requestPlayFromServer(); // ✅ 서버에 요청 후 재생
+    } else {
+      audioRef.current.pause(); // ⏸️ 일시정지
+      setIsPlaying(false); // ✅ 일시정지
+    }
+  };
+
   const playNext = () => {
     setCurrentIndex((prev) => (prev < playlist.length - 1 ? prev + 1 : 0));
   };
@@ -239,8 +300,14 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
   useEffect(() => {
     if (playlist.length > 0) {
       const newSong = playlist[currentIndex];
+      let duration = newSong.playTime; // 서버에서 받은 playTime
+
+      if (!duration || duration === 0) {
+        duration = 190000; // 🔥 playTime이 0이면 3분 10초(190초)로 설정
+      }
+
       setCurrentSong(newSong);
-      setTotalDuration(newSong.duration);
+      setTotalDuration(duration);
       setProgress(0); // 노래가 바뀌면 프로그레스 바 초기화
       setCurrentTime(0); // 시작 시간 0초로 초기화
     }
@@ -267,11 +334,16 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
     return () => clearInterval(interval);
   }, [isPlaying, currentTime, totalDuration, isDragging]);
 
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
+  const formatTime = (milliseconds) => {
+    if (!milliseconds || isNaN(milliseconds)) return "0:00";
+  
+    const totalSeconds = Math.floor(milliseconds / 1000); // 🔥 밀리초 → 초 변환
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+  
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };  
+  
   const handleProgressClick = (e) => {
     if (!progressRef.current) return;
 

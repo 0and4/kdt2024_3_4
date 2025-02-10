@@ -51,6 +51,11 @@ public class ProfileController {
                 map.put("nickname", nickname);
                 return ResponseEntity.ok(map);
 
+            case EMAIL:
+                String updatedEmail = userService.updateEmail(userId, value);
+                map.put("email", updatedEmail);
+                return ResponseEntity.ok(map);
+
                 default:
                     return ResponseEntity.badRequest().build();
         }
@@ -65,4 +70,24 @@ public class ProfileController {
         userMap.put("rank", rank.getRoleName().replace("ROLE_", ""));
         return ResponseEntity.ok(userMap);
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<Map<String, String>> getProfile(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body(Map.of("error", "로그인이 필요합니다."));
+        }
+
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        String email = principalDetails.getUser().getEmail();
+        String nickname = principalDetails.getUser().getNickname(); // 닉네임 추가
+
+        Map<String, String> response = new HashMap<>();
+        response.put("email", email);
+        response.put("nickname", nickname); // 닉네임도 응답에 포함
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
 }

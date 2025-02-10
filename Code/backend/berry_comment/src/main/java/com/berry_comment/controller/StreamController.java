@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/stream")
+@CrossOrigin(origins = "http://localhost:3030")
 @RequiredArgsConstructor
 public class StreamController {
     private final StreamService streamService;

@@ -62,6 +62,7 @@ public class UserService {
         return password;
     }
 
+
     public void validateUserCheckByEmailAndId(@Email String email, @NotNull String id) {
         System.out.println(id);
         UserEntity userEntity = userRepository.findById(id);
@@ -190,4 +191,28 @@ public class UserService {
         else
             throw new BerryCommentException(ErrorCode.TOKEN_INVALID, ErrorCode.TOKEN_INVALID.getMessage());
     }
+
+    public String updateEmail(String userId, String newEmail) {
+        UserEntity user = userRepository.findByEmail(userId).orElse(null);
+
+        if (user == null) {
+            throw new EntityNotFoundException("해당하는 사용자가 없습니다.");
+        }
+
+        // 이메일 형식 검사
+        if (!newEmail.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            throw new IllegalArgumentException("잘못된 이메일 형식입니다.");
+        }
+
+        // 이메일 중복 확인
+        if (userRepository.findByEmail(newEmail).isPresent()) {
+            throw new DuplicateKeyException("이미 존재하는 이메일입니다.");
+        }
+
+        user.setEmail(newEmail);
+        userRepository.save(user);
+
+        return user.getEmail(); // 업데이트된 이메일 반환
+    }
+
 }

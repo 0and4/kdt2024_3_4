@@ -49,18 +49,16 @@ const StyledModalInput = styled(ModalInput)`
 `;
 
 const MPEdit2 = ({ isOpen, onClose }) => {
-  // 입력값 상태
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [nickname, setNickname] = useState("");
 
-  // 각 필드의 변경(확인) 상태. 사용자가 변경 버튼을 눌러 유효성 검사 통과하면 true가 됩니다.
+  // 각 필드의 변경(확인) 상태. 사용자가 변경 버튼을 눌러 유효성 검사 통과하면 true 됨됨
   const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false);
   const [isEmailConfirmed, setIsEmailConfirmed] = useState(false);
   const [isNicknameConfirmed, setIsNicknameConfirmed] = useState(false);
 
   // 비밀번호 변경
-  // 영문, 숫자, 특수문자를 포함하여 8자 이상이어야 함
   const handlePasswordChange = async () => {
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
     if (!passwordRegex.test(password)) {
@@ -79,9 +77,9 @@ const MPEdit2 = ({ isOpen, onClose }) => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // 인증 토큰 추가
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ value: password }), // 새로운 비밀번호 전달
+          body: JSON.stringify({ value: password }),
         }
       );
 
@@ -89,7 +87,7 @@ const MPEdit2 = ({ isOpen, onClose }) => {
         const data = await response.json();
         console.log("비밀번호 변경 성공:", data);
         alert("비밀번호 변경이 완료되었습니다.");
-        setIsPasswordConfirmed(true); // 비밀번호 변경 완료 상태 업데이트
+        setIsPasswordConfirmed(true);
       } else {
         const errorData = await response.json();
         console.error("비밀번호 변경 실패:", errorData);
@@ -101,7 +99,7 @@ const MPEdit2 = ({ isOpen, onClose }) => {
     }
   };
 
-  // 이메일 변경 (수정 필요, 백엔드 이메일 변경 코드 추가 필요)
+  // 이메일 변경
   const handleEmailChange = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -109,32 +107,35 @@ const MPEdit2 = ({ isOpen, onClose }) => {
       return;
     }
 
-    const token = sessionStorage.getItem("access_token"); // 저장된 JWT 토큰 가져오기
+    const token = sessionStorage.getItem("access_token");
     console.log("보내는 토큰:", token);
     console.log("요청할 새 이메일:", email);
 
     try {
-      const response = await fetch(
-        "http://localhost:8080/profile/edit?editType=EMAIL",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // 인증 토큰 추가
-          },
-          body: JSON.stringify({ value: email }), // 새로운 이메일 전달
-        }
-      );
+      const url = new URL("http://localhost:8080/profile/edit");
+      url.searchParams.append("editType", "EMAIL");
+
+      const response = await fetch(url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ value: email }),
+      });
 
       if (response.ok) {
         const data = await response.json();
         console.log("이메일 변경 성공:", data);
+
+        sessionStorage.setItem("user_email", email);
+        setEmail(email); // UI 업데이트
         alert("이메일 변경이 완료되었습니다.");
-        setIsEmailConfirmed(true); // 이메일 변경 완료 상태 업데이트
+        setIsEmailConfirmed(true);
       } else {
         const errorData = await response.json();
         console.error("이메일 변경 실패:", errorData);
-        alert("이메일 변경에 실패했습니다.");
+        alert(`이메일 변경에 실패했습니다. (${errorData.error})`);
       }
     } catch (error) {
       console.error("네트워크 오류:", error);
@@ -149,7 +150,7 @@ const MPEdit2 = ({ isOpen, onClose }) => {
       return;
     }
 
-    const token = sessionStorage.getItem("access_token"); // 저장된 토큰 가져오기
+    const token = sessionStorage.getItem("access_token");
 
     try {
       const response = await fetch(
@@ -160,7 +161,7 @@ const MPEdit2 = ({ isOpen, onClose }) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ value: nickname }), // 변경할 별명 전달
+          body: JSON.stringify({ value: nickname }),
         }
       );
 
@@ -169,7 +170,7 @@ const MPEdit2 = ({ isOpen, onClose }) => {
       }
 
       const data = await response.json();
-      console.log("변경된 별명:", data.nickname); // 응답 데이터 확인
+      console.log("변경된 별명:", data.nickname);
       alert("별명이 성공적으로 변경되었습니다!");
       setIsNicknameConfirmed(true);
     } catch (error) {
@@ -185,9 +186,14 @@ const MPEdit2 = ({ isOpen, onClose }) => {
       alert("변경 버튼을 눌러 변경사항을 확인하세요.");
       return;
     }
+
     console.log("저장된 정보:", { password, email, nickname });
+
+    if (isEmailConfirmed) {
+      sessionStorage.setItem("user_email", email);
+    }
+
     alert("저장이 완료되었습니다.");
-    // 모든 입력값 및 확인 플래그 초기화
     setPassword("");
     setEmail("");
     setNickname("");
@@ -197,7 +203,6 @@ const MPEdit2 = ({ isOpen, onClose }) => {
     onClose();
   };
 
-  // 모달의 x(닫기) 버튼 클릭 시 모든 상태 초기화
   const handleClose = () => {
     setPassword("");
     setEmail("");
@@ -261,7 +266,7 @@ const MPEdit2 = ({ isOpen, onClose }) => {
           <SmallButton onClick={handleNicknameChange}>변경</SmallButton>
         </InputContainer>
       </div>
-      {/* 저장 버튼은 하나라도 변경 확인된 필드가 있을 때 활성화 */}
+      {/* 저장 버튼 중 하나라도 변경된 필드가 있을 때 활성화 */}
       <SaveButton
         onClick={handleSave}
         disabled={

@@ -96,7 +96,7 @@ function ActionButtons({ songId, song, type, liked, onToggleLike,onAddClick, onP
   
   const closePopup = () => setPopupPosition(null);
   
-  const handlePlay = () => {
+  const handlePlay =async () => {
     const token = sessionStorage.getItem("access_token"); // 세션에서 access token 확인
     if (!token) {
       alert("로그인 후 곡 재생 기능을 이용할 수 있습니다.");
@@ -111,6 +111,31 @@ function ActionButtons({ songId, song, type, liked, onToggleLike,onAddClick, onP
       console.error("onPlay 함수가 정의되지 않았습니다.");
       return;
     }
+
+    // try {
+    //   console.log(`🎵 서버로 재생 요청: http://localhost:8080/stream/play/${song.id}`); 
+    //   console.log(`🔑 전송할 토큰: ${token}`);
+    //   // ✅ Spring Boot 서버로 요청 전송
+    //   const response = await fetch(`http://localhost:8080/stream/play/${song.id}`, {
+    //     method: "GET",
+    //     headers: {
+    //       "Authorization": `Bearer ${token}`, // ✅ 토큰을 Authorization 헤더에 추가
+    //       "Content-Type": "application/json",
+    //     },
+    //   });
+
+    //   if (!response.ok) {
+    //     throw new Error(`서버 오류: ${response.status}`);
+    //   }
+
+    //   console.log(`🎵 서버에서 재생 요청 성공: ${song.title}`);
+    //   onPlay(song); // ✅ Player.js에 곡 정보 전달 (정상 요청 후 실행)
+      
+    // } catch (error) {
+    //   console.error("🚨 재생 요청 중 오류 발생:", error);
+    //   alert("음악을 재생하는 도중 오류가 발생했습니다.");
+    // }
+    
     onPlay(song); // Player.js의 handlePlaySong 호출
     // 여기에 실제 노래 재생 로직 추가
   };
