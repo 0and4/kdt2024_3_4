@@ -111,8 +111,6 @@ function SongList({ showAll, headerTitle, songs = [] }) {
   const [allSelected, setAllSelected] = useState(false);
   const [likedSongs, setLikedSongs] = useState({});
   const [albumIds, setAlbumIds] = useState({});
-  const [popupPosition, setPopupPosition] = useState(null);
-const [selectedSongId, setSelectedSongId] = useState(null);
 
   const fetchAlbumId = async (albumName) => {
     try {
@@ -219,7 +217,7 @@ const [selectedSongId, setSelectedSongId] = useState(null);
         <CheckboxColumn>
         <input
           type="checkbox"
-          checked={Array.isArray(selectedSongs) && selectedSongs.includes(songId)}
+          checked={selectedSongs.includes(songId)}
           onChange={() => handleCheckboxChange(songId)}
         />
         </CheckboxColumn>
@@ -260,13 +258,11 @@ const [selectedSongId, setSelectedSongId] = useState(null);
         </LikeColumn>
         <ActionColumn>
         <ActionButtons 
-  songId={songId} 
-  type="add" 
-  onAddClick={(songId, position) => {
-    setPopupPosition(position); // 팝업 위치 설정
-    setSelectedSongId(songId); // 선택한 노래 ID 저장
-  }} 
-/>
+          songId={songId} 
+          type="add" 
+          onAddClick={(songId, position) => {
+          }} 
+        />
         </ActionColumn>
         <PlayColumn>
           <ActionButtons songId={songId} song={song} type="play" />
