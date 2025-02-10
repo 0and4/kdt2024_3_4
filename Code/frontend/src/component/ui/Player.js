@@ -335,11 +335,21 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
     return () => clearInterval(interval);
   }, [isPlaying, currentTime, totalDuration, isDragging]);
 
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
+  // const formatTime = (time) => {
+  //   const minutes = Math.floor(time / 60);
+  //   const seconds = time % 60;
+  //   return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  // };
+  const formatTime = (milliseconds) => {
+    if (!milliseconds || isNaN(milliseconds)) return "0:00";
+  
+    const totalSeconds = Math.floor(milliseconds / 1000); // 🔥 밀리초 → 초 변환
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+  
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };  
+  
   const handleProgressClick = (e) => {
     if (!progressRef.current) return;
 
