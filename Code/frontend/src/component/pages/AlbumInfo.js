@@ -90,8 +90,8 @@ function AlbumInfo() {
   if (error)
     return (
       <p>
-        아티스트의 발매 앨범에서는 연동되는데 나머지에서 연동되고 있지 않음,,{" "}
-        <br />곧 수정하겠습니다 ㅜ ㅜ.. {error}
+        페이지 로딩 중 오류가 발생했습니다.
+        <br />{error}
       </p>
     );
 

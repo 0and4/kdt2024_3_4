@@ -65,7 +65,14 @@ const AlbumItem = styled.div`
 const TitleP = styled.p`
   font-weight: bold;
 `;
-
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+`;
 const formatPlayTime = (playTime) => {
   if (!playTime || playTime === 0) return "3:00";
   const minutes = Math.floor(playTime / 60);
@@ -229,13 +236,13 @@ function ArtistInfo() {
                   <AlbumItem key={album.id}>
                     <img src={album.cover} alt={album.name} />
                     <div>
-                      <Link
+                      <StyledLink
                         to={`/album/${album.id}?artist=${encodeURIComponent(
                           artistData.name
                         )}`}
                       >
                         <TitleP>{album.name}</TitleP>
-                      </Link>
+                      </StyledLink>
                     </div>
                   </AlbumItem>
                 );
