@@ -45,8 +45,9 @@ public class SecurityConfig {
                         .requestMatchers("/search/**").permitAll()
                         .requestMatchers("/stream/**").hasAnyAuthority("PREMIUM","NORMAL")
                         .requestMatchers("/playList/normal/**").hasAnyAuthority("PREMIUM", "NORMAL")
-                        .requestMatchers("/playList/recommend/**").hasAnyAuthority("PREMIUM")
-                        .requestMatchers("/profile/**").hasAnyAuthority("NORMAL", "PREMIUM")
+                        .requestMatchers("/playList/recommend/**").hasAnyAuthority("PREMIUM", "NORMAL") //추천 플리 구현을 위해 잠시 NORMAL까지 허용
+                        .requestMatchers("/profile/**").authenticated() // 마이페이지 구현을 위해 로그인된 사용자 모두 허용
+                        //.requestMatchers("/profile/**").hasAnyAuthority("NORMAL", "PREMIUM")
                         .anyRequest().permitAll() // 나머지 요청은 인증 필요X
 
                 );

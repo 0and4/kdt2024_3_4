@@ -172,11 +172,7 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
   const progressRef = useRef(null);
   const [playlist, setLocalPlaylist] = useState(propPlaylist); // 내부 상태 관리
   const audioRef = useRef(new Audio());
-  // const [playlist] = useState([
-  //   { title: "title 1", artist: "artist 1", duration: 188 },
-  //   { title: "title 2", artist: "artist 2", duration: 192 },
-  //   { title: "title 3", artist: "artist 3", duration: 220 },
-  // ]);
+
   // ✅ propPlaylist가 변경될 때, Player 내부 상태 업데이트
   useEffect(() => {
     setLocalPlaylist(propPlaylist);
@@ -281,9 +277,6 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
     }
   };
 
-  // const togglePlay = () => {
-  //   setIsPlaying((prev) => !prev);
-  // };
   const playNext = () => {
     setCurrentIndex((prev) => (prev < playlist.length - 1 ? prev + 1 : 0));
   };
@@ -307,8 +300,14 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
   useEffect(() => {
     if (playlist.length > 0) {
       const newSong = playlist[currentIndex];
+      let duration = newSong.playTime; // 서버에서 받은 playTime
+
+      if (!duration || duration === 0) {
+        duration = 190000; // 🔥 playTime이 0이면 3분 10초(190초)로 설정
+      }
+
       setCurrentSong(newSong);
-      setTotalDuration(newSong.playTime);
+      setTotalDuration(duration);
       setProgress(0); // 노래가 바뀌면 프로그레스 바 초기화
       setCurrentTime(0); // 시작 시간 0초로 초기화
     }
@@ -335,11 +334,6 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
     return () => clearInterval(interval);
   }, [isPlaying, currentTime, totalDuration, isDragging]);
 
-  // const formatTime = (time) => {
-  //   const minutes = Math.floor(time / 60);
-  //   const seconds = time % 60;
-  //   return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  // };
   const formatTime = (milliseconds) => {
     if (!milliseconds || isNaN(milliseconds)) return "0:00";
   

@@ -215,11 +215,11 @@ function SongList({ showAll, headerTitle, songs = [], onPlay }) {
     return (
       <TableRow key={songId}>
         <CheckboxColumn>
-          <input
-            type="checkbox"
-            checked={selectedSongs.includes(songId)}
-            onChange={() => handleCheckboxChange(songId)}
-          />
+        <input
+          type="checkbox"
+          checked={selectedSongs.includes(songId)}
+          onChange={() => handleCheckboxChange(songId)}
+        />
         </CheckboxColumn>
         <NumberColumn>{displayNumber}</NumberColumn>
         <SongInfoColumn>
@@ -257,7 +257,12 @@ function SongList({ showAll, headerTitle, songs = [], onPlay }) {
           />
         </LikeColumn>
         <ActionColumn>
-          <ActionButtons songId={songId} type="add" />
+        <ActionButtons 
+          songId={songId} 
+          type="add" 
+          onAddClick={(songId, position) => {
+          }} 
+        />
         </ActionColumn>
         <PlayColumn>
           <ActionButtons songId={songId} song={song} type="play" onPlay={onPlay} />
