@@ -174,11 +174,16 @@ function Header({ activeMenu, onMenuClick }) {
   };
 
   const handleLogoutClick = () => {
-    // 세션에서 토큰 삭제
-    sessionStorage.removeItem("access_token");
-    sessionStorage.removeItem("refresh_token");
-    sessionStorage.removeItem("name");
-    setIsLoggedIn(false); // 로그인 상태 변경
+    const confirmLogout = window.confirm("로그아웃 하시겠습니까?");
+    if (confirmLogout) {
+      // 세션에서 토큰 삭제
+      sessionStorage.removeItem("access_token");
+      sessionStorage.removeItem("refresh_token");
+      sessionStorage.removeItem("name");
+      setIsLoggedIn(false); // 로그인 상태 변경
+      alert("로그아웃 되었습니다."); // 로그아웃 완료 알림
+      window.location.reload();
+    }
   };
 
   return (
