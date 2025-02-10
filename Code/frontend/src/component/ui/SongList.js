@@ -105,7 +105,7 @@ const SongInfo = styled.div`
   min-width:100px;
 `;
 
-function SongList({ showAll, headerTitle, songs = [] }) {
+function SongList({ showAll, headerTitle, songs = [], onPlay }) {
   const navigate = useNavigate();
   const [selectedSongs, setSelectedSongs] = useState([]);
   const [allSelected, setAllSelected] = useState(false);
@@ -265,7 +265,7 @@ function SongList({ showAll, headerTitle, songs = [] }) {
         />
         </ActionColumn>
         <PlayColumn>
-          <ActionButtons songId={songId} song={song} type="play" />
+          <ActionButtons songId={songId} song={song} type="play" onPlay={onPlay} />
         </PlayColumn>
       </TableRow>
     );
