@@ -122,4 +122,17 @@ public class PlayListService {
                 .title(title)
                 .build();
     }
+
+    public boolean deletePlayList(Long playlistId, String userId) {
+        PlayList playList = playListRepository.findById(playlistId)
+                .orElseThrow(() -> new IllegalArgumentException("플레이리스트를 찾을 수 없습니다."));
+
+        if (!playList.getUser().getId().equals(userId)) {
+            return false; // 권한이 없는 경우
+        }
+
+        playListRepository.delete(playList);
+        return true;
+    }
+
 }
