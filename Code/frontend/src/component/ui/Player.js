@@ -311,12 +311,12 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
           <Container>
             <SongPlayDiv>
               <AlbumJacket>
-                <img
+                {/* <img
                   src={currentSong.image}
                   alt={currentSong.track}
                   width="180"
                   height="180"
-                />
+                /> */}
               </AlbumJacket>
               <SongTitleP>
                 {currentSong ? currentSong.track : "No Song"}
