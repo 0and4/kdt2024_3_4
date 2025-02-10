@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaChevronRight, FaChevronUp } from "react-icons/fa";
 import SongList from "../ui/SongList";
 import { Wrapper, Container } from "../ui/AllDiv";
@@ -101,8 +101,10 @@ const NoResultsText = styled.p`
 `;
 
 function Search() {
+  const scrollPosition = useRef(0);
   const location = useLocation();
   const query = new URLSearchParams(location.search).get("query") || "";
+  const navigate = useNavigate();
 
   const [songs, setSongs] = useState([]);
   const [albums, setAlbums] = useState([]);
@@ -114,43 +116,95 @@ function Search() {
   const [showAllAlbums, setShowAllAlbums] = useState(false);
   const [showAllArtists, setShowAllArtists] = useState(false);
 
+  const fetchAlbumId = async (albumName) => {
+    try {
+      const response = await fetch(`http://localhost:8080/search/?keyword=ALBUM&value=${encodeURIComponent(albumName)}`);
+      if (!response.ok) {
+        throw new Error(`서버 응답 실패: ${response.status}`);
+      }
+      const data = await response.json();
+      
+      if (data.dataList && data.dataList.length > 0) {
+        return data.dataList[0].id;
+      } else {
+        throw new Error("앨범을 찾을 수 없습니다.");
+      }
+    } catch (error) {
+      console.error("앨범 ID를 가져오는 중 에러가 발생했습니다:", error);
+      return null;
+    }
+  };
+
+  const handleAlbumClick = async (e, albumName) => {
+    e.preventDefault();  // 링크 기본 동작을 막음
+
+    const albumId = await fetchAlbumId(albumName);  // 앨범명으로 앨범 ID 가져오기
+    if (albumId) {
+      navigate(`/album/${albumId}`);  // 앨범 ID로 이동
+    }
+  };
+
+  const handleToggle = (setter) => {
+    scrollPosition.current = window.scrollY; // 현재 스크롤 위치 저장
+    setter((prev) => !prev); // 상태 변경
+  };
+
+  useEffect(() => {
+    window.scrollTo(0, scrollPosition.current); // 스크롤 위치 복원
+  }, [showAllSongs, showAllAlbums, showAllArtists]);
+
   useEffect(() => {
     if (!query) return;
-
     setLoading(true);
+    setError(null);
+
+    const controller = new AbortController();
+    const signal = controller.signal;
+
     const songUrl = `http://localhost:8080/search/?keyword=SONG&value=${query}&size=${showAllSongs ? 20 : 5}`;
-  const albumUrl = `http://localhost:8080/search/?keyword=ALBUM&value=${query}&size=${showAllAlbums ? 20 : 4}`;
-  const artistUrl = `http://localhost:8080/search/?keyword=ARTIST&value=${query}&size=${showAllArtists ? 20 : 4}`;
+    const albumUrl = `http://localhost:8080/search/?keyword=ALBUM&value=${query}&size=${showAllAlbums ? 20 : 4}`;
+    const artistUrl = `http://localhost:8080/search/?keyword=ARTIST&value=${query}&size=${showAllArtists ? 20 : 4}`;
 
     Promise.all([
-      fetch(songUrl).then((res) => res.json()),
-      fetch(albumUrl).then((res) => res.json()),
-      fetch(artistUrl).then((res) => res.json()),
+      fetch(songUrl, {signal}).then((res) => res.json()),
+      fetch(albumUrl, {signal}).then((res) => res.json()),
+      fetch(artistUrl, {signal}).then((res) => res.json()),
     ])
       .then(([songData, albumData, artistData]) => {
-        setSongs(songData.dataList || []);
-        setAlbums(albumData.dataList || []);
-        setArtists(artistData.dataList || []);
+        if(!signal.aborted){
+          setSongs(songData.dataList || []);
+          setAlbums(albumData.dataList || []);
+          setArtists(artistData.dataList || []);
+        }
       })
       .catch((error) => {
-        console.error("Error fetching data:", error);
-        setError("데이터를 불러오는 데 오류가 발생했습니다."); // 에러 메시지를 상태에 설정
+        if (error.name === "AbortError") {
+          console.log("요청이 취소되었습니다.");
+        } else {
+          console.error("데이터를 불러오는 중 오류 발생:", error);
+          setError("데이터를 불러오는 데 실패했습니다.");
+        }
       })
-      .finally(() => setLoading(false));
-}, [query, showAllSongs, showAllAlbums, showAllArtists]);
-
+      .finally(() => {
+        if (!signal.aborted) setLoading(false);
+      });
+  
+    return () => {
+      controller.abort(); // 컴포넌트 언마운트 시 요청 취소
+    };
+  }, [query, showAllSongs, showAllAlbums, showAllArtists]);
 
   if (loading) return <p>로딩 중...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   // playTime을 변환하는 함수
-const formatPlayTime = (playTime) => {
-  if (!playTime || playTime === 0) return "3:00"; // playTime이 0이면 기본값 3:00
+  const formatPlayTime = (playTime) => {
+    if (!playTime || playTime === 0) return "3:00"; // playTime이 0이면 기본값 3:00
 
-  const minutes = Math.floor(playTime / 60000); // 밀리초 → 분 변환
-  const seconds = Math.floor((playTime % 60000) / 1000); // 밀리초 → 초 변환
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`; // 2자리 초 포맷
-};
+    const minutes = Math.floor(playTime / 60000); // 밀리초 → 분 변환
+    const seconds = Math.floor((playTime % 60000) / 1000); // 밀리초 → 초 변환
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`; // 2자리 초 포맷
+  };
 
   return (
     <Wrapper>
@@ -163,7 +217,7 @@ const formatPlayTime = (playTime) => {
         <Section>
           <ResultDiv>
             <TitleP>곡명으로 검색</TitleP>
-            <button onClick={() => setShowAllSongs((prev) => !prev)} className="more-btn">
+            <button onClick={() => handleToggle(setShowAllSongs)} className="more-btn">
               {showAllSongs ? "접기" : "더보기"} {showAllSongs ? <FaChevronUp /> : <FaChevronRight />}
             </button>
           </ResultDiv>
@@ -188,7 +242,7 @@ const formatPlayTime = (playTime) => {
         <Section>
           <ResultDiv>
             <TitleP>앨범명으로 검색</TitleP>
-            <button onClick={() => setShowAllAlbums((prev) => !prev)} className="more-btn">
+            <button onClick={() => handleToggle(setShowAllAlbums)} className="more-btn">
               {showAllAlbums ? "접기" : "더보기"} {showAllAlbums ? <FaChevronUp /> : <FaChevronRight />}
             </button>
           </ResultDiv>
@@ -199,7 +253,11 @@ const formatPlayTime = (playTime) => {
                 <ListItem key={album.id}>
                   <img src={album.url || "https://via.placeholder.com/100"} alt={album.name} />
                   <div>
-                    <Link to={`/album/${album.name}`} style={{ textDecoration: "none", color: "black" }}>
+                    <Link
+                      to={`/album/${album.name}`}
+                      style={{ textDecoration: "none", color: "black" }}
+                      onClick={(e) => handleAlbumClick(e, album.name)} // 앨범 클릭 시 앨범 ID를 가져오는 함수 호출
+                    >
                       <TitleP>{album.name}</TitleP>
                     </Link>
                     <Link to={`/artist/${album.artist}`} style={{ textDecoration: "none", color: "black" }}>
@@ -218,7 +276,7 @@ const formatPlayTime = (playTime) => {
         <Section>
           <ResultDiv>
             <TitleP>아티스트명으로 검색</TitleP>
-            <button onClick={() => setShowAllArtists((prev) => !prev)} className="more-btn">
+            <button onClick={() => handleToggle(setShowAllArtists)} className="more-btn">
               {showAllArtists ? "접기" : "더보기"} {showAllArtists ? <FaChevronUp /> : <FaChevronRight />}
             </button>
           </ResultDiv>

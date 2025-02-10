@@ -110,6 +110,38 @@ function SongList({ showAll, headerTitle, songs = [], onPlay }) {
   const [selectedSongs, setSelectedSongs] = useState([]);
   const [allSelected, setAllSelected] = useState(false);
   const [likedSongs, setLikedSongs] = useState({});
+  const [albumIds, setAlbumIds] = useState({});
+
+  const fetchAlbumId = async (albumName) => {
+    try {
+      // 앨범명으로 앨범 목록을 검색
+      const response = await fetch(`http://localhost:8080/search/?keyword=ALBUM&value=${encodeURIComponent(albumName)}`);
+      const data = await response.json();
+      
+      if (data.dataList && data.dataList.length > 0) {
+        return data.dataList[0].id;
+      } else {
+        throw new Error("앨범을 찾을 수 없습니다.");
+      }
+    } catch (error) {
+      console.error("앨범 ID를 가져오는 중 에러가 발생했습니다:", error);
+      return null;
+    }
+  };
+
+  const handleAlbumClick = async (e, songId, albumName) => {
+    if (albumIds[songId]) return;  // 앨범 ID가 이미 있을 경우 fetch 하지 않음
+    e.preventDefault();  // 페이지 이동을 잠시 막음
+
+    const albumId = await fetchAlbumId(albumName);
+    if (albumId) {
+      setAlbumIds((prev) => ({
+        ...prev,
+        [songId]: albumId,
+      }));
+      navigate(`/album/${albumId}`);
+    }
+  };
 
   const handleCheckboxChange = (id) => {
     setSelectedSongs((prev) => {
@@ -208,7 +240,12 @@ function SongList({ showAll, headerTitle, songs = [], onPlay }) {
           </SongInfoContainer>
         </SongInfoColumn>
         <AlbumColumn>
-          <SongLink to={`/album/${song.album}`}>{song.album}</SongLink>
+          <SongLink
+            to={albumIds[songId] ? `/album/${albumIds[songId]}` : "#"} // 앨범 ID가 있을 때만 링크를 사용하고, 없으면 빈 링크 처리
+            onClick={(e) => handleAlbumClick(e, songId, song.album)}
+          >
+            {song.album}
+          </SongLink>
         </AlbumColumn>
         <PlayTimeColumn>{playTime}</PlayTimeColumn>
         <LikeColumn>
