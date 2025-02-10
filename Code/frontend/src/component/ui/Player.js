@@ -240,7 +240,7 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
     if (playlist.length > 0) {
       const newSong = playlist[currentIndex];
       setCurrentSong(newSong);
-      setTotalDuration(newSong.duration);
+      setTotalDuration(newSong.playTime);
       setProgress(0); // 노래가 바뀌면 프로그레스 바 초기화
       setCurrentTime(0); // 시작 시간 0초로 초기화
     }
