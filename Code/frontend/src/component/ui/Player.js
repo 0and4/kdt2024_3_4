@@ -212,10 +212,56 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
       setCurrentSong(playlist[currentIndex]);
     }
   }, [currentIndex, playlist]);
+  // ✅ 서버에 재생 요청을 보내는 함수
+  const requestPlayFromServer = async () => {
+    if (!currentSong) {
+      alert("재생할 곡이 없습니다.");
+      return;
+    }
 
-  const togglePlay = () => {
-    setIsPlaying((prev) => !prev);
+    const token = sessionStorage.getItem("access_token");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      console.log(`🎵 서버로 재생 요청: ${currentSong.id}`);
+      console.log(`서버로 보내는 토큰 :  ${token}`);
+
+      const response = await fetch(`http://localhost:8080/stream/play/${currentSong.id}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`서버 오류: ${response.status}`);
+      }
+
+      console.log(`🎵 서버에서 재생 요청 성공: ${currentSong.track}`);
+      setIsPlaying(true); // ✅ 실제 재생 상태 변경
+
+    } catch (error) {
+      console.error("🚨 재생 요청 중 오류 발생:", error);
+      alert("음악을 재생하는 도중 오류가 발생했습니다.");
+    }
   };
+
+  // ✅ Play/Pause 버튼 클릭 이벤트
+  const togglePlay = () => {
+    if (!isPlaying) {
+      requestPlayFromServer(); // ✅ 서버에 요청 후 재생
+    } else {
+      setIsPlaying(false); // ✅ 일시정지
+    }
+  };
+
+  // const togglePlay = () => {
+  //   setIsPlaying((prev) => !prev);
+  // };
   const playNext = () => {
     setCurrentIndex((prev) => (prev < playlist.length - 1 ? prev + 1 : 0));
   };
