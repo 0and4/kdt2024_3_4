@@ -172,11 +172,7 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
   const progressRef = useRef(null);
   const [playlist, setLocalPlaylist] = useState(propPlaylist); // 내부 상태 관리
   const audioRef = useRef(new Audio());
-  // const [playlist] = useState([
-  //   { title: "title 1", artist: "artist 1", duration: 188 },
-  //   { title: "title 2", artist: "artist 2", duration: 192 },
-  //   { title: "title 3", artist: "artist 3", duration: 220 },
-  // ]);
+
   // ✅ propPlaylist가 변경될 때, Player 내부 상태 업데이트
   useEffect(() => {
     setLocalPlaylist(propPlaylist);
