@@ -13,6 +13,8 @@ import Join from "./component/pages/Join";
 import FindId from "./component/pages/FindId";
 import FindPW from "./component/pages/FindPW";
 import PR from "./component/pages/PR";
+import MyPage from "./component/pages/MyPage";
+import MyPlaylistInfo from "./component/pages/MyPlaylistInfo";
 
 import { useState } from "react";
 import {
@@ -114,6 +116,8 @@ function App() {
               <Route path="/pr" element={<PR />} />
               <Route path="/album/:albumId" element={<AlbumInfo />} />
               <Route path="/album/:albumName" element={<AlbumInfo />} />
+              <Route path="/mypage" element={<MyPage />} />
+              <Route path="/my-playlist/:id" element={<MyPlaylistInfo />} />
             </Routes>
           </Container>
           <Player playlist={playlist} setPlaylist={setPlaylist} onPlay={handlePlaySong} />

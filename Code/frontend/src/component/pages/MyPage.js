@@ -1,25 +1,13 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import MPEdit1 from "../Popup/MPEdit1";
 import Subscribe1 from "../Popup/Subscribe1";
 import EditPL from "../Popup/EditPL";
-import { Wrapper as mpWrapper, Container as mpContainer } from "../ui/AllDiv";
-const Wrapper = styled(mpWrapper)`
-  width: 100%;
-  padding: 0;
-`;
-const Container = styled(mpContainer)`
-  width: 100%;
-  padding: 0;
-  @media (min-width: 769px) {
-    width: calc(100% - 70px);
-    margin: 0 auto;
-  }
-  @media (min-width: 1171px) {
-    width: calc(100% - 350px);
-    margin: 0 auto;
-  }
-`;
+import { Wrapper as MPWrapper, Container} from "../ui/AllDiv";
+const Wrapper = styled(MPWrapper)`
+height:auto;
+`
 
 const ProfileSection = styled.div`
   display: flex;
@@ -206,12 +194,16 @@ const generateRandomNickname = () => {
 };
 
 function MyPage() {
+  const navigate = useNavigate();
+
   const [isMPEdit1Open, setIsMPEdit1Open] = useState(false);
   const [isSubscribe1Open, setIsSubscribe1Open] = useState(false);
   const [isEditPLOpen, setIsEditPLOpen] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [email, setEmail] = useState("loading...");
   const [nickname, setNickname] = useState("로딩 중...");
+
+  const [playlists, setPlaylists] = useState([]);
 
   useEffect(() => {
     fetch("http://localhost:8080/profile/me", {
@@ -276,20 +268,92 @@ function MyPage() {
       .catch((error) => console.error("사용자 정보 요청 실패:", error));
   }, []);
 
-  const playlists = [
-    "내가 좋아하는 노래 💜",
-    "플레이리스트 1",
-    "앤틱한 카페에서 듣기 좋은 노래 모음 👑",
-  ];
+  useEffect(() => {
+    fetch("http://localhost:8080/playList/normal/my-thumb", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
+      },
+      credentials: "include",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`플레이리스트 불러오기 실패: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setPlaylists(data.dataList || []);
+      })
+      .catch((error) => console.error("플레이리스트 요청 실패:", error));
+  }, []);
 
+  const handlePlaylistClick = (playlist, event) => {
+    if (event.target.type === "checkbox") return; // 체크박스를 클릭한 경우 페이지 이동을 막음
+    navigate(`/my-playlist/${playlist.id}`, {
+      state: { playlistTitle: playlist.name }, // 제목 데이터 함께 전달
+    });
+  };
   const handleCheckboxChange = (playlist) => {
     setSelectedPlaylist(playlist === selectedPlaylist ? null : playlist);
   };
 
-  const handleDelete = (playlistName) => {
-    if (window.confirm(`"${playlistName}" 플레이리스트를 삭제하시겠습니까?`)) {
-      console.log(`"${playlistName}" 삭제됨`);
-    }
+  const handleEdit = (newName) => {
+    if (!selectedPlaylist) return;
+    
+    fetch("http://localhost:8080/playList/normal/edit", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        playlistId: selectedPlaylist.id,
+        title: newName,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`플레이리스트 수정 실패: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("수정된 플레이리스트:", data);
+        setPlaylists((prev) =>
+          prev.map((pl) => (pl.id === selectedPlaylist.id ? { ...pl, name: newName } : pl))
+        );
+        setIsEditPLOpen(false);
+      })
+      .catch((error) => console.error("플레이리스트 수정 오류:", error));
+  };
+  
+  const handleDelete = () => {
+    if (!selectedPlaylist) return;
+    if (!window.confirm(`\"${selectedPlaylist.name}\"을 삭제하시겠습니까?`)) return;
+  
+    fetch(`http://localhost:8080/playList/normal/delete/${selectedPlaylist.id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
+      },
+      credentials: "include",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`플레이리스트 삭제 실패: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(() => {
+        alert("플레이리스트 삭제 완료");
+        setPlaylists((prev) => prev.filter((pl) => pl.id !== selectedPlaylist.id));
+        setSelectedPlaylist(null);
+      })
+      .catch((error) => console.error("플레이리스트 삭제 오류:", error));
   };
 
   return (
@@ -344,14 +408,22 @@ function MyPage() {
             </EditButtons>
           </PlaylistHeader>
 
-          {playlists.map((playlist, index) => (
-            <PlaylistItem key={index}>
+          {playlists.map((playlist) => (
+            <PlaylistItem
+              key={playlist.id}
+              onClick={(e) => handlePlaylistClick(playlist, e)}
+            >
               <PlaylistThumbnail />
-              <PlaylistName>{playlist}</PlaylistName>
+                <PlaylistName>
+                    {playlist.name}
+                </PlaylistName>
               <Checkbox
                 type="checkbox"
                 checked={playlist === selectedPlaylist}
-                onChange={() => handleCheckboxChange(playlist)}
+                onChange={(e) => {
+                  e.stopPropagation(); // 이벤트 전파 방지
+                  handleCheckboxChange(playlist);
+                }}
               />
             </PlaylistItem>
           ))}
@@ -362,8 +434,8 @@ function MyPage() {
       <EditPL
         isOpen={isEditPLOpen}
         onClose={() => setIsEditPLOpen(false)}
-        playlistName={selectedPlaylist}
-        onSave={(newName) => console.log("새 플레이리스트 이름:", newName)}
+        playlistName={selectedPlaylist ? selectedPlaylist.name : ""}
+        onSave={(newName) => handleEdit(newName)} 
       />
     </Wrapper>
   );
