@@ -59,6 +59,17 @@ function App() {
   const [activeMenu, setActiveMenu] = useState("chart");
   const navigate = useNavigate();
   const location = useLocation();
+  const [playlist, setPlaylist] = useState([]);
+
+  const handlePlaySong = (song) => {
+    setPlaylist((prevPlaylist) => {
+      const isDuplicate = prevPlaylist.some((item) => item.id === song.id);
+      return isDuplicate ? prevPlaylist : [...prevPlaylist, song]; 
+    });
+    console.log("🔹 업데이트된 playlist:", playlist); // 확인용
+  };
+
+
 
   const onMenuClick = (menu) => {
     setActiveMenu(menu);
@@ -91,7 +102,7 @@ function App() {
           <Container>
             <Header activeMenu={activeMenu} onMenuClick={onMenuClick} />
             <Routes>
-              <Route path="*" element={<Main activeMenu={activeMenu} />} />
+              <Route path="*" element={<Main activeMenu={activeMenu} onPlay={handlePlaySong} />} />
               <Route path="/search" element={<Search />} />
               <Route path="/login" element={<LoginMenu />} />
               <Route path="/find-id" element={<FindId />} />
@@ -105,7 +116,8 @@ function App() {
               <Route path="/album/:albumName" element={<AlbumInfo />} />
             </Routes>
           </Container>
-          <Player />
+          <Player playlist={playlist} setPlaylist={setPlaylist} onPlay={handlePlaySong} />
+          {/* <Player /> */}
         </Wrapper>
       )}
     </div>

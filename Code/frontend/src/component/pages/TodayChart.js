@@ -23,7 +23,7 @@ const initialSongs = [
     duration: "3:45",
   }
 ];
-function TodayChart() {
+function TodayChart({ onPlay }) {
   //날짜 동적 표시
   const getCurrentDate = () => {
     const date = new Date();
@@ -100,7 +100,7 @@ function TodayChart() {
         </TodayP>
         <RecMenuDiv />
       </Container>
-      <SongList showAll={100} headerTitle="순위" songs={songs} />
+      <SongList showAll={100} headerTitle="순위" songs={songs} onPlay={onPlay} />
     </Wrapper>
   );
 }

@@ -105,8 +105,8 @@ const SongInfo = styled.div`
   min-width:100px;
 `;
 
-function SongList({ showAll, headerTitle, songs = [] }) {
-  const navigate = useNavigate(); // 페이지 이동 함수
+function SongList({ showAll, headerTitle, songs = [], onPlay }) {
+  const navigate = useNavigate();
   const [selectedSongs, setSelectedSongs] = useState([]);
   const [allSelected, setAllSelected] = useState(false);
   const [likedSongs, setLikedSongs] = useState({});
@@ -123,11 +123,7 @@ function SongList({ showAll, headerTitle, songs = [] }) {
   };
   
   const handleSelectAll = () => {
-    if (allSelected) {
-      setSelectedSongs([]);
-    } else {
-      setSelectedSongs(songs.map((song) => song.id));
-    }
+    setSelectedSongs(allSelected ? [] : songs.map((song) => song.id));
     setAllSelected(!allSelected);
   };
   
@@ -135,7 +131,7 @@ function SongList({ showAll, headerTitle, songs = [] }) {
   
 
   const handleToggleLike = (songId) => {
-    const token = sessionStorage.getItem("access_token"); // 세션에서 access token 확인
+    const token = sessionStorage.getItem("access_token");
     if (!token) {
       alert("로그인 후 이용할 수 있습니다.");
       navigate("/login");
@@ -173,6 +169,7 @@ function SongList({ showAll, headerTitle, songs = [] }) {
 <tbody>
   {displayedSongs.map((song, index) => {
     const songId = song.id || index + 1;
+    const displayNumber = headerTitle === "순위" ? song.rank : song.number;
 
     const convertToMinSec = (milliseconds) => {
       const totalSeconds = Math.floor(milliseconds / 1000); // 밀리초를 초로 변환
@@ -192,7 +189,7 @@ function SongList({ showAll, headerTitle, songs = [] }) {
             onChange={() => handleCheckboxChange(songId)}
           />
         </CheckboxColumn>
-        <NumberColumn>{song.rank}</NumberColumn>
+        <NumberColumn>{displayNumber}</NumberColumn>
         <SongInfoColumn>
           <SongInfoContainer>
             <SongCover>
@@ -226,7 +223,7 @@ function SongList({ showAll, headerTitle, songs = [] }) {
           <ActionButtons songId={songId} type="add" />
         </ActionColumn>
         <PlayColumn>
-          <ActionButtons songId={songId} song={song} type="play" />
+          <ActionButtons songId={songId} song={song} type="play" onPlay={onPlay} />
         </PlayColumn>
       </TableRow>
     );

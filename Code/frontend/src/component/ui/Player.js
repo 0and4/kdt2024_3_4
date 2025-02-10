@@ -159,7 +159,7 @@ const CompactPlayDiv = styled.div`
   display: flex;
   gap: 0;
 `;
-function Player() {
+function Player({ playlist: propPlaylist, setPlaylist }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
   const [currentSong, setCurrentSong] = useState(null);
@@ -170,11 +170,24 @@ function Player() {
   const [isDragging, setIsDragging] = useState(false);
   const [previousPressedOnce, setPreviousPressedOnce] = useState(false);
   const progressRef = useRef(null);
-  const [playlist] = useState([
-    { title: "title 1", artist: "artist 1", duration: 188 },
-    { title: "title 2", artist: "artist 2", duration: 192 },
-    { title: "title 3", artist: "artist 3", duration: 220 },
-  ]);
+  const [playlist, setLocalPlaylist] = useState(propPlaylist); // 내부 상태 관리
+  // const [playlist] = useState([
+  //   { title: "title 1", artist: "artist 1", duration: 188 },
+  //   { title: "title 2", artist: "artist 2", duration: 192 },
+  //   { title: "title 3", artist: "artist 3", duration: 220 },
+  // ]);
+  // ✅ propPlaylist가 변경될 때, Player 내부 상태 업데이트
+  useEffect(() => {
+    setLocalPlaylist(propPlaylist);
+  }, [propPlaylist]);
+
+  // ✅ 최신 곡이 자동으로 재생되도록 설정
+  useEffect(() => {
+    if (playlist.length > 0) {
+      setCurrentSong(playlist[playlist.length - 1]); // 최신 곡을 재생
+    }
+    console.log("🎶 Player 업데이트된 playlist:", playlist); // 확인용
+  }, [playlist]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -297,9 +310,16 @@ function Player() {
           {/* 전체 플레이어 */}
           <Container>
             <SongPlayDiv>
-              <AlbumJacket />
+              <AlbumJacket>
+                <img
+                  src={currentSong.image}
+                  alt={currentSong.track}
+                  width="180"
+                  height="180"
+                />
+              </AlbumJacket>
               <SongTitleP>
-                {currentSong ? currentSong.title : "No Song"}
+                {currentSong ? currentSong.track : "No Song"}
               </SongTitleP>
               <ArtistP>
                 {currentSong ? currentSong.artist : "No Artist"}
@@ -348,6 +368,7 @@ function Player() {
               playlist={playlist}
               setCurrentSong={setCurrentSong}
               setCurrentIndex={setCurrentIndex}
+              setPlaylist={setPlaylist}
             />
           </Container>
         </Wrapper>
