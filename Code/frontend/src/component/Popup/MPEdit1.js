@@ -12,12 +12,39 @@ const MPEdit1 = ({ isOpen, onClose }) => {
     onClose(); // 부모 onClose 호출
   };
 
-  const handleConfirm = () => {
-    if (password === "password123!") {
-      console.log("입력된 비밀번호:", password);
-      setIsMPEdit2Open(true);
-    } else {
-      alert("잘못된 비밀번호 입니다. 다시 입력해주세요.");
+  const handleConfirm = async () => {
+    if (!password) {
+      alert("비밀번호를 입력해주세요.");
+      return;
+    }
+
+    try {
+      console.log("API 요청 URL:", "http://localhost:8080/profile/check");
+      const token = sessionStorage.getItem("access_token");
+      console.log("보내는 accessToken:", token);
+
+      const response = await fetch("http://localhost:8080/profile/check", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // JWT 인증 토큰 추가
+        },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await response.json();
+      console.log("서버 응답:", data);
+
+      if (response.ok) {
+        console.log("비밀번호 확인 성공:", data);
+        setIsMPEdit2Open(true); // 다음 팝업 열기
+      } else {
+        console.log("비밀번호 확인 실패:", data);
+        alert("잘못된 비밀번호 입니다. 다시 입력해주세요.");
+      }
+    } catch (error) {
+      console.error("API 요청 오류:", error);
+      alert("서버 오류가 발생했습니다. 다시 시도해주세요.");
     }
   };
 

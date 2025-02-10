@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../images/logo.png";
 import { Header, BackButton, Logo } from "../ui/LoginDiv";
 
-import axios from 'axios';
+import axios from "axios";
 axios.defaults.withCredentials = false;
 
 const Wrapper = styled.div`
@@ -159,7 +159,7 @@ function Login() {
   //     if (response.status === 200) {
   //       // 응답 바디에서 토큰 추출
   //       const token = response.data.access_token;
-        
+
   //       // 토큰을 콘솔에 출력
   //       console.log("받은 토큰:", token);
   //       alert("로그인 성공. 환영합니다!");
@@ -172,21 +172,20 @@ function Login() {
   //   }
   // };
 
-
   //fetch방식
   const handleLogin = async () => {
     const loginData = { id, password };
-  
+
     try {
       // 로그인 요청을 fetch로 보내기
-      const response = await fetch('http://localhost:8080/user/form/login', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8080/user/form/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(loginData),
       });
-  
+
       // 응답이 정상일 경우
       if (response.ok) {
         const data = await response.json();
@@ -194,10 +193,10 @@ function Login() {
         const name = data.name;
 
         // 토큰을 sessionStorage에 저장
-      sessionStorage.setItem("access_token", token);
-      sessionStorage.setItem("refresh_token", token);
-      sessionStorage.setItem("name", name);
-        
+        sessionStorage.setItem("access_token", token);
+        sessionStorage.setItem("refresh_token", token);
+        sessionStorage.setItem("name", name);
+
         // 토큰을 콘솔에 출력
         console.log("받은 토큰:", token);
 
@@ -209,6 +208,7 @@ function Login() {
         // 로그인 실패 시
         const errorData = await response.json();
         setError("로그인 실패: 아이디 또는 비밀번호가 올바르지 않습니다.");
+        alert("로그인 실패: 아이디 또는 비밀번호가 올바르지 않습니다.");
         console.error("로그인 오류:", errorData);
       }
     } catch (error) {
@@ -217,7 +217,6 @@ function Login() {
       console.error("로그인 오류:", error);
     }
   };
-  
 
   return (
     <Wrapper>

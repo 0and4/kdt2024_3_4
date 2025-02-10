@@ -59,43 +59,127 @@ const MPEdit2 = ({ isOpen, onClose }) => {
   const [isEmailConfirmed, setIsEmailConfirmed] = useState(false);
   const [isNicknameConfirmed, setIsNicknameConfirmed] = useState(false);
 
-  // 비밀번호 변경 버튼 클릭 핸들러
-  // 영문, 숫자, 특수문자를 포함하여 8자 이상이어야 함.
-  const handlePasswordChange = () => {
+  // 비밀번호 변경
+  // 영문, 숫자, 특수문자를 포함하여 8자 이상이어야 함
+  const handlePasswordChange = async () => {
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
     if (!passwordRegex.test(password)) {
       alert("비밀번호는 영문, 숫자, 특수문자를 포함해 8자 이상이어야 합니다.");
       return;
     }
-    alert("비밀번호 변경이 완료되었습니다.");
-    setIsPasswordConfirmed(true);
+
+    const token = sessionStorage.getItem("access_token"); // 저장된 JWT 토큰 가져오기
+    console.log("보내는 토큰:", token);
+    console.log("요청할 새 비밀번호:", password);
+
+    try {
+      const response = await fetch(
+        "http://localhost:8080/profile/edit?editType=PASSWORD",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // 인증 토큰 추가
+          },
+          body: JSON.stringify({ value: password }), // 새로운 비밀번호 전달
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("비밀번호 변경 성공:", data);
+        alert("비밀번호 변경이 완료되었습니다.");
+        setIsPasswordConfirmed(true); // 비밀번호 변경 완료 상태 업데이트
+      } else {
+        const errorData = await response.json();
+        console.error("비밀번호 변경 실패:", errorData);
+        alert("비밀번호 변경에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("네트워크 오류:", error);
+      alert("네트워크 오류가 발생했습니다.");
+    }
   };
 
-  // 이메일 변경 버튼 클릭 핸들러
-  // 올바른 이메일 형식인지 검사합니다.
-  const handleEmailChange = () => {
+  // 이메일 변경 (수정 필요, 백엔드 이메일 변경 코드 추가 필요)
+  const handleEmailChange = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       alert("올바른 이메일 형식이 아닙니다.");
       return;
     }
-    alert("이메일 변경이 완료되었습니다.");
-    setIsEmailConfirmed(true);
+
+    const token = sessionStorage.getItem("access_token"); // 저장된 JWT 토큰 가져오기
+    console.log("보내는 토큰:", token);
+    console.log("요청할 새 이메일:", email);
+
+    try {
+      const response = await fetch(
+        "http://localhost:8080/profile/edit?editType=EMAIL",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // 인증 토큰 추가
+          },
+          body: JSON.stringify({ value: email }), // 새로운 이메일 전달
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("이메일 변경 성공:", data);
+        alert("이메일 변경이 완료되었습니다.");
+        setIsEmailConfirmed(true); // 이메일 변경 완료 상태 업데이트
+      } else {
+        const errorData = await response.json();
+        console.error("이메일 변경 실패:", errorData);
+        alert("이메일 변경에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("네트워크 오류:", error);
+      alert("네트워크 오류가 발생했습니다.");
+    }
   };
 
-  // 별명 변경 버튼 클릭 핸들러
-  // 별도 검증 없이 변경 버튼을 누르면 변경 완료 처리합니다.
-  const handleNicknameChange = () => {
+  // 별명 변경
+  const handleNicknameChange = async () => {
     if (nickname.trim() === "") {
       alert("별명은 비어있을 수 없습니다.");
       return;
     }
-    alert("별명 변경이 완료되었습니다. 저장 버튼을 눌러주세요.");
-    setIsNicknameConfirmed(true);
+
+    const token = sessionStorage.getItem("access_token"); // 저장된 토큰 가져오기
+
+    try {
+      const response = await fetch(
+        "http://localhost:8080/profile/edit?editType=NICKNAME",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ value: nickname }), // 변경할 별명 전달
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("별명 변경 실패");
+      }
+
+      const data = await response.json();
+      console.log("변경된 별명:", data.nickname); // 응답 데이터 확인
+      alert("별명이 성공적으로 변경되었습니다!");
+      setIsNicknameConfirmed(true);
+    } catch (error) {
+      console.error("별명 변경 오류:", error);
+      alert("별명 변경에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
-  // 저장 버튼 클릭 핸들러
-  // 하나라도 변경 버튼을 눌러 확인한 필드가 있어야 저장이 가능하도록 합니다.
+  // 저장 기능
+  // 하나라도 변경 버튼을 눌러 확인한 필드가 있어야 저장이 가능하도록 함
   const handleSave = () => {
     if (!(isPasswordConfirmed || isEmailConfirmed || isNicknameConfirmed)) {
       alert("변경 버튼을 눌러 변경사항을 확인하세요.");
