@@ -31,16 +31,21 @@ public class PaymentController {
             @RequestParam("pg_token") String pgToken
     ){
         KakaoApproveResponse kakaoApproveResponse = kaKaoPayService.approveResponse(pgToken);
-        return ResponseEntity.ok(kakaoApproveResponse);
+        // 결제 성공 후 localhost:3030으로 pg_token을 포함하여 리디렉션
+        String redirectUrl = "http://localhost:3030/mypage?pg_token=" + pgToken;
+        return ResponseEntity.status(302).header("Location", redirectUrl).build();
+//        return ResponseEntity.ok(kakaoApproveResponse);
     }
 
     /**
      * 결제 진행 중 취소
      */
     @GetMapping("/cancel")
-    public void cancel() {
-
-        throw new RuntimeException("오류 발생");
+    public ResponseEntity<Void> cancel() {
+//        throw new RuntimeException("오류 발생");
+        // 결제 취소 시 /mypage로 리디렉션하며 alert을 표시
+        String redirectUrl = "http://localhost:3030/mypage";
+        return ResponseEntity.status(302).header("Location", redirectUrl).build();
     }
 
     /**
@@ -48,8 +53,10 @@ public class PaymentController {
      */
 
     @GetMapping("/fail")
-    public void fail() {
-
-        throw new RuntimeException("오류 발생");
+    public ResponseEntity<Void> fail() {
+//        throw new RuntimeException("오류 발생");
+        // 결제 실패 시 /mypage로 리디렉션하며 alert을 표시
+        String redirectUrl = "http://localhost:3030/mypage";
+        return ResponseEntity.status(302).header("Location", redirectUrl).build();
     }
 }
