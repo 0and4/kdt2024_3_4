@@ -162,7 +162,7 @@ const CompactPlayDiv = styled.div`
 function Player({ playlist: propPlaylist, setPlaylist }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
-  const [currentSong, setCurrentSong] = useState(null);
+  const [currentSong, setCurrentSong] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -383,12 +383,12 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
           <Container>
             <SongPlayDiv>
               <AlbumJacket>
-                {/* <img
+                <img
                   src={currentSong.image}
                   alt={currentSong.track}
                   width="180"
                   height="180"
-                /> */}
+                />
               </AlbumJacket>
               <SongTitleP>
                 {currentSong ? currentSong.track : "No Song"}
