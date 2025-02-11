@@ -4,9 +4,6 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../images/logo.png";
 import { Header, BackButton, Logo } from "../ui/LoginDiv";
 
-import axios from "axios";
-axios.defaults.withCredentials = false;
-
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -142,38 +139,8 @@ function Login() {
     navigate("/"); //
   };
 
-  //axios 방식
-  // 로그인 버튼 클릭 시 로그인 검증
-  // const handleLogin = async () => {
-  //   const loginData = { id, password };
-
-  //   try {
-  //     // Spring Boot 서버에 로그인 요청 보내기
-  //     const response = await axios.post('http://localhost:8080/user/form/login', loginData, {
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     });
-
-  //     // 로그인 성공 시
-  //     if (response.status === 200) {
-  //       // 응답 바디에서 토큰 추출
-  //       const token = response.data.access_token;
-
-  //       // 토큰을 콘솔에 출력
-  //       console.log("받은 토큰:", token);
-  //       alert("로그인 성공. 환영합니다!");
-  //       navigate("/"); // 메인 페이지로 이동
-  //     }
-  //   } catch (error) {
-  //     // 로그인 실패 시
-  //     setError("로그인 실패: 아이디 또는 비밀번호가 올바르지 않습니다.");
-  //     console.error("로그인 오류:", error.response ? error.response.data : error.message);
-  //   }
-  // };
-
-  //fetch방식
-  const handleLogin = async () => {
+  const handleLogin = async (event) => {
+    event.preventDefault();
     const loginData = { id, password };
 
     try {
@@ -225,29 +192,32 @@ function Login() {
         {/* 뒤로 가기 버튼 */}
         <Logo src={logo} alt="Berrecommend 로고" onClick={handleLogoClick} />
       </Header>
-      <LoginBox>
-        <InputGroup>
-          <Label htmlFor="username">아이디</Label>
-          <Input
-            id="id"
-            type="text"
-            placeholder="아이디를 입력하세요"
-            value={id}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </InputGroup>
-        <InputGroup>
-          <Label htmlFor="password">비밀번호</Label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="비밀번호를 입력하세요"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </InputGroup>
-        <Button onClick={handleLogin}>로그인</Button>
-      </LoginBox>
+      <form onSubmit={handleLogin}>
+        <LoginBox>
+          <InputGroup>
+            <Label htmlFor="username">아이디</Label>
+            <Input
+              id="id"
+              type="text"
+              placeholder="아이디를 입력하세요"
+              value={id}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </InputGroup>
+          <InputGroup>
+            <Label htmlFor="password">비밀번호</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="비밀번호를 입력하세요"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </InputGroup>
+          <Button type="submit">로그인</Button>
+        </LoginBox>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+      </form>
       <TextLinks>
         <TextLink>
           아직 회원이 아니신가요?

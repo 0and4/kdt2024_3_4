@@ -15,7 +15,6 @@ const AddPL = ({ isOpen, onClose, playlistName, onSave }) => {
 
   const handleSave = () => {
     const trimmedName = name.trim();
-    console.log("Trimmed Name:", trimmedName);
     onSave(trimmedName);
     onClose();
   };

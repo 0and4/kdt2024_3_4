@@ -3,10 +3,23 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import MPEdit1 from "../Popup/MPEdit1";
 import Subscribe1 from "../Popup/Subscribe1";
+import AddPL from "../Popup/AddPL";
 import EditPL from "../Popup/EditPL";
-import { Wrapper as MPWrapper, Container} from "../ui/AllDiv";
+import { Wrapper as MPWrapper, Container as MPContainer} from "../ui/AllDiv";
 const Wrapper = styled(MPWrapper)`
-height:auto;
+  width: calc(100% - 310px);
+  margin-right:auto;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`
+const Container = styled(MPContainer)`
+ width:55vw;
+ margin: 0 auto;
+ padding:0 auto;
+ @media (max-width: 768px) {
+    width: 90%;
+  }
 `
 
 const ProfileSection = styled.div`
@@ -163,7 +176,12 @@ const SubscriptionButton = styled.button`
     color: white;
   }
 `;
-
+const AddPLWrapper = styled.div`
+  position: absolute;
+  top: -120px;
+  left: -20px;
+  z-index: 20;
+`;
 const generateRandomNickname = () => {
   const adjectives = [
     "달달한",
@@ -204,6 +222,7 @@ function MyPage() {
   const [nickname, setNickname] = useState("로딩 중...");
 
   const [playlists, setPlaylists] = useState([]);
+  const [showAddPL, setShowAddPL] = useState(false);
 
   useEffect(() => {
     fetch("http://localhost:8080/profile/me", {
@@ -221,7 +240,6 @@ function MyPage() {
         return response.json();
       })
       .then((data) => {
-        console.log("사용자 정보:", data);
         setEmail(data.email || "이메일 없음");
 
         // 각 계정(email)마다 닉네임을 다르게 저장하기 위해 키값을 "nickname_email" 형식으로 저장
@@ -256,7 +274,6 @@ function MyPage() {
               return response.json();
             })
             .then((updatedData) => {
-              console.log("닉네임 업데이트 성공:", updatedData);
               setNickname(updatedData.nickname);
               sessionStorage.setItem(nicknameKey, updatedData.nickname);
             })
@@ -299,6 +316,36 @@ function MyPage() {
     setSelectedPlaylist(playlist === selectedPlaylist ? null : playlist);
   };
 
+  const handleCreate = async (playlistName) =>{
+    if (!playlistName) return;
+
+    const cleanedName = playlistName.trim().replace(/^"|"$/g, '').replace(/\\"/g, '');
+    if (!cleanedName) {
+      alert("플레이리스트 이름을 입력해주세요.");
+      return;
+    }
+
+    try {
+      const token = sessionStorage.getItem("access_token");
+      const response = await fetch("http://localhost:8080/playList/normal/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(cleanedName),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setPlaylists([...playlists, { name: cleanedName }]); // 새로운 플레이리스트 추가
+      } else {
+        console.error("Failed to create playlist:", data);
+      }
+    } catch (error) {
+      console.error("Error creating playlist:", error);
+    }
+  }
   const handleEdit = (newName) => {
     if (!selectedPlaylist) return;
     
@@ -321,7 +368,6 @@ function MyPage() {
         return response.json();
       })
       .then((data) => {
-        console.log("수정된 플레이리스트:", data);
         setPlaylists((prev) =>
           prev.map((pl) => (pl.id === selectedPlaylist.id ? { ...pl, name: newName } : pl))
         );
@@ -332,7 +378,7 @@ function MyPage() {
   
   const handleDelete = () => {
     if (!selectedPlaylist) return;
-    if (!window.confirm(`\"${selectedPlaylist.name}\"을 삭제하시겠습니까?`)) return;
+    if (!window.confirm(`"${selectedPlaylist.name}"을 삭제하시겠습니까?`)) return;
   
     fetch(`http://localhost:8080/playList/normal/delete/${selectedPlaylist.id}`, {
       method: "DELETE",
@@ -349,7 +395,7 @@ function MyPage() {
         return response.json();
       })
       .then(() => {
-        alert("플레이리스트 삭제 완료");
+        alert("플레이리스트를 삭제했습니다!");
         setPlaylists((prev) => prev.filter((pl) => pl.id !== selectedPlaylist.id));
         setSelectedPlaylist(null);
       })
@@ -390,6 +436,12 @@ function MyPage() {
           <PlaylistHeader>
             <PlaylistTitle>내 플레이리스트</PlaylistTitle>
             <EditButtons>
+              <Button 
+                onClick={()=>setShowAddPL(true)}
+              >
+                생성
+              </Button>
+              |
               <Button
                 onClick={() => selectedPlaylist && setIsEditPLOpen(true)}
                 disabled={!selectedPlaylist}
@@ -408,9 +460,9 @@ function MyPage() {
             </EditButtons>
           </PlaylistHeader>
 
-          {playlists.map((playlist) => (
+          {playlists.map((playlist, index) => (
             <PlaylistItem
-              key={playlist.id}
+              key={playlist.id || index}
               onClick={(e) => handlePlaylistClick(playlist, e)}
             >
               <PlaylistThumbnail />
@@ -437,6 +489,11 @@ function MyPage() {
         playlistName={selectedPlaylist ? selectedPlaylist.name : ""}
         onSave={(newName) => handleEdit(newName)} 
       />
+      {showAddPL && (
+        <AddPLWrapper>
+          <AddPL isOpen={showAddPL} onClose={() => setShowAddPL(false)} onSave={handleCreate} />
+        </AddPLWrapper>
+      )}
     </Wrapper>
   );
 }
