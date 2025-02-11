@@ -2,21 +2,23 @@ import React, { useState } from "react";
 import Modal, { ModalInput, ModalButton } from "../Popup/Modal";
 import styled from "styled-components";
 
+const InputContainer = styled.div`
+  display: flex;
+  text-align:center;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  margin: 0 auto;
+`;
 const Label = styled.label`
   font-size: 17px;
   color: white;
   margin: 0 auto;
   width: 130px;
-`;
-
-const InputContainer = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  width: 350px;
-  margin-bottom: 5px;
+  justify-content: center;
+  height: 10px;
 `;
-
 const SmallButton = styled(ModalButton)`
   width: 80px;
   height: 35px;
@@ -42,6 +44,7 @@ const SaveButton = styled(ModalButton)`
 
 const StyledModalInput = styled(ModalInput)`
   font-size: 15px; /* 기본 폰트 크기 */
+  height: 15px;
   &::placeholder {
     font-size: 13px; /* 플레이스홀더 폰트 크기 */
     color: rgb(196, 196, 196);
@@ -219,6 +222,8 @@ const MPEdit2 = ({ isOpen, onClose }) => {
         style={{
           display: "flex",
           flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
           gap: "10px",
           width: "90%",
         }}

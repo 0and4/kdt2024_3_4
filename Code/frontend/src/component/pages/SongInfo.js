@@ -81,7 +81,6 @@ function SongInfo() {
   const songTitle = songData?.songName || "제목 없음";
   const artistName = songData?.artistName || "아티스트 정보 없음";
   const albumName = songData?.albumName || "앨범 정보 없음";
-  const albumId = songData?.albumId || "unknown";
   const lyrics = songData?.songLyrics || "가사 정보 없음";
   const albumImage = songData?.imageUrl || "/default-album.png";
 
