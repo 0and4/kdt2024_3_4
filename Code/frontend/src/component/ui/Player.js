@@ -263,8 +263,8 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
 
     } catch (error) {
       console.error("🚨 재생 요청 중 오류 발생:", error);
-      alert("음악을 재생하는 도중 오류가 발생했습니다.");
       playNext();
+      alert("음악을 재생하는 도중 오류가 발생했습니다.");
     }
   };
 
@@ -320,25 +320,52 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
     }
   }, [currentIndex, playlist]);
 
+  // ✅ 음악 재생이 끝나면 자동으로 다음 곡 재생
   useEffect(() => {
-    let interval;
+    const audio = audioRef.current;
+    
+    // 🔥 음악이 끝났을 때 자동으로 다음 곡으로 이동
+    audio.onended = () => {
+      console.log("🎵 음악 종료! 다음 곡으로 이동합니다.");
+      playNext();
+    };
+
+    // 🔥 재생 시간이 3분 10초를 초과하면 강제적으로 다음 곡으로 이동
+    const timeoutId = setTimeout(() => {
+      if (isPlaying) {
+        console.log("⏳ 3분 10초 경과! 강제로 다음 곡으로 이동합니다.");
+        playNext();
+      }
+    }, 190000); // 3분 10초 = 190000ms
+
+    // 🔥 음악이 로드되지 않거나 오류가 발생하면 자동으로 다음 곡 재생
+    audio.onerror = () => {
+      console.error("🚨 음악 재생 오류 발생! 다음 곡으로 이동합니다.");
+      playNext();
+    };
+
+    return () => {
+      clearTimeout(timeoutId); // ✅ 이전 타이머 제거
+      audio.onended = null;
+      audio.onerror = null;
+    };
+}, [currentSong, isPlaying]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+
     if (isPlaying && !isDragging) {
-      interval = setInterval(() => {
-        setCurrentTime((prev) => {
-          if (prev >= totalDuration) {
-            clearInterval(interval);
-            return totalDuration;
-          }
-          return prev + 1;
-        });
+      const updateProgress = () => {
+        setCurrentTime(audio.currentTime * 1000); // 🔥 초 → 밀리초 변환
+        setProgress((audio.currentTime / (totalDuration / 1000)) * 100); // 비율 계산
+      };
 
-        setProgress(((currentTime + 1) / totalDuration) * 100);
-      }, 1000);
-    } else {
-      clearInterval(interval);
+      audio.ontimeupdate = updateProgress;
+
+      return () => {
+        audio.ontimeupdate = null;
+      };
     }
-
-    return () => clearInterval(interval);
   }, [isPlaying, currentTime, totalDuration, isDragging]);
 
   const formatTime = (milliseconds) => {
