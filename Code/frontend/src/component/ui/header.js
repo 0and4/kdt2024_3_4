@@ -166,7 +166,7 @@ function Header({ activeMenu, onMenuClick }) {
 
   // 로고 클릭 시 메인 페이지로 이동
   const handleLogoClick = () => {
-    navigate("/"); // 메인 페이지로 이동
+    window.location.href = "/"; // 메인 페이지로 이동
   };
 
   const handleLoginClick = () => {

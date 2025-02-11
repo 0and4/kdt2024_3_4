@@ -7,6 +7,7 @@ import {
   LiaPlusSolid,
   LiaPlaySolid,
 } from "react-icons/lia";
+import { useLikedSongs } from '../LikedSongsContext';
 import AddPopup from "../Popup/AddPopup";
 export const Actions = styled.div`
   flex: 1;
@@ -50,7 +51,7 @@ const Button = styled.button`
 `;
 const LikePopup = styled.div`
   position: fixed;
-  bottom: 20px;
+  bottom: 100px;
   left: 50%;
   transform: translateX(-50%);
   background-color: black;
@@ -58,19 +59,76 @@ const LikePopup = styled.div`
   padding: 10px 20px;
   border-radius: 5px;
   font-size: 1rem;
-  opacity: ${(props) => (props.show ? "1" : "0")};
+  opacity: ${(props) => (props.$show  ? "1" : "0")};
   transition: opacity 0.5s ease-in-out;
-  visibility: ${(props) => (props.show ? "visible" : "hidden")};
+  visibility: ${(props) => (props.$show ? "visible" : "hidden")};
 `;
-function ActionButtons({ songId, song, type, liked, onToggleLike,onAddClick, onPlay }) {
+function ActionButtons({ songId, song, type, onPlay }) {
+  const { likedSongs, setLikedSongs } = useLikedSongs();
   const navigate = useNavigate(); // 페이지 이동 함수
   const [showLikePopup, setShowLikePopup] = useState(false);
   const [popupPosition, setPopupPosition] = useState(null);
 
-  const toggleLike = () => {
-    onToggleLike(songId);
-    setShowLikePopup(true);
-    setTimeout(() => setShowLikePopup(false), 2000);
+  const liked = Array.isArray(likedSongs) && likedSongs.some((likedSong) => likedSong?.id === songId);
+
+  const toggleLike = async () => {
+    const token = sessionStorage.getItem("access_token");
+    if (!token) {
+      alert("로그인 후 이용할 수 있습니다.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:8080/playList/normal/my-thumb", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) throw new Error("플레이리스트를 불러오는 데 실패했습니다.");
+
+      const data = await response.json();
+      const favoritePlaylist = data.dataList.find(
+        (playlist) => playlist.name === "내가 좋아하는 노래"
+      );
+
+      if (!favoritePlaylist) {
+        alert("‘내가 좋아하는 노래’ 플레이리스트를 찾을 수 없습니다.");
+        return;
+      }
+
+      const addResponse = await fetch("http://localhost:8080/playList/normal/addSong", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          playlistIds: [favoritePlaylist.id],
+          songId: songId,
+        }),
+      });
+
+      if (!addResponse.ok) throw new Error("노래를 찜하는 데 실패했습니다.");
+
+      setLikedSongs((prevLikedSongs) => {
+        // prevLikedSongs가 배열인지 확인하고, 배열이 아니면 빈 배열로 처리
+        const currentLikedSongs = Array.isArray(prevLikedSongs) ? prevLikedSongs : [];
+        if (currentLikedSongs.some((likedSong) => likedSong.id === songId)) {
+          return currentLikedSongs;
+        }
+        return [...currentLikedSongs, song];
+      });
+      //onToggleLike(songId);
+      setShowLikePopup(true);
+      setTimeout(() => setShowLikePopup(false), 2000);
+    } catch (error) {
+      console.error("🚨 오류 발생:", error);
+      alert(error.message);
+    }
   };
 
   const handleAddClick = (e) => {
@@ -168,7 +226,7 @@ function ActionButtons({ songId, song, type, liked, onToggleLike,onAddClick, onP
       </Actions>
       {/* 좋아요 팝업 */}
       {showLikePopup && (
-        <LikePopup show={showLikePopup}>
+        <LikePopup $show={showLikePopup ? "true" : "false"}>
           내가 좋아하는 노래로 저장했어요!
         </LikePopup>
       )}

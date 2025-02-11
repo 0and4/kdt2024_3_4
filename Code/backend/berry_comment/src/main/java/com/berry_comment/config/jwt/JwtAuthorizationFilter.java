@@ -40,6 +40,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         excludedUrls.add("/payment/success");
         excludedUrls.add("/payment/fail");
         excludedUrls.add("/payment/cancel");
+        excludedUrls.add("/payment/cancel-subscription");
+
 
         //가입 관련 url
         excludedUrls.add("/user");

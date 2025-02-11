@@ -25,6 +25,8 @@ import {
   useLocation,
 } from "react-router-dom";
 
+import { LikedSongsProvider } from "./component/LikedSongsContext";
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -131,7 +133,9 @@ function App() {
 function AppWithRouter() {
   return (
     <Router>
-      <App />
+      <LikedSongsProvider>
+        <App />
+      </LikedSongsProvider>
     </Router>
   );
 }

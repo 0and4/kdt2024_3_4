@@ -13,9 +13,39 @@ const Text = styled.p`
 const Subscribe2 = ({ isOpen, onClose }) => {
   const navigate = useNavigate(); // useNavigate 훅 추가
 
-  const onConfirm = () => {
-    alert("구독이 해지되었습니다."); // 해지 완료 alert
-    navigate("/"); // main.js로 이동
+  const onConfirm = async () => {
+    const token = sessionStorage.getItem("access_token");
+    const tidToken = sessionStorage.getItem("tidToken");
+  
+    if (!token || !tidToken) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+  
+    try {
+      const response = await fetch(`http://localhost:8080//payment/cancel-subscription/${tidToken}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("구독 해지 요청에 실패했습니다.");
+      }
+  
+      alert("구독이 해지되었습니다."); // 알림 표시
+  
+      // 해지 후 sessionStorage에서 tidToken 제거
+      sessionStorage.removeItem("tidToken");
+  
+      // 메인 페이지로 이동
+      navigate("/");
+    } catch (error) {
+      console.error("구독 해지 중 오류 발생:", error);
+      alert("구독 해지를 처리하는 중 오류가 발생했습니다.");
+    }
   };
 
   return (

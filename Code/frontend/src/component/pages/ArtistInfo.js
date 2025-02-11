@@ -63,6 +63,7 @@ const AlbumItem = styled.div`
   }
 `;
 const TitleP = styled.p`
+font-size:large;
   font-weight: bold;
 `;
 const StyledLink = styled(Link)`
@@ -204,7 +205,7 @@ function ArtistInfo() {
         </ControlDiv>
         <Section>
           <ResultDiv>
-            <h2>발매곡</h2>
+            <TitleP>발매곡</TitleP>
             <button
               onClick={() => setShowAllSongs((prev) => !prev)}
               className="more-btn"
@@ -214,7 +215,7 @@ function ArtistInfo() {
             </button>
           </ResultDiv>
           <RecMenuDiv />
-          <SongList showAll={showAllSongs} headerTitle="번호" songs={songs} />
+          <SongList showAll={true} headerTitle="번호" songs={songs} />
         </Section>
         {/* 발매 앨범 섹션 */}
         <Section>
