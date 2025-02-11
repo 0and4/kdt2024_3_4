@@ -50,25 +50,6 @@ const Subscribe1 = ({ isOpen, onClose, isPremium }) => {
 
   const handleCancelSubscription = async () => {
     setIsSubscribe2Open(true);
-    // try {
-    //   const response = await fetch("http://localhost:8080/profile/cancel", {
-    //     method: "POST",
-    //     credentials: "include",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
-    //     },
-    //   });
-
-    //   if (response.ok) {
-    //     setMembership("BASIC"); // 해지 후 BASIC으로 변경
-    //     alert("프리미엄 해지가 완료되었습니다.");
-    //   } else {
-    //     console.error("Failed to cancel subscription");
-    //   }
-    // } catch (error) {
-    //   console.error("Error cancelling subscription:", error);
-    // }
   };
 
   return (
