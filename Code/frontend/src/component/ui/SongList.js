@@ -261,9 +261,7 @@ function SongList({ showAll, headerTitle, songs = [], onPlay }) {
         <ActionColumn>
         <ActionButtons 
           songId={songId} 
-          type="add" 
-          onAddClick={(songId, position) => {
-          }} 
+          type="add"
         />
         </ActionColumn>
         <PlayColumn>
