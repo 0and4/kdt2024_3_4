@@ -47,7 +47,7 @@ const NoSongsMessage = styled.p`
   color: #888;
   margin-top: 20px;
 `;
-function MyPlaylistInfo() {
+function MyPlaylistInfo({ onPlay }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -123,6 +123,7 @@ function MyPlaylistInfo() {
                   number: index + 1,
                   playTimeFormatted: formatPlayTime(song.playTime),
                 }))}
+                onPlay={onPlay}
                />
             ) : (
               <NoSongsMessage>No songs available in this playlist</NoSongsMessage>

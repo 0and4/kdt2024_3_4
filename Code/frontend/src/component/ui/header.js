@@ -182,7 +182,7 @@ function Header({ activeMenu, onMenuClick }) {
       sessionStorage.removeItem("name");
       setIsLoggedIn(false); // 로그인 상태 변경
       alert("로그아웃 되었습니다."); // 로그아웃 완료 알림
-      window.location.reload();
+      window.location.href = "/";
     }
   };
 

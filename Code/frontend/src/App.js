@@ -119,7 +119,7 @@ function App() {
               <Route path="/album/:albumId" element={<AlbumInfo />} />
               <Route path="/album/:albumName" element={<AlbumInfo />} />
               <Route path="/mypage" element={<MyPage />} />
-              <Route path="/my-playlist/:id" element={<MyPlaylistInfo />} />
+              <Route path="/my-playlist/:id" element={<MyPlaylistInfo onPlay={handlePlaySong} />} />
             </Routes>
           </Container>
           <Player playlist={playlist} setPlaylist={setPlaylist} onPlay={handlePlaySong} />

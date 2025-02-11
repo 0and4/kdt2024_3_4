@@ -50,7 +50,7 @@ const ControlDiv = styled.div`
   justify-content: space-between;
 `;
 
-function PlaylistInfo() {
+function PlaylistInfo({ onPlay }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -126,7 +126,7 @@ function PlaylistInfo() {
               </InfoDiv>
             </ControlDiv>
 
-            <SongList showAll={50} headerTitle="번호" songs={playlist.songs} />
+            <SongList showAll={50} headerTitle="번호" songs={playlist.songs} onPlay={onPlay} />
           </>
         )}
       </Container>
