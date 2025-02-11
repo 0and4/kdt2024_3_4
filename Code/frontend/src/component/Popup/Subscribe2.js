@@ -18,21 +18,25 @@ const Subscribe2 = ({ isOpen, onClose }) => {
   //   navigate("/"); // main.js로 이동
   // };
   const onConfirm = async () => {
-    const tid = sessionStorage.getItem("tidToken");
+    const tidToken= sessionStorage.getItem("tidToken");
+    const accessToken = sessionStorage.getItem("access_token");
   
-    if (!tid) {
+    if (!tidToken) {
       alert("구독 정보가 없습니다.");
       return;
     }
+
+    console.log("Authorization Header:", `Bearer ${accessToken}`);
+    console.log("Request Body:", JSON.stringify({ tid: tidToken }));
   
     try {
-      const response = await fetch(`http://localhost:8080/payment/cancel-subscription/${tid}`, {
+      const response = await fetch("http://localhost:8080/payment/cancel-subscription", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
+          "Authorization": `Bearer ${accessToken}`,  // 인증 토큰을 헤더에 포함
+          "Content-Type": "application/json"
         },
-        credentials: "include",
+        body: JSON.stringify({ tid: tidToken })  // ✅ 바디에 JSON 데이터로 tid 포함
       });
   
       if (response.ok) {

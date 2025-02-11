@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -70,19 +71,28 @@ public class PaymentController {
         return ResponseEntity.status(302).header("Location", redirectUrl).build();
     }
 
-    //해지하기
-    @PostMapping("/cancel-subscription/{tid}")
+    @PostMapping("/cancel-subscription")
     public ResponseEntity<?> cancelSubscription(
-            @PathVariable String tid,
-            Authentication authentication
-    ) {
-        //유저 정보를 가져오기
+            @RequestHeader(value = "Authorization", required = false) String token,  // ✅ 헤더 값이 null인지 확인
+            @RequestBody Map<String, String> requestBody,
+            Authentication authentication) {
+
+        System.out.println("🔹 Received Authorization Header: " + token); // 디버깅 로그
+        System.out.println("🔹 Authentication Object: " + authentication); // 디버깅 로그
+
+        if (token == null || !token.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization is null");
+        }
+
         String userId = userService.getUserIdByAuthentication(authentication);
+        String tid = requestBody.get("tid");
 
-        // 결제 해지 서비스 실행
+        if (tid == null || tid.isEmpty()) {
+            return ResponseEntity.badRequest().body("tid is null");
+        }
+
         kaKaoPayService.cancelSubscription(tid, userId);
-
-        return ResponseEntity.ok("구독이 성공적으로 해지되었습니다.");
+        return ResponseEntity.ok().body("구독이 성공적으로 해지되었습니다.");
     }
 
 }
