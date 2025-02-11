@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import logo from "../../images/logo.png";
 import ArrowImage from "../../images/Arrow.png";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Subscribe2 from "../Popup/Subscribe2";
 
 const Wrapper = styled.div`
@@ -166,33 +166,8 @@ const CancelButton = styled.button`
 
 function PR() {
   const navigate = useNavigate();
-  const location = useLocation();
   const paymentRef = useRef(null);
   const [isSubscribe2Open, setIsSubscribe2Open] = useState(false);
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const pgToken = params.get("pg_token");
-
-    if (pgToken) {
-      fetch(`http://localhost:8080/payment/success?pg_token=${pgToken}`, {
-        method: "GET",
-        credentials: "include",
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          alert("결제가 성공적으로 완료되었습니다!");
-          navigate("/mypage");
-        })
-        .catch((error) => {
-          console.error("결제 승인 오류:", error);
-          alert("결제 승인 중 오류가 발생했습니다.");
-          navigate("/mypage");
-        });
-    } else if (location.pathname === "/mypage") {
-      alert("결제 취소되었습니다.");
-    }
-  }, [location, navigate]);
 
   // 해지 팝업 열기
   const handleCancelSubscription = () => {
