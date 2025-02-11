@@ -54,20 +54,58 @@ function PlaylistInfo() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { state } = useLocation();
-  const [playlist, setPlaylist] = useState(null);
+  const [playlist, setPlaylists] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [myPlaylists, setMyPlaylists] = useState([]);
+  const [size, setSize] = useState(50);
 
   const toggleBookmark = () => {
     setIsBookmarked((prev) => !prev);
+  };
+
+  const addPlaylistToState = (newPlaylist) => {
+    setMyPlaylists((prev) => {
+      if (!prev.some((p) => p.id === newPlaylist.id)) {
+        return [...prev, newPlaylist];
+      }
+      return prev;
+    });
+  };
+
+  const addToMyPlaylists = async () => {
+    const token = sessionStorage.getItem("access_token");
+    try {
+      const response = await fetch(`http://localhost:8080/playList/recommend/add?id=${id}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to add playlist to my playlists");
+      const data = await response.json();
+
+      console.log("Playlist added:", data);
+      addPlaylistToState(data);
+
+      const storedPlaylists = JSON.parse(localStorage.getItem("myPlaylists") || "[]");
+      if (!storedPlaylists.some((p) => p.id === data.id)) {
+        localStorage.setItem("myPlaylists", JSON.stringify([...storedPlaylists, data]));
+      }
+
+      alert("플레이리스트가 마이페이지에 추가되었습니다!");
+      toggleBookmark();
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   useEffect(() => {
     async function fetchPlaylist() {
       const token = sessionStorage.getItem("access_token");
       try {
-        const response = await fetch(`http://localhost:8080/playList/recommend/detail?id=${id}`, {
+        const response = await fetch(`http://localhost:8080/playList/recommend/detail?id=${id}&size=${size}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -80,7 +118,7 @@ function PlaylistInfo() {
           image: firstSongImage, // 기본 이미지 또는 첫 번째 앨범 이미지로 설정
           songs: data.dataList, // 노래 목록은 응답에서 받은 `dataList`로 설정
         };
-        setPlaylist(playlistData);
+        setPlaylists(playlistData);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -88,13 +126,12 @@ function PlaylistInfo() {
       }
     }
     fetchPlaylist();
-  }, [id, state]);
+  }, [id, state, size]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
   if (!playlist) return <p>Playlist not found</p>;
-  if (!playlist || !playlist.songs || playlist.songs.length === 0) return <p>No songs available in this playlist</p>;
-  
+  if (!playlist.songs || playlist.songs.length === 0) return <p>No songs available in this playlist</p>;
   
 
   return (
@@ -116,7 +153,7 @@ function PlaylistInfo() {
                     extraButton={
                       <KeepBtn
                         $isBookmarked={isBookmarked}
-                        onClick={toggleBookmark}
+                        onClick={() => addToMyPlaylists(playlist.id)}
                       >
                         {isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
                       </KeepBtn>
@@ -126,7 +163,7 @@ function PlaylistInfo() {
               </InfoDiv>
             </ControlDiv>
 
-            <SongList showAll={50} headerTitle="번호" songs={playlist.songs} />
+            <SongList showAll={true} headerTitle="번호" songs={playlist.songs} />
           </>
         )}
       </Container>
