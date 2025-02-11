@@ -264,6 +264,7 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
     } catch (error) {
       console.error("🚨 재생 요청 중 오류 발생:", error);
       alert("음악을 재생하는 도중 오류가 발생했습니다.");
+      playNext();
     }
   };
 
@@ -279,6 +280,7 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
 
   const playNext = () => {
     setCurrentIndex((prev) => (prev < playlist.length - 1 ? prev + 1 : 0));
+    setIsPlaying(true);
   };
   const playPrev = () => {
     if (currentTime >= 10 && !previousPressedOnce) {
@@ -286,7 +288,6 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
       setPreviousPressedOnce(true);
       setCurrentTime(0);
       setProgress(0);
-      setIsPlaying(false);
     } else {
       // 이전 곡 버튼을 다시 누르면 이전 곡으로 돌아감
       setPreviousPressedOnce(false);
@@ -296,6 +297,12 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
       setIsPlaying(true);
     }
   };
+
+  useEffect(() => {
+    if (currentSong && isPlaying) { 
+      requestPlayFromServer(); // ✅ 곡이 변경되었을 때 자동 재생
+    }
+  }, [currentSong]);
 
   useEffect(() => {
     if (playlist.length > 0) {
