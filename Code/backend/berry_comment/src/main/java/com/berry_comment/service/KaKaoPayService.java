@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -133,6 +134,31 @@ public class KaKaoPayService {
 
         //결제 후 --> 프리미엄으로 전환
         user.setRoleUser(RoleUser.PREMIUM);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void cancelSubscription(String tid, String userId) {
+        UserEntity user = userService.getUserById(userId);
+
+        // 해당 tid를 가진 결제 내역 찾기
+        Optional<Payment> paymentOptional = paymentRepository.findById(tid);
+        if (paymentOptional.isEmpty()) {
+            throw new BerryCommentException(ErrorCode.NOT_FOUND, "결제 정보를 찾을 수 없습니다.");
+        }
+
+        Payment payment = paymentOptional.get();
+
+        // 결제한 유저가 현재 유저와 동일한지 확인
+        if (!payment.getUser().getId().equals(user.getId())) {
+            throw new BerryCommentException(ErrorCode.FORBIDDEN, "결제 취소 권한이 없습니다.");
+        }
+
+        // 결제 정보 삭제
+        paymentRepository.delete(payment);
+
+        // 유저 권한을 NORMAL로 변경
+        user.setRoleUser(RoleUser.NORMAL);
         userRepository.save(user);
     }
 }

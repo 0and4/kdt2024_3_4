@@ -20,7 +20,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/payment")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3030")
 public class PaymentController {
     private final KaKaoPayService kaKaoPayService;
     private final UserService userService;
@@ -71,36 +70,17 @@ public class PaymentController {
         return ResponseEntity.status(302).header("Location", redirectUrl).build();
     }
 
+    //해지하기
     @PostMapping("/cancel-subscription/{tid}")
     public ResponseEntity<?> cancelSubscription(
             @PathVariable String tid,
             Authentication authentication
     ) {
+        //유저 정보를 가져오기
         String userId = userService.getUserIdByAuthentication(authentication);
-        UserEntity user = userService.getUserById(userId);
 
-        // 해당 tid를 가진 결제 내역을 찾기
-        Optional<Payment> paymentOptional = paymentRepository.findById(tid);
-
-        if (paymentOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("결제 정보를 찾을 수 없습니다.");
-        }
-
-        Payment payment = paymentOptional.get();
-
-        // 결제한 유저와 현재 유저가 동일한지 확인
-        if (!payment.getUser().getId().equals(user.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("해당 결제를 취소할 권한이 없습니다.");
-        }
-
-        // 결제 정보 삭제
-        paymentRepository.delete(payment);
-
-        // 유저 권한을 NORMAL로 변경
-        user.setRoleUser(RoleUser.NORMAL);
-        userRepository.save(user);
+        // 결제 해지 서비스 실행
+        kaKaoPayService.cancelSubscription(tid, userId);
 
         return ResponseEntity.ok("구독이 성공적으로 해지되었습니다.");
     }

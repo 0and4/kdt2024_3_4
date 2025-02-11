@@ -13,40 +13,42 @@ const Text = styled.p`
 const Subscribe2 = ({ isOpen, onClose }) => {
   const navigate = useNavigate(); // useNavigate 훅 추가
 
+  // const onConfirm = () => {
+  //   alert("구독이 해지되었습니다."); // 해지 완료 alert
+  //   navigate("/"); // main.js로 이동
+  // };
   const onConfirm = async () => {
-    const token = sessionStorage.getItem("access_token");
-    const tidToken = sessionStorage.getItem("tidToken");
+    const tid = sessionStorage.getItem("tidToken");
   
-    if (!token || !tidToken) {
-      alert("로그인이 필요합니다.");
+    if (!tid) {
+      alert("구독 정보가 없습니다.");
       return;
     }
   
     try {
-      const response = await fetch(`http://localhost:8080//payment/cancel-subscription/${tidToken}`, {
+      const response = await fetch(`http://localhost:8080/payment/cancel-subscription/${tid}`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
         },
+        credentials: "include",
       });
   
-      if (!response.ok) {
-        throw new Error("구독 해지 요청에 실패했습니다.");
+      if (response.ok) {
+        alert("구독이 성공적으로 해지되었습니다.");
+        sessionStorage.removeItem("tidToken"); // sessionStorage에서 tid 삭제
+        window.location.href = "/"; // 메인 페이지로 이동
+      } else {
+        const errorText = await response.text();
+        alert(`구독 해지 실패: ${errorText}`);
       }
-  
-      alert("구독이 해지되었습니다."); // 알림 표시
-  
-      // 해지 후 sessionStorage에서 tidToken 제거
-      sessionStorage.removeItem("tidToken");
-  
-      // 메인 페이지로 이동
-      navigate("/");
     } catch (error) {
       console.error("구독 해지 중 오류 발생:", error);
-      alert("구독 해지를 처리하는 중 오류가 발생했습니다.");
+      alert("구독 해지 요청 중 오류가 발생했습니다.");
     }
   };
+  
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
