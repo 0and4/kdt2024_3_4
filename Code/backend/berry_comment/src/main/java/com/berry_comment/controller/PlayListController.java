@@ -4,23 +4,17 @@ import com.berry_comment.dto.ListInfoDto;
 import com.berry_comment.dto.PlayListDto;
 import com.berry_comment.dto.RequestAddSongToPlayListDto;
 import com.berry_comment.dto.RequestEditPlayListDto;
-import com.berry_comment.entity.Song;
-import com.berry_comment.service.AlbumService;
+import com.berry_comment.oauth.PrincipalDetails;
 import com.berry_comment.service.PlayListService;
-import com.berry_comment.service.RecommendService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
-import com.berry_comment.oauth.PrincipalDetails;
-import java.security.Principal;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -107,17 +101,17 @@ public class PlayListController {
     @GetMapping("/my-detail")
     public ResponseEntity<?> myList(
             @RequestParam(name="id") Long id,
-            @PageableDefault(
-                    page = 0,
-                    size = 5,
-                    sort = "id",
-                    direction = Sort.Direction.ASC
-            )
-            Pageable pageable,
+            @RequestParam(name="size", defaultValue = "100") int size, // 클라이언트에서 size를 지정할 수 있게 변경
+            @RequestParam(name="page", defaultValue = "0") int page,
+            @RequestParam(name="sort", defaultValue = "id") String sort,
             Authentication authentication
-    ){
+    ) {
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        String userId = (String)principalDetails.getUser().getId();
+        String userId = (String) principalDetails.getUser().getId();
+
+        // Pageable 객체 생성
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, sort));
+
         ListInfoDto listInfoDto = playListService.getPlayList(id, userId, pageable);
         return ResponseEntity.ok(listInfoDto);
     }
