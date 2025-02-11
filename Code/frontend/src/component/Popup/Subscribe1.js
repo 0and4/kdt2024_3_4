@@ -46,12 +46,39 @@ const Subscribe1 = ({ isOpen, onClose, isPremium }) => {
     navigate("/pr"); //
   };
 
+  // const handleCancelSubscription = async () => {
+  //   try {
+  //     const response = await fetch("http://localhost:8080/profile/cancel", {
+  //       method: "POST",
+  //       credentials: "include",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
+  //       },
+  //     });
+
+  //     if (response.ok) {
+  //       setMembership("BASIC"); // 해지 후 BASIC으로 변경
+  //       alert("프리미엄 해지가 완료되었습니다.");
+  //     } else {
+  //       console.error("Failed to cancel subscription");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error cancelling subscription:", error);
+  //   }
+  // };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <Text>
         회원님의 현재 이용권은 <br /> [ {membership} ] 입니다.
       </Text>
-      <ModalButton onClick={handleChangeSubscription}>변경</ModalButton>
+      {membership === "PREMIUM" ? (
+        <ModalButton /*onClick={handleCancelSubscription}*/ >해지하기</ModalButton>
+      ) : (
+        <ModalButton onClick={handleChangeSubscription}>변경</ModalButton>
+      )}
+      {/* <ModalButton onClick={handleChangeSubscription}>변경</ModalButton> */}
     </Modal>
   );
 };
