@@ -31,8 +31,8 @@ public class PaymentController {
             @RequestParam("pg_token") String pgToken
     ){
         KakaoApproveResponse kakaoApproveResponse = kaKaoPayService.approveResponse(pgToken);
-        // 결제 성공 후 localhost:3030으로 pg_token을 포함하여 리디렉션
-        String redirectUrl = "http://localhost:3030/mypage?pg_token=" + pgToken;
+        // ✅ tid를 프론트로 넘겨서 저장하도록 수정
+        String redirectUrl = "http://localhost:3030/mypage?tid=" + kakaoApproveResponse.getTid();
         return ResponseEntity.status(302).header("Location", redirectUrl).build();
 //        return ResponseEntity.ok(kakaoApproveResponse);
     }

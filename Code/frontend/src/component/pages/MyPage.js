@@ -406,13 +406,13 @@ function MyPage() {
   //결제 완료 이후 실행되는 로직
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const pgToken = params.get("pg_token");
+    const tidToken = params.get("tid");
     const fail = params.get("fail");  // ✅ 결제 실패 감지
     const cancel = params.get("cancel");  // ✅ 결제 취소 감지
 
-    if (pgToken) {
-      console.log("pg_token 값:", pgToken); // ✅ pg_token 값 확인
-      sessionStorage.setItem("pg_token", pgToken);
+    if (tidToken) {
+      console.log("pg_token 값:", tidToken); // ✅ pg_token 값 확인
+      sessionStorage.setItem("tidToken", tidToken);
       alert("결제가 성공적으로 완료되었습니다!");
     } else if (fail) {
       alert("결제가 실패하였습니다.");
