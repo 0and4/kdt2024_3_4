@@ -388,6 +388,7 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
 
     setProgress(newProgress);
     setCurrentTime(Math.floor(newTime));
+    audioRef.current.currentTime = newTime;
   };
 
   const handleDragStart = (e) => {
@@ -395,19 +396,23 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
     handleDrag(e);
   };
 
+  //드래그 중 (진행 바 이동)
   const handleDrag = (e) => {
     if (!progressRef.current || !isDragging) return;
 
+    const clientX = e.type.includes("touch") ? e.touches[0].clientX : e.clientX;
     const rect = progressRef.current.getBoundingClientRect();
-    let newProgress = ((e.clientX - rect.left) / rect.width) * 100;
+    let newProgress = ((clientX - rect.left) / rect.width) * 100;
     newProgress = Math.max(0, Math.min(100, newProgress));
 
+    const newTime = (newProgress / 100) * (totalDuration / 1000);
     setProgress(newProgress);
-    setCurrentTime(Math.floor((newProgress / 100) * totalDuration));
+    setCurrentTime(newTime * 1000);
   };
 
   const handleDragEnd = () => {
     setIsDragging(false);
+    audioRef.current.currentTime = currentTime / 1000;
   };
   return (
     <>
@@ -443,9 +448,13 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
                 $progress={progress}
                 $isDragging={isDragging}
                 onClick={handleProgressClick}
+                onMouseDown={handleDragStart}
                 onMouseMove={handleDrag}
                 onMouseUp={handleDragEnd}
                 onMouseLeave={handleDragEnd}
+                onTouchStart={handleDragStart}
+                onTouchMove={handleDrag}
+                onTouchEnd={handleDragEnd}
               >
                 <span id="start-time">{formatTime(currentTime)}</span>
                 <div
