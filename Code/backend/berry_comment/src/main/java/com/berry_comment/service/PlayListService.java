@@ -49,6 +49,17 @@ public class PlayListService {
                 if(song == null) {
                     throw new EntityNotFoundException("요청하신 곡의 정보가 없습니다.");
                 }
+
+                // 이미 해당 플레이리스트에 노래가 추가되어 있는지 확인
+                boolean alreadyAdded = playListDetailRepository.existsByPlayListAndSong(playList, song);
+                if (alreadyAdded) {
+                    try {
+                        throw new BadRequestException("이 노래는 이미 플레이리스트에 추가되어 있습니다.");
+                    } catch (BadRequestException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
                 PlayListDetail playListDetail = new PlayListDetail(song, playList);
 
                 //해당 곡을 저장..
