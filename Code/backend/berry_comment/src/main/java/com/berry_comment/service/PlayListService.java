@@ -144,7 +144,7 @@ public class PlayListService {
             playListRepository.delete(playList);
             return true;
         } catch (Exception e) {
-            // 예외 처리 및 로깅
+            // 삭제 예외 처리 및 로깅
             System.out.println("플레이리스트 삭제 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
             return false;
