@@ -174,18 +174,12 @@ function AddPopup({ position, onClose, songId }) {
 
     console.log("선택된 플레이리스트 목록:", selectedPlaylists);
 
-    for (const playlist of selectedPlaylists) {
-      if (!playlist.id) {
-        console.error("잘못된 플레이리스트 ID입니다.", playlist);
-        continue;
-      }
-  
-      const requestBody = {
-        playlistId: playlist.id,
-        songId: songId,
-      };
-
-      console.log("전송할 데이터:", requestBody); 
+    const playlistIds = selectedPlaylists.map(playlist => playlist.id);
+    const requestBody = {
+      playlistIds: playlistIds,
+      songId: songId,
+    };
+    console.log("전송할 데이터:", requestBody); 
       try {
         const response = await fetch("http://localhost:8080/playList/normal/addSong", {
           method: "POST",
@@ -195,21 +189,23 @@ function AddPopup({ position, onClose, songId }) {
           },
           body: JSON.stringify(requestBody),
         });
-        console.log("전송할 데이터:", JSON.stringify(requestBody));
 
         if (!response.ok) {
-          console.error("Failed to add song to playlist : ", playlist.name);
-          console.error("넣으려던 플레이리스트 id : ", playlist.id);
-          console.error("넣으려던 노래의 id : ", songId);
+          console.error("Failed to add song to playlist : ", playlistIds);
+          if (response.status === 400 || 500) {
+            const errorData = await response.json();
+            alert(errorData.message || "중복된 노래가 이미 존재합니다.");
+          } else {
+            console.error("Failed to add song to playlist:", response);
+            alert("노래 추가에 실패했습니다.");
+          }
         } else {
-          console.log(`Song added to playlist: ${playlist.name}`);
+          console.log(`Song added to playlist: ${selectedPlaylists}`);
           alert("노래가 플레이리스트에 추가되었습니다!");
         }
       } catch (error) {
         console.error("Error adding song to playlist:", error);
       }
-    }
-    
     onClose();
   };
 
@@ -225,9 +221,12 @@ function AddPopup({ position, onClose, songId }) {
             <CiCircleRemove />
           </CloseBtn>
         </CreateDiv>
+
+        {/* 기존 플레이리스트 목록 */}
         {playlists.map((playlist, index) => (
           <PlaylistOption key={index} onClick={() => handleCheckboxToggle(index)}>
-            <div><img src={"" || "https://via.placeholder.com/100"} alt={playlist.name} />
+            <div>
+              <img src={"" || "https://via.placeholder.com/100"} alt={playlist.name} />
             </div>
             <p>{playlist.name.replace(/\\"/g, '"')}</p>
             <input type="checkbox" checked={playlist.checked || false}

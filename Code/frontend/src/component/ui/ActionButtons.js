@@ -87,21 +87,16 @@ function ActionButtons({ songId, song, type, liked, onToggleLike,onAddClick, onP
       left: rect.left + window.scrollX - 240,
     };
     setPopupPosition(newPosition);  // 위치 상태 업데이트
-
-  // popupPosition이 업데이트된 후에 AddPopup을 열도록 useEffect 활용 가능
-  setTimeout(() => {
-    onAddClick(songId, newPosition);
-  }, 0);
   };
   
   const closePopup = () => setPopupPosition(null);
   
-  const handlePlay =async () => {
-    const token = sessionStorage.getItem("access_token"); // 세션에서 access token 확인
+  const handlePlay = async () => {
+    const token = sessionStorage.getItem("access_token");
     if (!token) {
       alert("로그인 후 곡 재생 기능을 이용할 수 있습니다.");
       navigate("/login");
-      return; // 로그인 안 되면 함수 실행을 멈춤
+      return;
     }
 
     console.log("재생 버튼 클릭됨", songId);
@@ -147,6 +142,7 @@ function ActionButtons({ songId, song, type, liked, onToggleLike,onAddClick, onP
           position={popupPosition}
           onClose={closePopup}
           songId={songId}
+          song={song}
           //playlists={/* 전달할 플레이리스트 배열 */}
         />
       )}
