@@ -92,9 +92,13 @@ public class PlayListController {
                     sort = "id",
                     direction = Sort.Direction.ASC
             )
-            Pageable pageable
+            Pageable pageable,
+            Authentication authentication
     ){
-        ListInfoDto listInfoDto = playListService.getPlayListThumbnail(pageable);
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        String userId = (String) principalDetails.getUser().getId();
+
+        ListInfoDto listInfoDto = playListService.getPlayListThumbnail(userId, pageable);
         return ResponseEntity.ok(listInfoDto);
     }
 

@@ -1,16 +1,16 @@
 package com.berry_comment.controller;
 
 import com.berry_comment.dto.ListInfoDto;
+import com.berry_comment.dto.PlayListDto;
 import com.berry_comment.oauth.PrincipalDetails;
-import com.berry_comment.service.PlayListService;
 import com.berry_comment.service.RecommendService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -35,6 +35,7 @@ public class PlayListControllerAdvance {
     @GetMapping("/detail")
     public ResponseEntity<?> recommendDetail(
             @RequestParam(name = "id") int id,
+            @RequestParam(name = "size", defaultValue = "10") int size,
             @PageableDefault(
                     page = 0,
                     size = 10,
@@ -43,7 +44,8 @@ public class PlayListControllerAdvance {
             )
             Pageable pageable)
     {
-        ListInfoDto listInfoDto = recommendService.getRecommendationDetail(id, pageable);
+        Pageable dynamicPageable = PageRequest.of(pageable.getPageNumber(), size, pageable.getSort());
+        ListInfoDto listInfoDto = recommendService.getRecommendationDetail(id, dynamicPageable);
         return ResponseEntity.ok(listInfoDto);
     }
 
@@ -55,8 +57,14 @@ public class PlayListControllerAdvance {
     ){
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         String userId = (String)principalDetails.getUser().getId();
-        recommendService.addPlayListFromRecommendation(userId, id);
-        return ResponseEntity.ok("");
+        //recommendService.addPlayListFromRecommendation(userId, id);
+        // return ResponseEntity.ok("");
+
+        // 플레이리스트 추가 후 생성된 플레이리스트 정보 반환
+        PlayListDto newPlayList = recommendService.addPlayListFromRecommendation(userId, id);
+
+        // 생성된 플레이리스트 정보를 응답으로 반환
+        return ResponseEntity.ok(newPlayList);
     }
 
 
