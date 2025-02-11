@@ -59,9 +59,9 @@ const LikePopup = styled.div`
   padding: 10px 20px;
   border-radius: 5px;
   font-size: 1rem;
-  opacity: ${(props) => (props.$show === "true"  ? "1" : "0")};
+  opacity: ${(props) => (props.$show  ? "1" : "0")};
   transition: opacity 0.5s ease-in-out;
-  visibility: ${(props) => (props.$show === "true" ? "visible" : "hidden")};
+  visibility: ${(props) => (props.$show ? "visible" : "hidden")};
 `;
 function ActionButtons({ songId, song, type, onPlay }) {
   const { likedSongs, setLikedSongs } = useLikedSongs();
@@ -69,7 +69,7 @@ function ActionButtons({ songId, song, type, onPlay }) {
   const [showLikePopup, setShowLikePopup] = useState(false);
   const [popupPosition, setPopupPosition] = useState(null);
 
-  const liked = Array.isArray(likedSongs) && likedSongs.some((likedSong) => likedSong.id === songId);
+  const liked = Array.isArray(likedSongs) && likedSongs.some((likedSong) => likedSong?.id === songId);
 
   const toggleLike = async () => {
     const token = sessionStorage.getItem("access_token");
@@ -114,8 +114,14 @@ function ActionButtons({ songId, song, type, onPlay }) {
 
       if (!addResponse.ok) throw new Error("노래를 찜하는 데 실패했습니다.");
 
-      setLikedSongs((prevLikedSongs) => [...prevLikedSongs, song]);
-      
+      setLikedSongs((prevLikedSongs) => {
+        // prevLikedSongs가 배열인지 확인하고, 배열이 아니면 빈 배열로 처리
+        const currentLikedSongs = Array.isArray(prevLikedSongs) ? prevLikedSongs : [];
+        if (currentLikedSongs.some((likedSong) => likedSong.id === songId)) {
+          return currentLikedSongs;
+        }
+        return [...currentLikedSongs, song];
+      });
       //onToggleLike(songId);
       setShowLikePopup(true);
       setTimeout(() => setShowLikePopup(false), 2000);
