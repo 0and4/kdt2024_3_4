@@ -6,6 +6,9 @@ import Subscribe1 from "../Popup/Subscribe1";
 import AddPL from "../Popup/AddPL";
 import EditPL from "../Popup/EditPL";
 import { Wrapper as MPWrapper, Container as MPContainer} from "../ui/AllDiv";
+import { FaBookmark } from "react-icons/fa";
+import { LiaHeartSolid } from "react-icons/lia";
+
 const Wrapper = styled(MPWrapper)`
   width: calc(100% - 310px);
   margin-right:auto;
@@ -144,8 +147,13 @@ const PlaylistItem = styled.div`
 const PlaylistThumbnail = styled.div`
   width: 100px;
   height: 100px;
-  background-color: #cfcfcf;
+  background-color: ${(props) =>
+    props.name === "내가 좋아하는 노래" ? "#FFB6C1" : props.$isStored ? "#D8BFD8" : "#cfcfcf"};
   margin-right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 `;
 
 const PlaylistName = styled.p`
@@ -154,6 +162,15 @@ const PlaylistName = styled.p`
   margin: 0;
   flex-grow: 1;
   text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  @media (max-width: 600px) {
+    font-size: 0.9rem;
+  }
+  @media (max-width: 400px) {
+    font-size: 0.8rem;
+  }
 `;
 
 const Checkbox = styled.input`
@@ -287,25 +304,41 @@ function MyPage() {
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:8080/playList/normal/my-thumb", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
-      },
-      credentials: "include",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`플레이리스트 불러오기 실패: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setPlaylists(data.dataList || []);
-      })
-      .catch((error) => console.error("플레이리스트 요청 실패:", error));
-  }, []);
+    const fetchPlaylists = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/playList/normal/my-thumb", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
+          },
+        });
+  
+        if (!response.ok) throw new Error(`플레이리스트 불러오기 실패: ${response.status}`);
+  
+        const data = await response.json();
+        const fetchedPlaylists = data.dataList || [];
+  
+        // 로컬스토리지에서 추가된 추천 플레이리스트 가져오기
+        const storedPlaylists = JSON.parse(localStorage.getItem("myPlaylists") || "[]");
+        const storedIds = storedPlaylists.map(pl => pl.id);
+  
+        // 중복되지 않도록 병합
+        const combinedPlaylists = [...fetchedPlaylists, ...storedPlaylists].filter(
+          (v, i, a) => a.findIndex((t) => t.id === v.id) === i
+        );
+  
+        setPlaylists(combinedPlaylists.map(pl => ({
+          ...pl,
+          isStored: storedIds.includes(pl.id)
+        })));
+      } catch (error) {
+        console.error("플레이리스트 요청 실패:", error);
+      }
+    };
+  
+    fetchPlaylists();
+  }, []);  
 
   const handlePlaylistClick = (playlist, event) => {
     if (event.target.type === "checkbox") return; // 체크박스를 클릭한 경우 페이지 이동을 막음
@@ -379,7 +412,9 @@ function MyPage() {
   
   const handleDelete = () => {
     if (!selectedPlaylist) return;
-    if (!window.confirm(`"${selectedPlaylist.name}"을 삭제하시겠습니까?`)) return;
+
+    const cleanName = selectedPlaylist.name.replace(/["\\]/g, "").trim();
+    if (!window.confirm(`"${cleanName}"을 삭제하시겠습니까?`)) return;
   
     fetch(`http://localhost:8080/playList/normal/delete/${selectedPlaylist.id}`, {
       method: "DELETE",
@@ -396,9 +431,13 @@ function MyPage() {
         return response.json();
       })
       .then(() => {
-        alert("플레이리스트를 삭제했습니다!");
+        alert(`"${cleanName}" 플레이리스트를 삭제했습니다!`);
         setPlaylists((prev) => prev.filter((pl) => pl.id !== selectedPlaylist.id));
         setSelectedPlaylist(null);
+
+        const storedPlaylists = JSON.parse(localStorage.getItem("myPlaylists") || "[]");
+        const updatedPlaylists = storedPlaylists.filter((pl) => pl.id !== selectedPlaylist.id);
+        localStorage.setItem("myPlaylists", JSON.stringify(updatedPlaylists));
       })
       .catch((error) => console.error("플레이리스트 삭제 오류:", error));
   };
@@ -480,15 +519,19 @@ function MyPage() {
             </EditButtons>
           </PlaylistHeader>
 
-          {playlists.map((playlist, index) => (
+          {playlists.map((playlist, index) => {
+          const cleanName = playlist.name.replace(/[^a-zA-Z0-9ㄱ-ㅎ가-힣\s]/g, '').trim(); // 특수문자 제거 및 trim
+          return (
             <PlaylistItem
               key={playlist.id || index}
               onClick={(e) => handlePlaylistClick(playlist, e)}
             >
-              <PlaylistThumbnail />
-                <PlaylistName>
-                    {playlist.name}
-                </PlaylistName>
+              <PlaylistThumbnail $isStored={playlist.isStored} />
+              <PlaylistName>
+                {cleanName}
+                {cleanName === "내가 좋아하는 노래" && <LiaHeartSolid />}
+                {playlist.isStored && <FaBookmark />}
+              </PlaylistName>
               <Checkbox
                 type="checkbox"
                 checked={playlist === selectedPlaylist}
@@ -498,7 +541,8 @@ function MyPage() {
                 }}
               />
             </PlaylistItem>
-          ))}
+          );
+        })}
         </PlaylistSection>
       </Container>
 

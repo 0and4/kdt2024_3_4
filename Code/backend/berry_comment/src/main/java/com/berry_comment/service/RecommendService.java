@@ -1,6 +1,7 @@
 package com.berry_comment.service;
 
 import com.berry_comment.dto.ListInfoDto;
+import com.berry_comment.dto.PlayListDto;
 import com.berry_comment.dto.RecommendationDto;
 import com.berry_comment.dto.SongDto;
 import com.berry_comment.entity.*;
@@ -84,10 +85,10 @@ public class RecommendService {
         return recommendation.getTitle();
     }
 
-    public void addPlayListFromRecommendation(String userId, int recommendId) {
+    public PlayListDto addPlayListFromRecommendation(String userId, int recommendId) {
         UserEntity user = userRepository.findById(userId);
         String recommend = getRecommendationNameById(recommendId);
-        PlayList playList = new PlayList(recommend ,user);
+        PlayList playList = new PlayList(recommend, user);
         playListRepository.save(playList);
         try {
             JobParameters jobParameters = new JobParametersBuilder()
@@ -99,5 +100,9 @@ public class RecommendService {
         }catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return PlayListDto.builder()
+                .id(playList.getId().intValue())
+                .name(playList.getPlayListName()) // name 필드에 playListName 저장
+                .build();
     }
 }

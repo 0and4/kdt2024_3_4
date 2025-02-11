@@ -10,7 +10,6 @@ import com.berry_comment.repository.PlayListRepository;
 import com.berry_comment.repository.SongRepository;
 import com.berry_comment.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Pageable;
@@ -18,12 +17,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestAttributes;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -84,8 +79,8 @@ public class PlayListService {
         return playListDto;
     }
 
-    public ListInfoDto getPlayListThumbnail(Pageable pageable) {
-        Slice<PlayList> playListSlice = playListRepository.findAll(pageable);
+    public ListInfoDto getPlayListThumbnail(String userId, Pageable pageable) {
+        Slice<PlayList> playListSlice = playListRepository.findAllByUserId(userId, pageable);
         List<PlayListDto> playListDtoList = new ArrayList<>();
         playListSlice.forEach(playList -> {
             PlayListDto playListDto = PlayListDto.builder()
@@ -135,15 +130,25 @@ public class PlayListService {
     }
 
     public boolean deletePlayList(Long playlistId, String userId) {
+        // 플레이리스트 존재 여부 확인
         PlayList playList = playListRepository.findById(playlistId)
                 .orElseThrow(() -> new IllegalArgumentException("플레이리스트를 찾을 수 없습니다."));
 
+        // 사용자 확인 (필요 시 삭제 권한 확인)
         if (!playList.getUser().getId().equals(userId)) {
-            return false; // 권한이 없는 경우
+            throw new IllegalArgumentException("해당 플레이리스트를 삭제할 권한이 없습니다.");
         }
 
-        playListRepository.delete(playList);
-        return true;
+        // 플레이리스트 삭제 처리
+        try {
+            playListRepository.delete(playList);
+            return true;
+        } catch (Exception e) {
+            // 삭제 예외 처리 및 로깅
+            System.out.println("플레이리스트 삭제 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }
