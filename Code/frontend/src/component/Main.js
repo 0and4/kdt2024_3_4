@@ -13,8 +13,8 @@ function Main({ onPlay }) {
         <Routes>
           <Route path="/" element={<TodayChart onPlay={onPlay} />} />
           <Route path="/chart" element={<TodayChart onPlay={onPlay} />} />
-          <Route path="/recommend" element={<Recommend />} />
-          <Route path="/playlist/:id" element={<PlaylistInfo />} />
+          <Route path="/recommend" element={<Recommend />} onPlay={onPlay} />
+          <Route path="/playlist/:id" element={<PlaylistInfo />} onPlay={onPlay} />
           <Route path="/myPage" element={<MyPage />} />
         </Routes>
       </Container>

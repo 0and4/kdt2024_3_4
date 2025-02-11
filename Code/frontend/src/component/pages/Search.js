@@ -224,7 +224,7 @@ function Search() {
           <ListDiv>
             {songs.length > 0 ? (
               <SongList
-                showAll={showAllSongs}
+                showAll={true}
                 headerTitle="번호"
                 songs={songs.map((song, index) => ({
                   ...song,

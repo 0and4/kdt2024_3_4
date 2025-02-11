@@ -3,11 +3,14 @@ import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import ActionButtons from "./ActionButtons";
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+
+`;
 const Container = styled.table`
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
+  max-height: 80vh;
 `;
 const TableHeader = styled.thead`
   background-color: #eee;
@@ -159,8 +162,7 @@ function SongList({ showAll, headerTitle, songs = [], onPlay }) {
     setAllSelected(!allSelected);
   };
   
-  const displayedSongs = showAll ? songs : songs.slice(0, 5);
-  
+  const displayedSongs = showAll === true ? songs : songs.slice(0, showAll);
 
   const handleToggleLike = (songId) => {
     const token = sessionStorage.getItem("access_token");
@@ -201,7 +203,7 @@ function SongList({ showAll, headerTitle, songs = [], onPlay }) {
 <tbody>
   {displayedSongs.map((song, index) => {
     const songId = song.id || index + 1;
-    const displayNumber = headerTitle === "순위" ? song.rank : song.number;
+    const displayNumber = headerTitle === "순위" ? song.rank : song.number || index + 1;
 
     const convertToMinSec = (milliseconds) => {
       const totalSeconds = Math.floor(milliseconds / 1000); // 밀리초를 초로 변환
@@ -259,9 +261,7 @@ function SongList({ showAll, headerTitle, songs = [], onPlay }) {
         <ActionColumn>
         <ActionButtons 
           songId={songId} 
-          type="add" 
-          onAddClick={(songId, position) => {
-          }} 
+          type="add"
         />
         </ActionColumn>
         <PlayColumn>

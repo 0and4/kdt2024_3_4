@@ -59,7 +59,7 @@ function MyPlaylistInfo() {
     async function fetchPlaylist() {
       const token = sessionStorage.getItem("access_token");
       try {
-        const response = await fetch(`http://localhost:8080/playList/normal/my-detail?id=${id}`, {
+        const response = await fetch(`http://localhost:8080/playList/normal/my-detail?id=${id}&size=100`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -86,7 +86,7 @@ function MyPlaylistInfo() {
   if (error) return <p>Error: {error}</p>;
   if (!playlist) return <p>Playlist not found</p>;
   if (!playlist || !playlist.songs || playlist.songs.length === 0) return <p>No songs available in this playlist</p>;
-  
+
   const formatPlayTime = (playTime) => {
     if (!playTime || playTime === 0) return "3:00"; // playTime이 0이면 기본값 3:00
 
@@ -117,7 +117,7 @@ function MyPlaylistInfo() {
 
             {/* 노래 목록이 없을 때 메시지 표시 */}
             {playlist.songs && playlist.songs.length > 0 ? (
-              <SongList showAll={50} headerTitle="번호"
+              <SongList showAll={true} headerTitle="번호"
                 songs={playlist.songs.map((song, index) => ({
                   ...song,
                   number: index + 1,

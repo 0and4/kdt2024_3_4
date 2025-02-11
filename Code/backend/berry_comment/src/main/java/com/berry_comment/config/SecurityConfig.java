@@ -43,6 +43,8 @@ public class SecurityConfig {
                         .requestMatchers("/user/**").permitAll()// 로그인 API 허용
                         .requestMatchers("/h2-console/**").permitAll()// H2 콘솔 요청 허용
                         .requestMatchers("/search/**").permitAll()
+                        .requestMatchers("/payment/**").permitAll()
+                        .requestMatchers("/payment/cancel-subscription/**").authenticated()
                         .requestMatchers("/stream/**").hasAnyAuthority("PREMIUM","NORMAL")
                         .requestMatchers("/playList/normal/**").hasAnyAuthority("PREMIUM", "NORMAL")
                         .requestMatchers("/playList/recommend/**").hasAnyAuthority("PREMIUM", "NORMAL") //추천 플리 구현을 위해 잠시 NORMAL까지 허용

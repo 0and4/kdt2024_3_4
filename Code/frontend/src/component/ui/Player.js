@@ -162,7 +162,7 @@ const CompactPlayDiv = styled.div`
 function Player({ playlist: propPlaylist, setPlaylist }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
-  const [currentSong, setCurrentSong] = useState(null);
+  const [currentSong, setCurrentSong] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -263,6 +263,7 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
 
     } catch (error) {
       console.error("🚨 재생 요청 중 오류 발생:", error);
+      playNext();
       alert("음악을 재생하는 도중 오류가 발생했습니다.");
     }
   };
@@ -279,6 +280,7 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
 
   const playNext = () => {
     setCurrentIndex((prev) => (prev < playlist.length - 1 ? prev + 1 : 0));
+    setIsPlaying(true);
   };
   const playPrev = () => {
     if (currentTime >= 10 && !previousPressedOnce) {
@@ -286,7 +288,6 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
       setPreviousPressedOnce(true);
       setCurrentTime(0);
       setProgress(0);
-      setIsPlaying(false);
     } else {
       // 이전 곡 버튼을 다시 누르면 이전 곡으로 돌아감
       setPreviousPressedOnce(false);
@@ -296,6 +297,12 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
       setIsPlaying(true);
     }
   };
+
+  useEffect(() => {
+    if (currentSong && isPlaying) { 
+      requestPlayFromServer(); // ✅ 곡이 변경되었을 때 자동 재생
+    }
+  }, [currentSong]);
 
   useEffect(() => {
     if (playlist.length > 0) {
@@ -313,25 +320,52 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
     }
   }, [currentIndex, playlist]);
 
+  // ✅ 음악 재생이 끝나면 자동으로 다음 곡 재생
   useEffect(() => {
-    let interval;
+    const audio = audioRef.current;
+    
+    // 🔥 음악이 끝났을 때 자동으로 다음 곡으로 이동
+    audio.onended = () => {
+      console.log("🎵 음악 종료! 다음 곡으로 이동합니다.");
+      playNext();
+    };
+
+    // 🔥 재생 시간이 3분 10초를 초과하면 강제적으로 다음 곡으로 이동
+    const timeoutId = setTimeout(() => {
+      if (isPlaying) {
+        console.log("⏳ 3분 10초 경과! 강제로 다음 곡으로 이동합니다.");
+        playNext();
+      }
+    }, 190000); // 3분 10초 = 190000ms
+
+    // 🔥 음악이 로드되지 않거나 오류가 발생하면 자동으로 다음 곡 재생
+    audio.onerror = () => {
+      console.error("🚨 음악 재생 오류 발생! 다음 곡으로 이동합니다.");
+      playNext();
+    };
+
+    return () => {
+      clearTimeout(timeoutId); // ✅ 이전 타이머 제거
+      audio.onended = null;
+      audio.onerror = null;
+    };
+}, [currentSong, isPlaying]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+
     if (isPlaying && !isDragging) {
-      interval = setInterval(() => {
-        setCurrentTime((prev) => {
-          if (prev >= totalDuration) {
-            clearInterval(interval);
-            return totalDuration;
-          }
-          return prev + 1;
-        });
+      const updateProgress = () => {
+        setCurrentTime(audio.currentTime * 1000); // 🔥 초 → 밀리초 변환
+        setProgress((audio.currentTime / (totalDuration / 1000)) * 100); // 비율 계산
+      };
 
-        setProgress(((currentTime + 1) / totalDuration) * 100);
-      }, 1000);
-    } else {
-      clearInterval(interval);
+      audio.ontimeupdate = updateProgress;
+
+      return () => {
+        audio.ontimeupdate = null;
+      };
     }
-
-    return () => clearInterval(interval);
   }, [isPlaying, currentTime, totalDuration, isDragging]);
 
   const formatTime = (milliseconds) => {
@@ -354,6 +388,7 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
 
     setProgress(newProgress);
     setCurrentTime(Math.floor(newTime));
+    audioRef.current.currentTime = newTime;
   };
 
   const handleDragStart = (e) => {
@@ -361,19 +396,23 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
     handleDrag(e);
   };
 
+  //드래그 중 (진행 바 이동)
   const handleDrag = (e) => {
     if (!progressRef.current || !isDragging) return;
 
+    const clientX = e.type.includes("touch") ? e.touches[0].clientX : e.clientX;
     const rect = progressRef.current.getBoundingClientRect();
-    let newProgress = ((e.clientX - rect.left) / rect.width) * 100;
+    let newProgress = ((clientX - rect.left) / rect.width) * 100;
     newProgress = Math.max(0, Math.min(100, newProgress));
 
+    const newTime = (newProgress / 100) * (totalDuration / 1000);
     setProgress(newProgress);
-    setCurrentTime(Math.floor((newProgress / 100) * totalDuration));
+    setCurrentTime(newTime * 1000);
   };
 
   const handleDragEnd = () => {
     setIsDragging(false);
+    audioRef.current.currentTime = currentTime / 1000;
   };
   return (
     <>
@@ -383,12 +422,12 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
           <Container>
             <SongPlayDiv>
               <AlbumJacket>
-                {/* <img
+                <img
                   src={currentSong.image}
                   alt={currentSong.track}
                   width="180"
                   height="180"
-                /> */}
+                />
               </AlbumJacket>
               <SongTitleP>
                 {currentSong ? currentSong.track : "No Song"}
@@ -409,9 +448,13 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
                 $progress={progress}
                 $isDragging={isDragging}
                 onClick={handleProgressClick}
+                onMouseDown={handleDragStart}
                 onMouseMove={handleDrag}
                 onMouseUp={handleDragEnd}
                 onMouseLeave={handleDragEnd}
+                onTouchStart={handleDragStart}
+                onTouchMove={handleDrag}
+                onTouchEnd={handleDragEnd}
               >
                 <span id="start-time">{formatTime(currentTime)}</span>
                 <div

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import MPEdit1 from "../Popup/MPEdit1";
 import Subscribe1 from "../Popup/Subscribe1";
@@ -213,6 +213,7 @@ const generateRandomNickname = () => {
 
 function MyPage() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [isMPEdit1Open, setIsMPEdit1Open] = useState(false);
   const [isSubscribe1Open, setIsSubscribe1Open] = useState(false);
@@ -401,6 +402,25 @@ function MyPage() {
       })
       .catch((error) => console.error("플레이리스트 삭제 오류:", error));
   };
+
+  //결제 완료 이후 실행되는 로직
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tidToken = params.get("tid");
+    const fail = params.get("fail");  // ✅ 결제 실패 감지
+    const cancel = params.get("cancel");  // ✅ 결제 취소 감지
+
+    if (tidToken) {
+      console.log("pg_token 값:", tidToken); // ✅ pg_token 값 확인
+      sessionStorage.setItem("tidToken", tidToken);
+      alert("결제가 성공적으로 완료되었습니다!");
+    } else if (fail) {
+      alert("결제가 실패하였습니다.");
+    } else if (cancel) {
+      alert("결제가 취소되었습니다.");
+    }
+
+  }, [location, navigate]);
 
   return (
     <Wrapper>

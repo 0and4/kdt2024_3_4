@@ -183,6 +183,38 @@ function PR() {
     navigate("/");
   };
 
+  //카카오페이 결제 창
+  const handlePayment = async () => {
+    const token = sessionStorage.getItem("access_token"); // 토큰 가져오기
+
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:8080/payment/ready", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`, // 토큰을 Authorization 헤더에 포함
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("결제 요청에 실패했습니다.");
+      }
+  
+      const data = await response.json();
+      window.location.href = data.next_redirect_pc_url; // 카카오 결제 페이지로 이동
+  
+    } catch (error) {
+      console.error("결제 요청 중 오류 발생:", error);
+      alert("결제 요청을 처리하는 중 오류가 발생했습니다.");
+    }
+
+  };
+
   return (
     <Wrapper>
       <Logo src={logo} alt="Berrecommend 로고" onClick={handleLogoClick} />{" "}
@@ -219,7 +251,7 @@ function PR() {
         </TermsText>
 
         <ButtonWrapper>
-          <PaymentButton>결제하기</PaymentButton>
+          <PaymentButton onClick={handlePayment} >결제하기</PaymentButton>
         </ButtonWrapper>
       </PaymentSection>
       <CancelButtonWrapper>
