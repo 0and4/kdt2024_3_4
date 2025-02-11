@@ -122,15 +122,15 @@ const PayWay = styled.button`
   height: 50px;
   font-size: 1rem;
   font-weight: bold;
-  color: #333;
-  background-color: #e0e0e0;
+  color: ${({ disabled }) => (disabled ? "#999" : "#333")};
+  background-color: ${({ disabled }) => (disabled ? "#e0e0e0" : "#f7c600")};
   border: none;
   border-radius: 10px;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: #cfcfcf;
+    background-color: ${({ disabled }) => (disabled ? "#e0e0e0" : "#f1b600")};
   }
 `;
 
@@ -207,9 +207,9 @@ function PR() {
         <h3>베리코멘드 PREMIUM 5,900원/월</h3>
         <Title>결제 수단 선택</Title>
         <PaymentOptions>
-          <PayWay>신용카드</PayWay>
-          <PayWay>체크카드</PayWay>
-          <PayWay>휴대폰 결제</PayWay>
+          <PayWay disabled>신용카드</PayWay>
+          <PayWay disabled>체크카드</PayWay>
+          <PayWay disabled>휴대폰 결제</PayWay>
           <PayWay>카카오페이</PayWay>
         </PaymentOptions>
 
