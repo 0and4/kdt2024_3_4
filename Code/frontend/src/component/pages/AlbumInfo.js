@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { BackBtn } from "../ui/Buttons";
 import SongList from "../ui/SongList";
 import { RiArrowGoBackFill } from "react-icons/ri";
-import { FaChevronRight } from "react-icons/fa"; // 아이콘 추가
+import { FaChevronRight } from "react-icons/fa";
 import { Wrapper, Container, BackWrapper, InfoDiv } from "../ui/AllDiv";
 import RecMenuDiv from "../ui/MenuDiv";
 
@@ -82,6 +82,39 @@ function AlbumInfo() {
     if (albumId) fetchAlbumInfo();
   }, [albumId]);
 
+  const fetchArtistId = async (artistName) => {
+    try {
+      const encodedArtistName = encodeURIComponent(artistName);
+      const response = await fetch(
+        `http://localhost:8080/search/?keyword=ARTIST&value=${encodedArtistName}`
+      );
+  
+      if (!response.ok) {
+        throw new Error(`서버 응답 실패: ${response.status}`);
+      }
+  
+      const data = await response.json();
+  
+      if (!data?.dataList || data.dataList.length === 0) {
+        throw new Error(`"${artistName}" 아티스트를 찾을 수 없습니다.`);
+      }
+  
+      return data.dataList[0].id; // 첫 번째 검색 결과의 ID 반환
+    } catch (error) {
+      console.error("아티스트 ID를 가져오는 중 오류 발생:", error);
+      return null;
+    }
+  };  
+
+  const handleArtistClick = (e, artistId) => {
+    e.preventDefault();
+    if (artistId) {
+      navigate(`/artist/${artistId}`);
+    } else {
+      alert("아티스트 정보를 찾을 수 없습니다.");
+    }
+  };  
+
   const handleBackClick = () => {
     navigate(-1);
   };
@@ -117,12 +150,13 @@ function AlbumInfo() {
             <div>
               <TitleP>{albumData?.name || "앨범 정보 없음"}</TitleP>
               <p>
-                <Link
-                  to={`/artist/${artistName}`}
+                <a
+                  href={`/artist/${albumData?.artist?.id}`}
                   style={{ textDecoration: "none", color: "black" }}
+                  onClick={(e) => handleArtistClick(e, albumData.artist)}
                 >
                   {albumData?.artist || "아티스트 정보 없음"} <FaChevronRight />
-                </Link>
+                </a>
               </p>
             </div>
           </InfoDiv>

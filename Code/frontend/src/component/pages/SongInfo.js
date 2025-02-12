@@ -57,7 +57,6 @@ function SongInfo() {
         if (!response.ok) throw new Error("데이터 불러오기 실패");
 
         const data = await response.json();
-        console.log("API 응답 데이터:", data);
         setSongData(data);
       } catch (error) {
         console.error("노래 정보를 불러오는 중 오류 발생:", error);
@@ -68,6 +67,34 @@ function SongInfo() {
 
     fetchSongInfo();
   }, [songId]);
+
+  const fetchAlbumId = async (albumName) => {
+    try {
+      const response = await fetch(`http://localhost:8080/search/?keyword=ALBUM&value=${encodeURIComponent(albumName)}`);
+      if (!response.ok) {
+        throw new Error(`서버 응답 실패: ${response.status}`);
+      }
+      const data = await response.json();
+      
+      if (data.dataList && data.dataList.length > 0) {
+        return data.dataList[0].id;
+      } else {
+        throw new Error("앨범을 찾을 수 없습니다.");
+      }
+    } catch (error) {
+      console.error("앨범 ID를 가져오는 중 에러가 발생했습니다:", error);
+      return null;
+    }
+  };
+
+  const handleAlbumClick = async (e, albumName) => {
+    e.preventDefault();
+
+    const albumId = await fetchAlbumId(albumName);
+    if (albumId) {
+      navigate(`/album/${albumId}`);
+    }
+  };
 
   if (loading) {
     return <p>로딩 중...</p>;
@@ -101,14 +128,13 @@ function SongInfo() {
           <ControlDiv>
             <div>
               <TitleP>
-                <Link
-                  to={`/album?album=${encodeURIComponent(
-                    albumName
-                  )}&artist=${encodeURIComponent(artistName)}`}
+                <a
+                  href={`/album/${albumName}`}
                   style={{ textDecoration: "none", color: "black" }}
+                  onClick={(e) => handleAlbumClick(e, albumName)}
                 >
                   {albumName} <FaChevronRight />
-                </Link>
+                </a>
               </TitleP>
               <p>{songTitle}</p>
               <p>
