@@ -94,7 +94,7 @@ const formatPlayTime = (playTime) => {
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 };
 
-function ArtistInfo() {
+function ArtistInfo({ onPlay }) {
   const scrollPosition = useRef(0);
   const { artistName } = useParams();
   const navigate = useNavigate();
@@ -262,7 +262,7 @@ function ArtistInfo() {
             </button>
           </ResultDiv>
           <RecMenuDiv />
-          <SongList showAll={true} headerTitle="번호" songs={songs.slice(0, showAllSongs ? songs.length : 5)} />
+          <SongList showAll={true} headerTitle="번호" songs={songs.slice(0, showAllSongs ? songs.length : 5)} onPlay={onPlay} />
         </Section>
         {/* 발매 앨범 섹션 */}
         <Section>

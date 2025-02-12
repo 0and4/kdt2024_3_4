@@ -20,7 +20,7 @@ const TitleP = styled.p`
   font-weight: bold;
 `;
 
-function AlbumInfo() {
+function AlbumInfo({ onPlay }) {
   const navigate = useNavigate();
   const { albumId } = useParams();
   const location = useLocation();
@@ -127,6 +127,16 @@ function AlbumInfo() {
         <br />{error}
       </p>
     );
+  
+  const handlePlaySong = (song) => {
+    if (!onPlay) {
+      console.error("🚨 onPlay 함수가 정의되지 않았음");
+      return;
+    }
+
+    console.log("🎵 재생할 곡 정보:", song);
+    onPlay(song);  // ✅ 부모 컴포넌트(App.js)로 곡 정보 전달
+  };
 
   return (
     <Wrapper>
@@ -176,6 +186,7 @@ function AlbumInfo() {
                 : [...prev, songRank]
             )
           }
+          onPlay={handlePlaySong}
         />
       </Container>
     </Wrapper>

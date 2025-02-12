@@ -113,12 +113,12 @@ function App() {
               <Route path="/find-pw" element={<FindPW />} />
               <Route path="/signup" element={<Join />} />
               <Route path="/login-id" element={<Login />} />
-              <Route path="/song/:songId" element={<SongInfo />} />
-              <Route path="/artist/:artistName" element={<ArtistInfo />} />
+              <Route path="/song/:songId" element={<SongInfo onPlay={handlePlaySong} />} />
+              <Route path="/artist/:artistName" element={<ArtistInfo onPlay={handlePlaySong} />} />
               <Route path="/pr" element={<PR />} />
-              <Route path="/album/:albumId" element={<AlbumInfo />} />
-              <Route path="/album/:albumName" element={<AlbumInfo />} />
-              <Route path="/mypage" element={<MyPage />} />
+              <Route path="/album/:albumId" element={<AlbumInfo onPlay={handlePlaySong} />} />
+              <Route path="/album/:albumName" element={<AlbumInfo onPlay={handlePlaySong} />} />
+              <Route path="/mypage" element={<MyPage onPlay={handlePlaySong} />} />
               <Route path="/my-playlist/:id" element={<MyPlaylistInfo onPlay={handlePlaySong} />} />
             </Routes>
           </Container>
