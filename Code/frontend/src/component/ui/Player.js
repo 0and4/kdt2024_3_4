@@ -497,13 +497,20 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
               e.stopPropagation();
             }}
           >
-            <CompactAlbumJacket />
+            <CompactAlbumJacket>
+              <img
+                  src={currentSong.image}
+                  alt={currentSong.track}
+                  width="100%"
+                  height="100%"
+                />
+            </CompactAlbumJacket>
             <CompactSongInfo>
-              <SongTitleP>Song Title</SongTitleP>
-              <ArtistP>artist name</ArtistP>
+              <SongTitleP>{currentSong ? currentSong.track : "No Song"}</SongTitleP>
+              <ArtistP>{currentSong ? currentSong.artist : "No Artist"}</ArtistP>
             </CompactSongInfo>
             <CompactPlayDiv>
-              <PlaySettingBtn>
+              <PlaySettingBtn onClick={playPrev}>
                 <CgPlayTrackPrevO />
               </PlaySettingBtn>
               <PlaySettingBtn
@@ -514,7 +521,7 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
               >
                 {isPlaying ? <FaRegPauseCircle /> : <FaRegPlayCircle />}
               </PlaySettingBtn>
-              <PlaySettingBtn>
+              <PlaySettingBtn onClick={playNext}>
                 <CgPlayTrackNextO />
               </PlaySettingBtn>
             </CompactPlayDiv>
