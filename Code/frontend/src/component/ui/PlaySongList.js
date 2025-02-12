@@ -127,7 +127,7 @@ const PlayButton = styled.button`
   border-radius: 3px;
   cursor: pointer;
 `;
-function PlaySongList({ playlist, setCurrentSong, setCurrentIndex }) {
+function PlaySongList({ playlist, setCurrentSong, setCurrentIndex, onPlay }) {
   const [activeTab, setActiveTab] = useState("playlist");
   const [mylistData, setMylistData] = useState([]);
 
@@ -195,6 +195,40 @@ function PlaySongList({ playlist, setCurrentSong, setCurrentIndex }) {
     }
   };
 
+  // ✅ 플레이리스트의 모든 곡 정보를 가져와 `onPlay`로 전달하는 함수
+  const handlePlayPlaylist = async (playlistId) => {
+    try {
+      const token = sessionStorage.getItem("access_token");
+      const response = await fetch(`http://localhost:8080/playList/normal/my-detail?id=${playlistId}&size=100`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("플레이리스트 곡 목록 불러오기 실패");
+
+      const data = await response.json();
+      const songs = data.dataList || [];
+
+      if (songs.length === 0) {
+        alert("이 플레이리스트에는 곡이 없습니다.");
+        return;
+      }
+
+      console.log(`🎵 플레이리스트 ID ${playlistId}의 곡 목록:`, songs);
+
+      // 첫 번째 곡을 현재 재생 곡으로 설정
+      setCurrentSong(songs[0]);
+      setCurrentIndex(0);
+
+      // `Player.js`로 전체 플레이리스트 전송
+      onPlay(songs);
+    } catch (error) {
+      console.error(`🚨 플레이리스트 ID ${playlistId}의 곡 불러오기 실패:`, error);
+      alert("플레이리스트 곡을 불러오는 중 오류가 발생했습니다.");
+    }
+  };
+
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
@@ -252,7 +286,7 @@ function PlaySongList({ playlist, setCurrentSong, setCurrentIndex }) {
                 <PlaylistInfo>
                   <PlaylistTitle>{playlist.name}</PlaylistTitle>
                 </PlaylistInfo>
-                <PlayButton>
+                <PlayButton onClick={() => handlePlayPlaylist(playlist.id)}>
                   <FaPlay />
                 </PlayButton>
               </PlaylistItem>

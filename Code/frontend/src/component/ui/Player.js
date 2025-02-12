@@ -414,6 +414,13 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
     setIsDragging(false);
     audioRef.current.currentTime = currentTime / 1000;
   };
+
+  // ✅ 플레이리스트 전체 곡을 추가하는 함수
+  const handlePlaySongs = (songs) => {
+    setPlaylist(songs); // 전체 플레이리스트 교체
+    setCurrentSong(songs[0]); // 첫 번째 곡 재생
+    setCurrentIndex(0);
+  };
   return (
     <>
       {isExpanded && (
@@ -484,6 +491,7 @@ function Player({ playlist: propPlaylist, setPlaylist }) {
               setCurrentSong={setCurrentSong}
               setCurrentIndex={setCurrentIndex}
               setPlaylist={setPlaylist}
+              onPlay={handlePlaySongs}
             />
           </Container>
         </Wrapper>
