@@ -100,7 +100,7 @@ const NoResultsText = styled.p`
   margin-top: 10px;
 `;
 
-function Search() {
+function Search({ onPlay }) {
   const scrollPosition = useRef(0);
   const location = useLocation();
   const query = new URLSearchParams(location.search).get("query") || "";
@@ -231,6 +231,7 @@ function Search() {
                   number: index + 1,
                   playTimeFormatted: formatPlayTime(song.playTime),
                 }))}
+                onPlay={onPlay}
               />
             ) : (
               <NoResultsText>검색결과가 없습니다</NoResultsText>

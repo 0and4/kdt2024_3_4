@@ -107,7 +107,7 @@ function App() {
             <Header activeMenu={activeMenu} onMenuClick={onMenuClick} />
             <Routes>
               <Route path="*" element={<Main activeMenu={activeMenu} onPlay={handlePlaySong} />} />
-              <Route path="/search" element={<Search />} />
+              <Route path="/search" element={<Search onPlay={handlePlaySong} />} />
               <Route path="/login" element={<LoginMenu />} />
               <Route path="/find-id" element={<FindId />} />
               <Route path="/find-pw" element={<FindPW />} />
