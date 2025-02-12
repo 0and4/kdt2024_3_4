@@ -199,6 +199,16 @@ function Header({ activeMenu, onMenuClick }) {
     navigate("/mypage");
   };
 
+  const handleRecommendClick = () => {
+    const token = sessionStorage.getItem("access_token");
+    if (!token) {
+      alert("로그인 후 이용할 수 있습니다.");
+      navigate("/login");
+      return;
+    }
+    onMenuClick("recommend");
+  };
+
   return (
     <Wrapper>
       <Container>
@@ -235,7 +245,7 @@ function Header({ activeMenu, onMenuClick }) {
             </button>
             <button
               className={activeMenu === "recommend" ? "active" : ""}
-              onClick={() => onMenuClick("recommend")}
+              onClick={handleRecommendClick}
             >
               추천
             </button>
