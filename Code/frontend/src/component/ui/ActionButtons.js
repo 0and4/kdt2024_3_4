@@ -129,33 +129,6 @@ function ActionButtons({ songId, song, type, onPlay }) {
 
       if (!addResponse.ok) throw new Error("노래를 찜하는 데 실패했습니다.");
 
-      // setLikedSongs((prevLikedSongs) => {
-      //   // prevLikedSongs가 배열인지 확인하고, 배열이 아니면 빈 배열로 처리
-      //   const currentLikedSongs = Array.isArray(prevLikedSongs) ? prevLikedSongs : [];
-      //   if (currentLikedSongs.some((likedSong) => likedSong.id === songId)) {
-      //     return currentLikedSongs;
-      //   }
-      //   return [...currentLikedSongs, song];
-      // });
-
-      //2nd 수정
-      // setLikedSongs((prevLikedSongs) => {
-      //   const currentLikedSongs = Array.isArray(prevLikedSongs) ? prevLikedSongs.filter(Boolean) : [];
-        
-      //   if (currentLikedSongs.some((likedSong) => likedSong?.id === songId)) {
-      //     return currentLikedSongs;
-      //   }
-        
-      //   return song ? [...currentLikedSongs, song] : currentLikedSongs;
-      // });
-
-      // console.log("🔍 likedSongs:", likedSongs);
-      // console.log("🔍 songId:", songId);
-
-      // //onToggleLike(songId);
-      // setShowLikePopup(true);
-      // setTimeout(() => setShowLikePopup(false), 2000);
-
       // ✅ 상태 업데이트 및 `localStorage` 반영
       setLikedSongs((prevLikedSongs) => {
         const updatedLikedSongs = [...prevLikedSongs, { ...song, id: songId }];

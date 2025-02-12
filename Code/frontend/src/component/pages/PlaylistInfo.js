@@ -163,7 +163,6 @@ function PlaylistInfo({ onPlay }) {
               </InfoDiv>
             </ControlDiv>
             <SongList showAll={50} headerTitle="번호" songs={playlist.songs} onPlay={onPlay} />
-            {/* <SongList showAll={true} headerTitle="번호" songs={playlist.songs} /> */}
           </>
         )}
       </Container>

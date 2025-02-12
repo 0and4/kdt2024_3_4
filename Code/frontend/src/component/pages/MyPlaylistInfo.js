@@ -10,6 +10,7 @@ import {
   BackWrapper as plBackWrapper,
 } from "../ui/AllDiv";
 import RecMenuDiv from "../ui/MenuDiv";
+import { useLikedSongs } from "../LikedSongsContext";
 
 const BackWrapper = styled(plBackWrapper)`
   right: 10;
@@ -54,6 +55,7 @@ function MyPlaylistInfo({ onPlay }) {
   const [playlist, setPlaylist] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { setLikedSongs } = useLikedSongs();
 
   useEffect(() => {
     async function fetchPlaylist() {
@@ -73,6 +75,19 @@ function MyPlaylistInfo({ onPlay }) {
           songs: data.dataList, // 노래 목록은 응답에서 받은 `dataList`로 설정
         };
         setPlaylist(playlistData);
+
+        // ✅ likedSongs 업데이트 (ID 기준으로 병합)
+        setLikedSongs((prevLikedSongs) => {
+          const updatedLikedSongs = [
+            ...new Map(
+              [...prevLikedSongs, ...playlistData.songs.map(song => ({ ...song, liked: true }))]
+              .map(song => [song.id, song])
+            ).values()
+          ];
+          localStorage.setItem("likedSongs", JSON.stringify(updatedLikedSongs));
+          return updatedLikedSongs;
+        });
+
       } catch (error) {
         setError(error.message);
       } finally {
@@ -80,7 +95,7 @@ function MyPlaylistInfo({ onPlay }) {
       }
     }
     fetchPlaylist();
-  }, [id, state]);
+  }, [id, state, setLikedSongs]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
