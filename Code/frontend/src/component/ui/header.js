@@ -188,6 +188,17 @@ function Header({ activeMenu, onMenuClick }) {
     }
   };
 
+  const handleMyPageClick = () => {
+    const token = sessionStorage.getItem("access_token");
+    if (!token) {
+      alert("로그인 후 이용할 수 있습니다.");
+      navigate("/login");
+      return;
+    }
+    onMenuClick("mypage");
+    navigate("/mypage");
+  };
+
   return (
     <Wrapper>
       <Container>
@@ -232,10 +243,7 @@ function Header({ activeMenu, onMenuClick }) {
           <MyMenuDiv>
             <button
               className={activeMenu === "mypage" ? "active" : ""}
-              onClick={() => {
-                onMenuClick("mypage");
-                navigate("/mypage");
-              }}
+              onClick={handleMyPageClick}
             >
               마이페이지
             </button>
