@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { FaPlay } from "react-icons/fa";
 
@@ -129,11 +129,45 @@ const PlayButton = styled.button`
 `;
 function PlaySongList({ playlist, setCurrentSong, setCurrentIndex }) {
   const [activeTab, setActiveTab] = useState("playlist");
-  const mylistData = [
-    { title: "플레이리스트 1" },
-    { title: "플레이리스트 2" },
-    { title: "플레이리스트 3" },
-  ];
+  const [mylistData, setMylistData] = useState([]);
+
+  useEffect(() => {
+    const fetchPlaylists = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/playList/normal/my-thumb", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
+          },
+        });
+
+        if (!response.ok) throw new Error(`플레이리스트 불러오기 실패: ${response.status}`);
+
+        const data = await response.json();
+        console.log("API 응답 데이터:", data);
+        const fetchedPlaylists = data.dataList || [];
+
+        // 로컬스토리지에서 추가된 추천 플레이리스트 가져오기
+        const storedPlaylists = JSON.parse(localStorage.getItem("myPlaylists") || "[]");
+        const storedIds = storedPlaylists.map(pl => pl.id);
+
+        // 중복되지 않도록 병합
+        const combinedPlaylists = [...fetchedPlaylists, ...storedPlaylists].filter(
+          (v, i, a) => a.findIndex((t) => t.id === v.id) === i
+        );
+
+        setMylistData(combinedPlaylists.map(pl => ({
+          ...pl,
+          isStored: storedIds.includes(pl.id)
+        })));
+      } catch (error) {
+        console.error("플레이리스트 요청 실패:", error);
+      }
+    };
+
+    fetchPlaylists();
+  }, []);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -188,7 +222,7 @@ function PlaySongList({ playlist, setCurrentSong, setCurrentIndex }) {
               <PlaylistItem key={index}>
                 <PlaylistCover />
                 <PlaylistInfo>
-                  <PlaylistTitle>{playlist.title}</PlaylistTitle>
+                  <PlaylistTitle>{playlist.name}</PlaylistTitle>
                 </PlaylistInfo>
                 <PlayButton>
                   <FaPlay />
