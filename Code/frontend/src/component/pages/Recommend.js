@@ -165,6 +165,14 @@ function Recommend() {
     }
     fetchPlaylists();
   }, [page]);
+
+  // ✅ 플레이리스트가 비어있을 경우 PR.js 창을 자동으로 실행하는 useEffect
+  useEffect(() => {
+    if (playlists.length === 0 && !loading) {
+      window.location.href = "/pr";
+    }
+  }, [playlists, loading]);
+
   
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
