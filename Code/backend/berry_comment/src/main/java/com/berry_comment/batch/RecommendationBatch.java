@@ -82,5 +82,6 @@ public class RecommendationBatch {
                 .methodName("save")
                 .build();
     }
+    
 }
 
