@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   LiaHeart,
@@ -69,7 +69,16 @@ function ActionButtons({ songId, song, type, onPlay }) {
   const [showLikePopup, setShowLikePopup] = useState(false);
   const [popupPosition, setPopupPosition] = useState(null);
 
-  const liked = Array.isArray(likedSongs) && likedSongs.some((likedSong) => likedSong?.id === songId);
+  // const liked = Array.isArray(likedSongs) && likedSongs.some((likedSong) => likedSong?.id === songId);
+
+  // const liked = Array.isArray(likedSongs) && likedSongs.filter(Boolean).some((likedSong) => likedSong?.id === songId);
+
+  const [liked, setLiked] = useState(false);
+
+  // ✅ `likedSongs`가 업데이트될 때 `liked` 상태 반영
+  useEffect(() => {
+    setLiked(likedSongs.some((likedSong) => likedSong.id === songId));
+  }, [likedSongs, songId]);
 
   const toggleLike = async () => {
     const token = sessionStorage.getItem("access_token");
@@ -80,6 +89,12 @@ function ActionButtons({ songId, song, type, onPlay }) {
     }
 
     try {
+
+      if (liked) {
+        alert("이미 좋아요한 곡입니다!");
+        return;
+      }
+
       const response = await fetch("http://localhost:8080/playList/normal/my-thumb", {
         method: "GET",
         headers: {
@@ -114,17 +129,44 @@ function ActionButtons({ songId, song, type, onPlay }) {
 
       if (!addResponse.ok) throw new Error("노래를 찜하는 데 실패했습니다.");
 
+      // setLikedSongs((prevLikedSongs) => {
+      //   // prevLikedSongs가 배열인지 확인하고, 배열이 아니면 빈 배열로 처리
+      //   const currentLikedSongs = Array.isArray(prevLikedSongs) ? prevLikedSongs : [];
+      //   if (currentLikedSongs.some((likedSong) => likedSong.id === songId)) {
+      //     return currentLikedSongs;
+      //   }
+      //   return [...currentLikedSongs, song];
+      // });
+
+      //2nd 수정
+      // setLikedSongs((prevLikedSongs) => {
+      //   const currentLikedSongs = Array.isArray(prevLikedSongs) ? prevLikedSongs.filter(Boolean) : [];
+        
+      //   if (currentLikedSongs.some((likedSong) => likedSong?.id === songId)) {
+      //     return currentLikedSongs;
+      //   }
+        
+      //   return song ? [...currentLikedSongs, song] : currentLikedSongs;
+      // });
+
+      // console.log("🔍 likedSongs:", likedSongs);
+      // console.log("🔍 songId:", songId);
+
+      // //onToggleLike(songId);
+      // setShowLikePopup(true);
+      // setTimeout(() => setShowLikePopup(false), 2000);
+
+      // ✅ 상태 업데이트 및 `localStorage` 반영
       setLikedSongs((prevLikedSongs) => {
-        // prevLikedSongs가 배열인지 확인하고, 배열이 아니면 빈 배열로 처리
-        const currentLikedSongs = Array.isArray(prevLikedSongs) ? prevLikedSongs : [];
-        if (currentLikedSongs.some((likedSong) => likedSong.id === songId)) {
-          return currentLikedSongs;
-        }
-        return [...currentLikedSongs, song];
+        const updatedLikedSongs = [...prevLikedSongs, { ...song, id: songId }];
+        localStorage.setItem("likedSongs", JSON.stringify(updatedLikedSongs));
+        return updatedLikedSongs;
       });
-      //onToggleLike(songId);
+
+      setLiked(true);
       setShowLikePopup(true);
       setTimeout(() => setShowLikePopup(false), 2000);
+      
     } catch (error) {
       console.error("🚨 오류 발생:", error);
       alert(error.message);
