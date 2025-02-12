@@ -119,4 +119,5 @@ public class PlayListController {
         ListInfoDto listInfoDto = playListService.getPlayList(id, userId, pageable);
         return ResponseEntity.ok(listInfoDto);
     }
+    
 }
