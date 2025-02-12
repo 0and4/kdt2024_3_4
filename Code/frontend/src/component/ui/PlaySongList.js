@@ -157,10 +157,15 @@ function PlaySongList({ playlist, setCurrentSong, setCurrentIndex }) {
           (v, i, a) => a.findIndex((t) => t.id === v.id) === i
         );
 
-        setMylistData(combinedPlaylists.map(pl => ({
-          ...pl,
-          isStored: storedIds.includes(pl.id)
-        })));
+        // 개별 플레이리스트의 첫 번째 곡 이미지를 가져오기
+        const playlistsWithImages = await Promise.all(
+          combinedPlaylists.map(async (pl) => {
+            const firstSongImage = await fetchPlaylistImage(pl.id);
+            return { ...pl, image: firstSongImage };
+          })
+        );
+
+        setMylistData(playlistsWithImages);
       } catch (error) {
         console.error("플레이리스트 요청 실패:", error);
       }
@@ -168,6 +173,27 @@ function PlaySongList({ playlist, setCurrentSong, setCurrentIndex }) {
 
     fetchPlaylists();
   }, []);
+
+  // 개별 플레이리스트의 첫 번째 곡 이미지 가져오기
+  const fetchPlaylistImage = async (playlistId) => {
+    try {
+      const token = sessionStorage.getItem("access_token");
+      const response = await fetch(`http://localhost:8080/playList/normal/my-detail?id=${playlistId}&size=1`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("첫 번째 곡 이미지 가져오기 실패");
+
+      const data = await response.json();
+      console.log("image 응답 데이터:", data);
+      return data.dataList?.[0]?.image || "/default-thumbnail.jpg"; // 첫 번째 곡의 이미지 반환, 없으면 기본 이미지
+    } catch (error) {
+      console.error(`플레이리스트 ID ${playlistId}의 첫 번째 곡 이미지 가져오기 실패:`, error);
+      return "/default-thumbnail.jpg"; // 에러 발생 시 기본 이미지 반환
+    }
+  };
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -220,7 +246,9 @@ function PlaySongList({ playlist, setCurrentSong, setCurrentIndex }) {
           <ul>
             {mylistData.map((playlist, index) => (
               <PlaylistItem key={index}>
-                <PlaylistCover />
+                <PlaylistCover>
+                  <img src={playlist.image} alt={playlist.name} width="100%" />
+                </PlaylistCover>
                 <PlaylistInfo>
                   <PlaylistTitle>{playlist.name}</PlaylistTitle>
                 </PlaylistInfo>
