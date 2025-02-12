@@ -9,8 +9,12 @@ const Container = styled.div``;
 const TodayP = styled.p`
   font-size: 1.5rem;
   margin-bottom: 0;
-  span {
+  display:block;
+  #current_date {
     font-weight: bold;
+  }
+  #current_time{
+    font-size: medium;
   }
 `;
 // 임의의 노래 목록
@@ -24,26 +28,34 @@ const initialSongs = [
   }
 ];
 function TodayChart({ onPlay }) {
-  //날짜 동적 표시
   const getCurrentDate = () => {
     const date = new Date();
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0"); // 24시간제 시간
-    const minutes = String(date.getMinutes()).padStart(2, "0"); // 분 추가
-    const seconds = String(date.getSeconds()).padStart(2, "0"); // 초 추가
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+    return {
+      fullDateTime: `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`,
+      onlyDate: `${year}.${month}.${day}`,
+      onlyTime: `${parseInt(hours)}시`,
+    };
   };
 
   // 현재 시간 표시를 위한 상태
-  const [currentDateTime, setCurrentDateTime] = useState(getCurrentDate());
+  const [currentDateTime, setCurrentDateTime] = useState(getCurrentDate().fullDateTime);
+  const [currentDate, setCurrentDate] = useState(getCurrentDate().onlyDate);
+  const [currentTime, setCurrentTime] = useState(getCurrentDate().onlyTime);
   const [songs, setSongs] = useState(initialSongs);
 
   useEffect(() => {
     // 1초마다 시간을 갱신
     const interval = setInterval(() => {
-      setCurrentDateTime(getCurrentDate());
+      const { fullDateTime, onlyDate, onlyTime } = getCurrentDate();
+      setCurrentDateTime(fullDateTime);
+      setCurrentDate(onlyDate);
+      setCurrentTime(onlyTime);
     }, 1000);
 
     // 정시마다 5분 뒤에 페이지 새로 고침
@@ -60,7 +72,7 @@ function TodayChart({ onPlay }) {
     }, 1000); // 1초마다 체크
 
     const fetchSongs = async () => {
-      const currentDate = getCurrentDate(); // 현재 시간 가져오기
+      const currentDate = getCurrentDate().fullDateTime; // 현재 시간 가져오기
       try {
         const response = await fetch(`http://localhost:8080/search/chart?dateTime=${encodeURIComponent(currentDate)}`, {
           method: 'GET', // GET 요청에서는 body 사용 불가
@@ -74,15 +86,11 @@ function TodayChart({ onPlay }) {
         }
     
         const data = await response.json();
-        
-        setSongs(data.song); // 서버에서 받은 songs 배열로 업데이트
-        console.log(JSON.stringify(data, null, 2));
-        console.log(data);
+        setSongs(data.song);
       } catch (error) {
         console.error('Error fetching songs:', error);
       }
     };
-    
     fetchSongs(); // 컴포넌트가 처음 렌더링될 때 서버로 요청
 
     // 클린업: 컴포넌트가 언마운트되면 인터벌 정리
@@ -96,7 +104,9 @@ function TodayChart({ onPlay }) {
     <Wrapper>
       <Container>
         <TodayP>
-          <span id="current_date">{currentDateTime}시 기준</span> TOP 100
+          <span id="current_date">{currentDate}</span> TOP 100
+          <br></br>
+          <span id="current_time">- {currentTime} -</span>
         </TodayP>
         <RecMenuDiv />
       </Container>
