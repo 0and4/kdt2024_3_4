@@ -81,7 +81,9 @@ public class SearchController {
     @GetMapping("/detail")
     public ResponseEntity<?> getDetail(
             @RequestParam(name = "keyword") SearchType keyword,
-            @RequestParam(name = "id") int id
+            @RequestParam(name = "id") int id,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "50") int size
     ){
         switch (keyword){
             case SONG:
@@ -92,8 +94,8 @@ public class SearchController {
                 return ResponseEntity.ok(albumDetailDto);
             case ARTIST:
                 ArtistDto artistDto = artistService.getArtistById(id);
-                Pageable pageableOfSong = PageRequest.of(0,5);
-                Pageable pageableOfAlbum = PageRequest.of(0,4);
+                Pageable pageableOfSong = PageRequest.of(page, size);
+                Pageable pageableOfAlbum = PageRequest.of(page, size);
                 List<SongDto> songDtoList = artistService.getArtistDetailById(id, pageableOfSong);
                 List<AlbumDto> albumDtoList = albumService.getAlbumByArtistId(id, pageableOfAlbum);
                 ListInfoDto songListInfoDto = ListInfoDto.builder()
