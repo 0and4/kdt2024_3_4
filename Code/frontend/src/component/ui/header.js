@@ -180,6 +180,7 @@ function Header({ activeMenu, onMenuClick }) {
       sessionStorage.removeItem("access_token");
       sessionStorage.removeItem("refresh_token");
       sessionStorage.removeItem("name");
+      localStorage.removeItem("myPlaylists");
       localStorage.removeItem("likedSongs"); // ✅ 좋아요 목록 삭제
       setIsLoggedIn(false); // 로그인 상태 변경
       alert("로그아웃 되었습니다."); // 로그아웃 완료 알림
